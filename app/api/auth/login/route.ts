@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ message: 'Invalid password' }, { status: 401 });
       }
 
-      // ✅ BUILD email based on auth method
+    
       const userEmail = user.authMethod === 'email' 
         ? user.identifier 
         : `${user.identifier}@${university}.edu`;
