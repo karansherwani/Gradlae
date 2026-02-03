@@ -1,0 +1,3348 @@
+{
+  "metadata": {
+    "source": "Eller College of Management, University of Arizona",
+    "url": "https://eller.arizona.edu/programs/undergraduate/advising/sample-plans",
+    "scraped_date": "2026-02-02 17:39:35"
+  },
+  "programs": [
+    {
+      "program_name": "Foundational Business Management Three-Semester Plan (for students placing into Calculus and transfer credits)",
+      "years": [
+        {
+          "year_name": "First Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "ENGL 101* First Year Composition",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 111* Computers and Internetworked Society",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 112* Computers and Internetworked Society Lab",
+                  "units": "1"
+                },
+                {
+                  "name": "MATH 116* Calculus Concepts for Business Majors",
+                  "units": "3"
+                },
+                {
+                  "name": "UNIV 101 Introduction to the General Education Experience",
+                  "units": "1"
+                },
+                {
+                  "name": "1-2 General Education courses",
+                  "units": "3-6"
+                }
+              ],
+              "total_units": "14-17"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ENGL 102* First Year Composition",
+                  "units": "3"
+                },
+                {
+                  "name": "BNAN 276* Statistical Inference in Management",
+                  "units": "3"
+                },
+                {
+                  "name": "ACCT 200* Introduction to Financial Accounting",
+                  "units": "3"
+                },
+                {
+                  "name": "ECON 200* Basic Economic Issues",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education Course or Second Language",
+                  "units": "3-4"
+                },
+                {
+                  "name": "BNAD 100 Language and Context of Business",
+                  "units": "1"
+                },
+                {
+                  "name": "BNAD 200 Career Management in Business",
+                  "units": "1"
+                }
+              ],
+              "total_units": "17-18"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Sophomore Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "ACCT 210* Introduction to Managerial Accounting",
+                  "units": "3"
+                },
+                {
+                  "name": "BNAN 277* Analytical Methods for Business",
+                  "units": "4"
+                },
+                {
+                  "name": "BCOM 214* Fundamentals of Business Communication",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education course, Second Language, or Ethics**",
+                  "units": "3-4"
+                },
+                {
+                  "name": "UNIV 301 General Education Portfolio",
+                  "units": "1"
+                }
+              ],
+              "total_units": "16-17"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "program_name": "Foundational Business Management Four-Semester Plan (for students placing into College Algebra)",
+      "years": [
+        {
+          "year_name": "First Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "ENGL 101* First Year Composition",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 111* Computers and Internetworked Society",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 112* Computers and Internetworked Society Lab",
+                  "units": "1"
+                },
+                {
+                  "name": "MATH 112 College Algebra Concepts and Applications (requires C or better)",
+                  "units": "3"
+                },
+                {
+                  "name": "UNIV 101 Introduction to the General Education Experience",
+                  "units": "1"
+                },
+                {
+                  "name": "1-2 General Education courses",
+                  "units": "3-6"
+                }
+              ],
+              "total_units": "14-17"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ENGL 102* First Year Composition",
+                  "units": "3"
+                },
+                {
+                  "name": "MATH 116* Calculus Concepts for Business Majors",
+                  "units": "3"
+                },
+                {
+                  "name": "1-2 General Education courses",
+                  "units": "3-6"
+                },
+                {
+                  "name": "Second Language",
+                  "units": "4"
+                },
+                {
+                  "name": "BNAD 100 Language and Context of Business",
+                  "units": "1"
+                }
+              ],
+              "total_units": "14-17"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Sophomore Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "BNAN 276* Statistical Inference in Management",
+                  "units": "3"
+                },
+                {
+                  "name": "ACCT 200* Introduction to Financial Accounting",
+                  "units": "3"
+                },
+                {
+                  "name": "ECON 200* Basic Economic Issues",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education or Second Language",
+                  "units": "3-4"
+                },
+                {
+                  "name": "BNAD 200 Career Management in Business",
+                  "units": "1"
+                }
+              ],
+              "total_units": "16-17"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ACCT 210* Introduction to Managerial Accounting",
+                  "units": "3"
+                },
+                {
+                  "name": "BNAN 277* Analytical Methods for Business",
+                  "units": "4"
+                },
+                {
+                  "name": "BCOM 214* Fundamentals of Business Communication",
+                  "units": "3"
+                },
+                {
+                  "name": "UNIV 301 General Education Portfolio",
+                  "units": "1"
+                },
+                {
+                  "name": "1-2 General Education courses or Ethics**",
+                  "units": "3-6"
+                }
+              ],
+              "total_units": "14-17"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        }
+      ],
+      "description": "This sample plan is based on 14-17 credits per semester, but each student and their academic plan is unique. Please meet with your Academic Advisor to create a custom plan for you.  Please note that your General Education requirements, including second language, are determined by when you were admitted to the university.  Your Academic Advisor can help you navigate the requirements relevant for you. For a full list of official degree requirements, check out the University General Catalog."
+    },
+    {
+      "program_name": "Foundational Business Management Five-Semester Plan (for students placing below College Algebra)",
+      "years": [
+        {
+          "year_name": "First Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "ENGL 101* First Year Composition\nMATH 100 Preparation for University-level Mathematics\nMIS 111* Computers and Internetworked Society\nMIS 112* Computers and Internetworked Society Lab\nGeneral Education\nUNIV 101 Introduction to the General Education Experience\nA student's performance in MATH 100 will determine future UA MATH courses.",
+                  "units": "3"
+                }
+              ],
+              "total_units": "14"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ENGL 102* First Year Composition",
+                  "units": "3"
+                },
+                {
+                  "name": "MATH 112 College Algebra Concepts and Applications (requires C or better)",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "Second Language",
+                  "units": "4"
+                },
+                {
+                  "name": "BNAD 100 Language and Context of Business",
+                  "units": "1"
+                }
+              ],
+              "total_units": "14"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Sophomore Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "MATH 116* Calculus Concepts for Business Majors",
+                  "units": "3"
+                },
+                {
+                  "name": "ECON 200* Basic Economic Issues",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "Second Language",
+                  "units": "4"
+                },
+                {
+                  "name": "BNAD 200 Career Management in Business",
+                  "units": "1"
+                }
+              ],
+              "total_units": "17"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "BNAN 276* Statistical Inference in Management",
+                  "units": "3"
+                },
+                {
+                  "name": "ACCT 200* Introduction to Financial Accounting",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "Ethics**",
+                  "units": "3"
+                }
+              ],
+              "total_units": "15"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Junior Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "ACCT 210* Introduction to Managerial Accounting",
+                  "units": "3"
+                },
+                {
+                  "name": "BNAN 277* Analytical Methods for Business",
+                  "units": "4"
+                },
+                {
+                  "name": "BCOM 214* Fundamentals of Business Communication",
+                  "units": "3"
+                },
+                {
+                  "name": "UNIV 301 General Education Portfolio",
+                  "units": "1"
+                },
+                {
+                  "name": "General Education and/or Ethics",
+                  "units": "3-6"
+                }
+              ],
+              "total_units": "14-17"
+            }
+          ]
+        }
+      ],
+      "description": "Students who test below College Algebra on the PPL Math Placement exam should be prepared to take multiple prerequisite math courses before starting Foundational Business Management courses.  Students will likely be applying for Professional Admission during the first semester of their Junior year."
+    },
+    {
+      "program_name": "Accounting",
+      "years": [
+        {
+          "year_name": "First Year",
+          "semesters": [
+            {
+              "semester_name": "First Semester",
+              "courses": [
+                {
+                  "name": "ENGL 101* First Year Composition",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 111* Computers and Internetworked Society",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 112* Computers and Internetworked Society Lab",
+                  "units": "1"
+                },
+                {
+                  "name": "MATH 112 College Algebra Concepts and Applications",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education and/or Second Language",
+                  "units": "3-7"
+                },
+                {
+                  "name": "UNIV 101 Introduction to the General Education Experience",
+                  "units": "1"
+                }
+              ],
+              "total_units": "14-18"
+            },
+            {
+              "semester_name": "Second Semester",
+              "courses": [
+                {
+                  "name": "ENGL 102* First Year Composition",
+                  "units": "3"
+                },
+                {
+                  "name": "MATH 116* Calculus Concepts for Business Majors",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education and/or Second Language",
+                  "units": "3-7"
+                },
+                {
+                  "name": "BNAD 100 Language and Context of Business",
+                  "units": "1"
+                }
+              ],
+              "total_units": "13-17"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Sophomore Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "BNAN 276* Statistical Inference in Management",
+                  "units": "3"
+                },
+                {
+                  "name": "ACCT 200* Introduction to Financial Accounting",
+                  "units": "3"
+                },
+                {
+                  "name": "ECON 200* Basic Economic Issues",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "BNAD 200 Career Management in Business",
+                  "units": "1"
+                }
+              ],
+              "total_units": "16"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ACCT 210* Introduction to Managerial Accounting",
+                  "units": "3"
+                },
+                {
+                  "name": "BNAN 277* Analytical Methods for Business",
+                  "units": "4"
+                },
+                {
+                  "name": "BCOM 214* Fundamentals of Business Communication",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education or Ethics**",
+                  "units": "3"
+                },
+                {
+                  "name": "UNIV 301 General Education Portfolio",
+                  "units": "1"
+                }
+              ],
+              "total_units": "17"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Professional Phase",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "MGMT 310A Organization Behavior and Management",
+                  "units": "3"
+                },
+                {
+                  "name": "MKTG 361 Introduction to Marketing",
+                  "units": "3"
+                },
+                {
+                  "name": "BCOM 314R Business Communication",
+                  "units": "3"
+                },
+                {
+                  "name": "ACCT 400A Intermediate Financial Accounting",
+                  "units": "3"
+                },
+                {
+                  "name": "ACCT 310 Cost and Managerial Accounting OR ACCT 430 Information Quality and Assurance (Optional 5th course)",
+                  "units": "3"
+                }
+              ],
+              "total_units": "12-15"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "FIN 360 Quantitative Finance Management",
+                  "units": "3"
+                },
+                {
+                  "name": "FIN 360L Quantitative Financial Management Techniques",
+                  "units": "1"
+                },
+                {
+                  "name": "OSCM 373 Basic Operations Management",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 304 Using and Managing Information Systems",
+                  "units": "3"
+                },
+                {
+                  "name": "ACCT 400B Intermediate Financial Accounting",
+                  "units": "3"
+                },
+                {
+                  "name": "ACCT 461 Accounting Information Systems",
+                  "units": "3"
+                }
+              ],
+              "total_units": "16"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            },
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "MGMT 310A Organization Behavior and Management",
+                  "units": "3"
+                },
+                {
+                  "name": "MKTG 361 Introduction to Marketing",
+                  "units": "3"
+                },
+                {
+                  "name": "BCOM 314R Business Communication",
+                  "units": "3"
+                },
+                {
+                  "name": "ACCT 420 Principles of Federal Taxation",
+                  "units": "3"
+                },
+                {
+                  "name": "ACCT 310 Cost and Managerial Accounting OR ACCT 430 Information Quality and Assurance (Optional 5th course)",
+                  "units": "3"
+                }
+              ],
+              "total_units": "12-15"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "FIN 360 Quantitative Finance Management",
+                  "units": "3"
+                },
+                {
+                  "name": "FIN 360L Quantitative Financial Management Techniques",
+                  "units": "1"
+                },
+                {
+                  "name": "OSCM 373 Basic Operations Management",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 304 Using and Managing Information Systems",
+                  "units": "3"
+                },
+                {
+                  "name": "ACCT 400A Intermediate Financial Accounting",
+                  "units": "3"
+                },
+                {
+                  "name": "ACCT 310 Cost and Managerial Accounting OR ACCT 430 Information Quality and Assurance",
+                  "units": "3"
+                }
+              ],
+              "total_units": "16"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Professional Phase",
+          "semesters": [
+            {
+              "semester_name": "3rd Semester",
+              "courses": [
+                {
+                  "name": "MGMT 402 Integrating Business Fundamentals with Ethics and Law in Management",
+                  "units": "3"
+                },
+                {
+                  "name": "ECON 330 Macroeconomic and Global Institutions and Policy",
+                  "units": "3"
+                },
+                {
+                  "name": "ENTR 485 Innovating: Creating the Future",
+                  "units": "3"
+                },
+                {
+                  "name": "ACCT 420 Principles of Federal Taxation",
+                  "units": "3"
+                },
+                {
+                  "name": "ACCT 310 Cost and Managerial Accounting OR ACCT 430 Information Quality and Assurance",
+                  "units": "3"
+                }
+              ],
+              "total_units": "15"
+            },
+            {
+              "semester_name": "4th Semester",
+              "courses": [
+                {
+                  "name": "ECON 300 Microeconomic Analysis for Business Decisions",
+                  "units": "3"
+                },
+                {
+                  "name": "ACCT 451 Analysis of Financial Statements",
+                  "units": "3"
+                },
+                {
+                  "name": "ACCT 310 Cost and Managerial Accounting OR ACCT 430 Information Quality and Assurance (If not previously taken)",
+                  "units": "3"
+                },
+                {
+                  "name": "Remaining General Education requirements",
+                  "units": "3"
+                },
+                {
+                  "name": "Minor courses or Elective units to reach 120 unit minimum",
+                  "units": "0-3"
+                }
+              ],
+              "total_units": "12-15"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            },
+            {
+              "semester_name": "3rd Semester",
+              "courses": [
+                {
+                  "name": "MGMT 402 Integrating Business Fundamentals with Ethics and Law in Management",
+                  "units": "3"
+                },
+                {
+                  "name": "ECON 330 Macroeconomic and Global Institutions and Policy",
+                  "units": "3"
+                },
+                {
+                  "name": "ENTR 485 Innovating: Creating the Future",
+                  "units": "3"
+                },
+                {
+                  "name": "ACCT 400B Intermediate Financial Accounting",
+                  "units": "3"
+                },
+                {
+                  "name": "ACCT 461 Accounting Information Systems",
+                  "units": "3"
+                }
+              ],
+              "total_units": "15"
+            },
+            {
+              "semester_name": "4th Semester",
+              "courses": [
+                {
+                  "name": "ECON 300 Microeconomic Analysis for Business Decisions",
+                  "units": "3"
+                },
+                {
+                  "name": "ACCT 451 Analysis of Financial Statements",
+                  "units": "3"
+                },
+                {
+                  "name": "ACCT 310 Cost and Managerial Accounting OR ACCT 430 Information Quality and Assurance (If not previously taken)",
+                  "units": "3"
+                },
+                {
+                  "name": "Remaining General Education requirements",
+                  "units": "3"
+                },
+                {
+                  "name": "Minor courses or Elective units to reach 120 unit minimum",
+                  "units": "0-3"
+                }
+              ],
+              "total_units": "12-15"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        }
+      ],
+      "description": "This sample plan is based on 14-17 credits per semester, but each student and their academic plan is unique. Please meet with your Academic Advisor to create a custom plan for you.  Please note that your General Education requirements, including second language, are determined by when you were admitted to the university.  Your Academic Advisor can help you navigate the requirements relevant for you. For a full list of official degree requirements, check out the University General Catalog."
+    },
+    {
+      "program_name": "Accounting (Online)",
+      "years": [
+        {
+          "year_name": "The Eller Online Undergraduate program allows students to work at their own pace.",
+          "semesters": []
+        }
+      ],
+      "description": "To learn more about the different phases and programs offered through the Eller Online Undergraduate program, please see:"
+    },
+    {
+      "program_name": "Business Administration (Online)",
+      "years": [
+        {
+          "year_name": "The Eller Online Undergraduate program allows students to work at their own pace.",
+          "semesters": []
+        }
+      ],
+      "description": "To learn more about the different phases and programs offered through the Eller Online Undergraduate program, please see:"
+    },
+    {
+      "program_name": "Business Analytics",
+      "years": [
+        {
+          "year_name": "First Year",
+          "semesters": [
+            {
+              "semester_name": "First Semester",
+              "courses": [
+                {
+                  "name": "ENGL 101* First Year Composition",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 111* Computers and Internetworked Society",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 112* Computers and Internetworked Society Lab",
+                  "units": "1"
+                },
+                {
+                  "name": "MATH 112 College Algebra Concepts and Applications",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education and/or Second Language",
+                  "units": "3-7"
+                },
+                {
+                  "name": "UNIV 101 Introduction to the General Education Experience",
+                  "units": "1"
+                }
+              ],
+              "total_units": "14-18"
+            },
+            {
+              "semester_name": "Second Semester",
+              "courses": [
+                {
+                  "name": "ENGL 102* First Year Composition",
+                  "units": "3"
+                },
+                {
+                  "name": "MATH 116* Calculus Concepts for Business Majors",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education and/or Second Language",
+                  "units": "3-7"
+                },
+                {
+                  "name": "BNAD 100 Language and Context of Business",
+                  "units": "1"
+                }
+              ],
+              "total_units": "13-17"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Sophomore Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "BNAN 276* Statistical Inference in Management",
+                  "units": "3"
+                },
+                {
+                  "name": "ACCT 200* Introduction to Financial Accounting",
+                  "units": "3"
+                },
+                {
+                  "name": "ECON 200* Basic Economic Issues",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "BNAD 200 Career Management in Business",
+                  "units": "1"
+                }
+              ],
+              "total_units": "16"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ACCT 210* Introduction to Managerial Accounting",
+                  "units": "3"
+                },
+                {
+                  "name": "BNAN 277* Analytical Methods for Business",
+                  "units": "4"
+                },
+                {
+                  "name": "BCOM 214* Fundamentals of Business Communication",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education or Ethics**",
+                  "units": "3"
+                },
+                {
+                  "name": "UNIV 301 General Education Portfolio",
+                  "units": "1"
+                }
+              ],
+              "total_units": "14"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Professional Phase",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "MGMT 310A Organization Behavior and Management",
+                  "units": "3"
+                },
+                {
+                  "name": "MKTG 361 Introduction to Marketing",
+                  "units": "3"
+                },
+                {
+                  "name": "BCOM 314R Business Communication",
+                  "units": "3"
+                },
+                {
+                  "name": "BNAN 325 Applied Programming in Business Analytics",
+                  "units": "3"
+                },
+                {
+                  "name": "BNAN 331 Database Management Systems",
+                  "units": "3"
+                }
+              ],
+              "total_units": "15"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "OSCM 373 Basic Operations Management",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 304 Using and Managing Information Systems",
+                  "units": "3"
+                },
+                {
+                  "name": "ECON 300 Microeconomic Analysis for Business Decisions",
+                  "units": "3"
+                },
+                {
+                  "name": "BNAN 420 Business Analytics Techniques",
+                  "units": "3"
+                },
+                {
+                  "name": "BNAN 430 Data Visualization for Business",
+                  "units": "3"
+                }
+              ],
+              "total_units": "15"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Professional Phase",
+          "semesters": [
+            {
+              "semester_name": "3rd Semester",
+              "courses": [
+                {
+                  "name": "MGMT 402 Integrating Business Fundamentals with Ethics and Law in Management  |",
+                  "units": "3"
+                },
+                {
+                  "name": "FIN 311 Introduction to Finance",
+                  "units": "3"
+                },
+                {
+                  "name": "ENTR 485 Innovating: Creating the Future",
+                  "units": "3"
+                },
+                {
+                  "name": "BNAN 440 Prescriptive Analytics",
+                  "units": "3"
+                },
+                {
+                  "name": "BNAN Major Elective Course",
+                  "units": "3"
+                }
+              ],
+              "total_units": "15"
+            },
+            {
+              "semester_name": "4th Semester",
+              "courses": [
+                {
+                  "name": "ECON 330 Macroeconomic and Global Institutions and Policy",
+                  "units": "3"
+                },
+                {
+                  "name": "BNAN Major Elective Course",
+                  "units": "3"
+                },
+                {
+                  "name": "Remaining General Education requirements",
+                  "units": "3"
+                },
+                {
+                  "name": "Minor courses or Elective units to reach 120 unit minimum",
+                  "units": "3-6"
+                }
+              ],
+              "total_units": "12-15"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        }
+      ],
+      "description": "This sample plan is based on 14-17 credits per semester, but each student and their academic plan is unique. Please meet with your Academic Advisor to create a custom plan for you.  Please note that your General Education requirements, including second language, are determined by when you were admitted to the university.  Your Academic Advisor can help you navigate the requirements relevant for you. For a full list of official degree requirements, check out the University General Catalog."
+    },
+    {
+      "program_name": "Business Economics",
+      "years": [
+        {
+          "year_name": "First Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "ENGL 101* First Year Composition",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 111* Computers and Internetworked Society",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 112* Computers and Internetworked Society Lab",
+                  "units": "1"
+                },
+                {
+                  "name": "MATH 112 College Algebra Concepts and Applications",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education and/or Second Language",
+                  "units": "3-7"
+                },
+                {
+                  "name": "UNIV 101 Introduction to the General Education Experience",
+                  "units": "1"
+                }
+              ],
+              "total_units": "14-18"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ENGL 102* First Year Composition",
+                  "units": "3"
+                },
+                {
+                  "name": "MATH 116* Calculus Concepts for Business Majors (Grade of C or better required for students to be eligible to apply for Business Economics Major)",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education and/or Second Language",
+                  "units": "3-7"
+                },
+                {
+                  "name": "BNAD 100 Language and Context of Business",
+                  "units": "1"
+                }
+              ],
+              "total_units": "13-17"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Sophomore Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "BNAN 276* Statistical Inference in Management",
+                  "units": "3"
+                },
+                {
+                  "name": "ACCT 200* Introduction to Financial Accounting",
+                  "units": "3"
+                },
+                {
+                  "name": "ECON 200* Basic Economic Issues",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "BNAD 200 Career Management in Business",
+                  "units": "1"
+                }
+              ],
+              "total_units": "16"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ACCT 210* Introduction to Managerial Accounting",
+                  "units": "3"
+                },
+                {
+                  "name": "BNAN 277* Analytical Methods for Business",
+                  "units": "4"
+                },
+                {
+                  "name": "BCOM 214* Fundamentals of Business Communication",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education or Ethics**",
+                  "units": "3"
+                },
+                {
+                  "name": "UNIV 301 General Education Portfolio",
+                  "units": "1"
+                }
+              ],
+              "total_units": "17"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Professional Phase",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "MGMT 310A Organization Behavior and Management",
+                  "units": "3"
+                },
+                {
+                  "name": "MKTG 361 Introduction to Marketing",
+                  "units": "3"
+                },
+                {
+                  "name": "BCOM 314R Business Communication",
+                  "units": "3"
+                },
+                {
+                  "name": "ECON 361 Intermediate Microeconomics",
+                  "units": "3"
+                },
+                {
+                  "name": "FIN 360 Quantitative Financial Management",
+                  "units": "3"
+                },
+                {
+                  "name": "FIN 360L Quantitative Financial Management Techniques",
+                  "units": "1"
+                }
+              ],
+              "total_units": "16"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ECON 332 Intermediate Macroeconomics",
+                  "units": "3"
+                },
+                {
+                  "name": "OSCM 373 Basic Operations Management",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 304 Using and Managing Information Systems",
+                  "units": "3"
+                },
+                {
+                  "name": "ECON 453 Quantitative Methods for Economic Strategy",
+                  "units": "3"
+                },
+                {
+                  "name": "300 or 400-level ECON Major Elective Course",
+                  "units": "3"
+                }
+              ],
+              "total_units": "15"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Professional Phase",
+          "semesters": [
+            {
+              "semester_name": "3rd Semester",
+              "courses": [
+                {
+                  "name": "MGMT 402 Integrating Business Fundamentals with Ethics and Law in Management",
+                  "units": "3"
+                },
+                {
+                  "name": "ENTR 485 Innovating: Creating the Future",
+                  "units": "3"
+                },
+                {
+                  "name": "ECON 406, 418, 431, 435, 436, 440, 443, 454, 460, 473 or 481 (select 1)",
+                  "units": "3"
+                },
+                {
+                  "name": "ECON 407 Economics of Strategy",
+                  "units": "3"
+                }
+              ],
+              "total_units": "12"
+            },
+            {
+              "semester_name": "4th Semester",
+              "courses": [
+                {
+                  "name": "300 or 400-level ECON Major Elective Course",
+                  "units": "3"
+                },
+                {
+                  "name": "Remaining General Education requirements",
+                  "units": "3-6"
+                },
+                {
+                  "name": "Minor courses or Elective units to reach 120 unit minimum",
+                  "units": "3-6"
+                }
+              ],
+              "total_units": "12-15"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        }
+      ],
+      "description": "This sample plan is based on 14-17 credits per semester, but each student and their academic plan is unique. Please meet with your Academic Advisor to create a custom plan for you.  Please note that your General Education requirements, including second language, are determined by when you were admitted to the university.  Your Academic Advisor can help you navigate the requirements relevant for you. For a full list of official degree requirements, check out the University General Catalog."
+    },
+    {
+      "program_name": "Business Management",
+      "years": [
+        {
+          "year_name": "First Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "ENGL 101* First Year Composition",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 111* Computers and Internetworked Society",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 112* Computers and Internetworked Society Lab",
+                  "units": "1"
+                },
+                {
+                  "name": "MATH 112 College Algebra Concepts and Applications",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education and/or Second Language",
+                  "units": "3-7"
+                },
+                {
+                  "name": "UNIV 101 Introduction to the General Education Experience",
+                  "units": "1"
+                }
+              ],
+              "total_units": "14-18"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ENGL 102* First Year Composition",
+                  "units": "3"
+                },
+                {
+                  "name": "MATH 116* Calculus Concepts for Business Majors",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education and/or Second Language",
+                  "units": "3-7"
+                },
+                {
+                  "name": "BNAD 100 Language and Context of Business",
+                  "units": "1"
+                }
+              ],
+              "total_units": "13-17"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Sophomore Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "BNAN 276* Statistical Inference in Management",
+                  "units": "3"
+                },
+                {
+                  "name": "ACCT 200* Introduction to Financial Accounting",
+                  "units": "3"
+                },
+                {
+                  "name": "ECON 200* Basic Economic Issues",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "BNAD 200 Career Management in Business",
+                  "units": "1"
+                }
+              ],
+              "total_units": "16"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ACCT 210* Introduction to Managerial Accounting",
+                  "units": "3"
+                },
+                {
+                  "name": "BNAN 277* Analytical Methods for Business",
+                  "units": "4"
+                },
+                {
+                  "name": "BCOM 214* Fundamentals of Business Communication",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education or Ethics**",
+                  "units": "3"
+                },
+                {
+                  "name": "UNIV 301 General Education Portfolio",
+                  "units": "1"
+                }
+              ],
+              "total_units": "17"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Professional Phase",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "MGMT 310A Organization Behavior and Management",
+                  "units": "3"
+                },
+                {
+                  "name": "MKTG 361 Introduction to Marketing",
+                  "units": "3"
+                },
+                {
+                  "name": "BCOM 314R Business Communication",
+                  "units": "3"
+                },
+                {
+                  "name": "FIN 311 Introduction to Finance",
+                  "units": "3"
+                },
+                {
+                  "name": "MGMT 330 Introduction to Human Resources Management",
+                  "units": "3"
+                }
+              ],
+              "total_units": "15"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ECON 300 Microeconomic Analysis for Business Decisions",
+                  "units": "3"
+                },
+                {
+                  "name": "OSCM 373 Basic Operations Management",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 304 Using and Managing Information Systems",
+                  "units": "3"
+                },
+                {
+                  "name": "BMGT Major Elective Course",
+                  "units": "3"
+                },
+                {
+                  "name": "BMGT Major Elective Course",
+                  "units": "3"
+                }
+              ],
+              "total_units": "15"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Professional Phase",
+          "semesters": [
+            {
+              "semester_name": "3rd Semester",
+              "courses": [
+                {
+                  "name": "MGMT 402 Integrating Business Fundamentals with Ethics and Law in Management",
+                  "units": "3"
+                },
+                {
+                  "name": "ECON 330 Macroeconomic and Global Institutions and Policy",
+                  "units": "3"
+                },
+                {
+                  "name": "ENTR 485 Innovating: Creating the Future",
+                  "units": "3"
+                },
+                {
+                  "name": "BMGT Major Elective Course",
+                  "units": "3"
+                },
+                {
+                  "name": "BMGT Major Elective Course",
+                  "units": "3"
+                }
+              ],
+              "total_units": "15"
+            },
+            {
+              "semester_name": "4th Semester",
+              "courses": [
+                {
+                  "name": "MGMT 471 Management Policies",
+                  "units": "3"
+                },
+                {
+                  "name": "Remaining General Education requirements",
+                  "units": "3-6"
+                },
+                {
+                  "name": "Minor courses or Elective units to reach 120 unit minimum",
+                  "units": "3-6"
+                }
+              ],
+              "total_units": "12-15"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        }
+      ],
+      "description": "This sample plan is based on 14-17 credits per semester, but each student and their academic plan is unique. Please meet with your Academic Advisor to create a custom plan for you.  Please note that your General Education requirements, including second language, are determined by when you were admitted to the university.  Your Academic Advisor can help you navigate the requirements relevant for you. For a full list of official degree requirements, check out the University General Catalog."
+    },
+    {
+      "program_name": "Entrepreneurship (Senior Year Program)",
+      "years": [
+        {
+          "year_name": "First Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "ENGL 101* First Year Composition",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 111* Computers and Internetworked Society",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 112* Computers and Internetworked Society Lab",
+                  "units": "1"
+                },
+                {
+                  "name": "MATH 112 College Algebra Concepts and Applications",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education and/or Second Language",
+                  "units": "3-7"
+                },
+                {
+                  "name": "UNIV 101 Introduction to the General Education Experience",
+                  "units": "1"
+                }
+              ],
+              "total_units": "14-18"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ENGL 102* First Year Composition",
+                  "units": "3"
+                },
+                {
+                  "name": "MATH 116* Calculus Concepts for Business Majors",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education and/or Second Language",
+                  "units": "3-7"
+                },
+                {
+                  "name": "BNAD 100 Language and Context of Business",
+                  "units": "1"
+                }
+              ],
+              "total_units": "13-17"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Sophomore Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "BNAN 276* Statistical Inference in Management",
+                  "units": "3"
+                },
+                {
+                  "name": "ACCT 200* Introduction to Financial Accounting",
+                  "units": "3"
+                },
+                {
+                  "name": "ECON 200* Basic Economic Issues",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education or Ethics**",
+                  "units": "3"
+                },
+                {
+                  "name": "BNAD 200 Career Management in Business",
+                  "units": "1"
+                }
+              ],
+              "total_units": "16"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ACCT 210* Introduction to Managerial Accounting",
+                  "units": "3"
+                },
+                {
+                  "name": "BNAN 277* Analytical Methods for Business",
+                  "units": "4"
+                },
+                {
+                  "name": "BCOM 214* Fundamentals of Business Communication",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education or Ethics**",
+                  "units": "3"
+                },
+                {
+                  "name": "UNIV 301 General Education Portfolio",
+                  "units": "1"
+                }
+              ],
+              "total_units": "17"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Junior Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "MGMT 310A Organization Behavior and Management",
+                  "units": "3"
+                },
+                {
+                  "name": "MKTG 361 Introduction to Marketing",
+                  "units": "3"
+                },
+                {
+                  "name": "BCOM 314R Business Communication",
+                  "units": "3"
+                },
+                {
+                  "name": "FIN 311 Introduction to Finance/FIN 360 Quantitative Finance Management",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                }
+              ],
+              "total_units": "15"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ECON 300 Microeconomic Analysis for Business Decisions",
+                  "units": "3"
+                },
+                {
+                  "name": "OSCM 373 Basic Operations Management",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 304 Using and Managing Information Systems",
+                  "units": "3"
+                },
+                {
+                  "name": "300 or 400-level Minor or General Elective",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                }
+              ],
+              "total_units": "15"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Senior Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "MGMT 402 Integrating Business Fundamentals with Ethics and Law in Management",
+                  "units": "3"
+                },
+                {
+                  "name": "FIN 480 Finance for New Ventures",
+                  "units": "3"
+                },
+                {
+                  "name": "ENTR 487 New Venture Development and Industry Analysis",
+                  "units": "4"
+                },
+                {
+                  "name": "MKTG 480 Marketing Research for Entrepreneurs",
+                  "units": "3"
+                }
+              ],
+              "total_units": "14"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ECON 330 Macroeconomic and Global Institution Policy",
+                  "units": "3"
+                },
+                {
+                  "name": "ENTR 484 Development of New Venture Plans",
+                  "units": "4"
+                },
+                {
+                  "name": "Ethics",
+                  "units": "3"
+                },
+                {
+                  "name": "Remaining General Education requirements",
+                  "units": "3"
+                },
+                {
+                  "name": "Minor courses or Elective units to reach 120 unit minimum",
+                  "units": "0-3"
+                }
+              ],
+              "total_units": "13-16"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        }
+      ],
+      "description": "This sample plan is based on 14-17 credits per semester, but each student and their academic plan is unique. Please meet with your Academic Advisor to create a custom plan for you.  Please note that your General Education requirements, including second language, are determined by when you were admitted to the university.  Your Academic Advisor can help you navigate the requirements relevant for you. For a full list of official degree requirements, check out the University General Catalog."
+    },
+    {
+      "program_name": "Finance",
+      "years": [
+        {
+          "year_name": "First Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "ENGL 101* First Year Composition",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 111* Computers and Internetworked Society",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 112* Computers and Internetworked Society Lab",
+                  "units": "1"
+                },
+                {
+                  "name": "MATH 112 College Algebra Concepts and Applications",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education and/or Second Language",
+                  "units": "3-7"
+                },
+                {
+                  "name": "UNIV 101 Introduction to the General Education Experience",
+                  "units": "1"
+                }
+              ],
+              "total_units": "14-18"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ENGL 102* First Year Composition",
+                  "units": "3"
+                },
+                {
+                  "name": "MATH 116* Calculus Concepts for Business Majors",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education and/or Second Language",
+                  "units": "3-7"
+                },
+                {
+                  "name": "BNAD 100 Language and Context of Business",
+                  "units": "1"
+                }
+              ],
+              "total_units": "13-17"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Sophomore Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "BNAN 276* Statistical Inference in Management",
+                  "units": "3"
+                },
+                {
+                  "name": "ACCT 200* Introduction to Financial Accounting",
+                  "units": "3"
+                },
+                {
+                  "name": "ECON 200* Basic Economic Issues",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "BNAD 200 Career Management in Business",
+                  "units": "1"
+                }
+              ],
+              "total_units": "16"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ACCT 210* Introduction to Managerial Accounting",
+                  "units": "3"
+                },
+                {
+                  "name": "BNAN 277* Analytical Methods for Business",
+                  "units": "4"
+                },
+                {
+                  "name": "BCOM 214* Fundamentals of Business Communication",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education or Ethics**",
+                  "units": "3"
+                },
+                {
+                  "name": "UNIV 301 General Education Portfolio",
+                  "units": "1"
+                }
+              ],
+              "total_units": "17"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Professional Phase",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "MGMT 310A Organization Behavior and Management",
+                  "units": "3"
+                },
+                {
+                  "name": "MKTG 361 Introduction to Marketing",
+                  "units": "3"
+                },
+                {
+                  "name": "BCOM 314R Business Communication",
+                  "units": "3"
+                },
+                {
+                  "name": "ACCT 400C Intermediate Financial Accounting (Grade of C or better required)",
+                  "units": "3"
+                },
+                {
+                  "name": "FIN 360 Quantitative Financial Management  (Grade of C or better required)",
+                  "units": "3"
+                },
+                {
+                  "name": "FIN 360L Quantitative Financial Management Techniques  (Grade of C or better required)",
+                  "units": "1"
+                }
+              ],
+              "total_units": "16"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ECON 300 Microeconomic Analysis for Business Decisions",
+                  "units": "3"
+                },
+                {
+                  "name": "OSCM 373 Basic Operations Management",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 304 Using and Managing Information Systems",
+                  "units": "3"
+                },
+                {
+                  "name": "FIN 412 Corporate Financial Problems (Grade of C or better required)",
+                  "units": "3"
+                },
+                {
+                  "name": "FIN 421 Investments (Grade of C or better required)",
+                  "units": "3"
+                }
+              ],
+              "total_units": "15"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Professional Phase",
+          "semesters": [
+            {
+              "semester_name": "3rd Semester",
+              "courses": [
+                {
+                  "name": "MGMT 402 Integrating Business Fundamentals with Ethics and Law in Management",
+                  "units": "3"
+                },
+                {
+                  "name": "ECON 330 Macroeconomic Institutions and Policy",
+                  "units": "3"
+                },
+                {
+                  "name": "ENTR 485 Innovating: Creating the Future",
+                  "units": "3"
+                },
+                {
+                  "name": "FIN Major Elective Course",
+                  "units": "3"
+                },
+                {
+                  "name": "FIN Major Elective Course",
+                  "units": "3"
+                },
+                {
+                  "name": "FIN 498 (Senior Capstone)",
+                  "units": "1"
+                }
+              ],
+              "total_units": "16"
+            },
+            {
+              "semester_name": "4th Semester",
+              "courses": [
+                {
+                  "name": "FIN Major Elective Course",
+                  "units": "3"
+                },
+                {
+                  "name": "Remaining General Education requirements",
+                  "units": "3-6"
+                },
+                {
+                  "name": "Minor courses or Elective units to reach 120 unit minimum",
+                  "units": "3-6"
+                }
+              ],
+              "total_units": "9-15"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        }
+      ],
+      "description": "This sample plan is based on 14-17 credits per semester, but each student and their academic plan is unique. Please meet with your Academic Advisor to create a custom plan for you.  Please note that your General Education requirements, including second language, are determined by when you were admitted to the university.  Your Academic Advisor can help you navigate the requirements relevant for you. For a full list of official degree requirements, check out the University General Catalog."
+    },
+    {
+      "program_name": "Management Information Systems",
+      "years": [
+        {
+          "year_name": "First Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "ENGL 101* First Year Composition",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 111* Computers and Internetworked Society",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 112* Computers and Internetworked Society Lab",
+                  "units": "1"
+                },
+                {
+                  "name": "MATH 112 College Algebra Concepts and Applications",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education and/or Second Language",
+                  "units": "3-7"
+                },
+                {
+                  "name": "UNIV 101 Introduction to the General Education Experience",
+                  "units": "1"
+                }
+              ],
+              "total_units": "14-18"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ENGL 102* First Year Composition",
+                  "units": "3"
+                },
+                {
+                  "name": "MATH 116* Calculus Concepts for Business Majors",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education and/or Second Language",
+                  "units": "3-7"
+                },
+                {
+                  "name": "BNAD 100 Language and Context of Business",
+                  "units": "1"
+                }
+              ],
+              "total_units": "13-17"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Sophomore Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "BNAN 276* Statistical Inference in Management",
+                  "units": "3"
+                },
+                {
+                  "name": "ACCT 200* Introduction to Financial Accounting",
+                  "units": "3"
+                },
+                {
+                  "name": "ECON 200* Basic Economic Issues",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "BNAD 200 Career Management in Business",
+                  "units": "1"
+                }
+              ],
+              "total_units": "16"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ACCT 210* Introduction to Managerial Accounting",
+                  "units": "3"
+                },
+                {
+                  "name": "BNAN 277* Analytical Methods for Business",
+                  "units": "4"
+                },
+                {
+                  "name": "BCOM 214* Fundamentals of Business Communication",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education or Ethics**",
+                  "units": "3"
+                },
+                {
+                  "name": "UNIV 301 General Education Portfolio",
+                  "units": "1"
+                }
+              ],
+              "total_units": "17"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Professional Phase",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "MGMT 310A Organization Behavior and Management",
+                  "units": "3"
+                },
+                {
+                  "name": "MKTG 361 Introduction to Marketing",
+                  "units": "3"
+                },
+                {
+                  "name": "BCOM 314R Business Communication",
+                  "units": "3"
+                },
+                {
+                  "name": "FIN 311 Introduction to Finance",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 331 Database Management Systems",
+                  "units": "3"
+                }
+              ],
+              "total_units": "15"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ECON 300 Microeconomic Analysis for Business Decisions",
+                  "units": "3"
+                },
+                {
+                  "name": "OSCM 373 Basic Operations Management",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 304 Using and Managing Information Systems",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 443 Business Data Communications",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 301 Data Structures and Algorithms",
+                  "units": "3"
+                }
+              ],
+              "total_units": "15"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Professional Phase",
+          "semesters": [
+            {
+              "semester_name": "3rd Semester",
+              "courses": [
+                {
+                  "name": "MGMT 402 Integrating Business Fundamentals with Ethics and Law in Management",
+                  "units": "3"
+                },
+                {
+                  "name": "ECON 330 Macroeconomic and Global Institutions and Policy",
+                  "units": "3"
+                },
+                {
+                  "name": "ENTR 485 Innovating: Creating the Future",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 441 Information Systems Analysis and Design",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS Major Elective Course",
+                  "units": "3"
+                }
+              ],
+              "total_units": "15"
+            },
+            {
+              "semester_name": "4th Semester",
+              "courses": [
+                {
+                  "name": "MIS Major Elective Course",
+                  "units": "3"
+                },
+                {
+                  "name": "Remaining General Education requirements",
+                  "units": "3-6"
+                },
+                {
+                  "name": "Minor courses or Elective units to reach 120 unit minimum",
+                  "units": "3-6"
+                }
+              ],
+              "total_units": "9-15"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        }
+      ],
+      "description": "This sample plan is based on 14-17 credits per semester, but each student and their academic plan is unique. Please meet with your Academic Advisor to create a custom plan for you.  Please note that your General Education requirements, including second language, are determined by when you were admitted to the university.  Your Academic Advisor can help you navigate the requirements relevant for you. For a full list of official degree requirements, check out the University General Catalog."
+    },
+    {
+      "program_name": "Marketing",
+      "years": [
+        {
+          "year_name": "First Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "ENGL 101* First Year Composition",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 111* Computers and Internetworked Society",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 112* Computers and Internetworked Society Lab",
+                  "units": "1"
+                },
+                {
+                  "name": "MATH 112 College Algebra Concepts and Applications",
+                  "units": "3"
+                },
+                {
+                  "name": "Tier I General Education and/or Second Language",
+                  "units": "3-7"
+                }
+              ],
+              "total_units": "13-17"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ENGL 102* First Year Composition",
+                  "units": "3"
+                },
+                {
+                  "name": "MATH 116* Calculus Concepts for Business Majors",
+                  "units": "3"
+                },
+                {
+                  "name": "Tier I General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "Tier I General Education and/or Second Language",
+                  "units": "3-7"
+                },
+                {
+                  "name": "BNAD 100 Language and Context of Business",
+                  "units": "1"
+                }
+              ],
+              "total_units": "13-17"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Sophomore Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "BNAN 276* Statistical Inference in Management",
+                  "units": "3"
+                },
+                {
+                  "name": "ACCT 200* Introduction to Financial Accounting",
+                  "units": "3"
+                },
+                {
+                  "name": "ECON 200* Basic Economic Issues",
+                  "units": "3"
+                },
+                {
+                  "name": "Tier I General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "Tier I General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "BNAD 200 Career Management in Business",
+                  "units": "1"
+                }
+              ],
+              "total_units": "16"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ACCT 210* Introduction to Managerial Accounting",
+                  "units": "3"
+                },
+                {
+                  "name": "BNAN 277* Analytical Methods for Business",
+                  "units": "4"
+                },
+                {
+                  "name": "BCOM 214* Fundamentals of Business Communication",
+                  "units": "3"
+                },
+                {
+                  "name": "Tier I General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "Tier II General Education or Ethics**",
+                  "units": "3"
+                }
+              ],
+              "total_units": "16"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Junior Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "MGMT 310A Organization Behavior and Management",
+                  "units": "3"
+                },
+                {
+                  "name": "MKTG 361 Introduction to Marketing",
+                  "units": "3"
+                },
+                {
+                  "name": "BCOM 314R† Business Communication",
+                  "units": "3"
+                },
+                {
+                  "name": "FIN 311 Introduction to Finance",
+                  "units": "3"
+                },
+                {
+                  "name": "MKTG 376 Marketing Analytics",
+                  "units": "3"
+                }
+              ],
+              "total_units": "15"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "MIS 304 Using and Managing Information Systems",
+                  "units": "3"
+                },
+                {
+                  "name": "OSCM 373 Basic Operations Management",
+                  "units": "3"
+                },
+                {
+                  "name": "ECON 300 Microeconomic Analysis for Business Decisions",
+                  "units": "3"
+                },
+                {
+                  "name": "MKTG 440 Marketing Research",
+                  "units": "3"
+                },
+                {
+                  "name": "MKTG 450 Buyer Behavior",
+                  "units": "3"
+                }
+              ],
+              "total_units": "15"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Senior Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "MGMT 402 Integrating Business Fundamentals with Ethics and Law in Management",
+                  "units": "3"
+                },
+                {
+                  "name": "ECON 330 Macroeconomic Institutions and Policy",
+                  "units": "3"
+                },
+                {
+                  "name": "ENTR 485 Innovating: Creating the Future",
+                  "units": "3"
+                },
+                {
+                  "name": "MKTG Major Elective Course",
+                  "units": "3"
+                },
+                {
+                  "name": "MKTG Major Elective Course",
+                  "units": "3"
+                }
+              ],
+              "total_units": "15"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "MKTG 471 Marketing Policies and Operations",
+                  "units": "3"
+                },
+                {
+                  "name": "MKTG Major Elective Course",
+                  "units": "3"
+                },
+                {
+                  "name": "Tier II General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "Tier II General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "Minor, Electives, or remaining General Education requirements",
+                  "units": "3"
+                }
+              ],
+              "total_units": "15"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        }
+      ],
+      "description": "This sample plan is based on 14-17 credits per semester, but each student and their academic plan is unique. Please meet with your Academic Advisor to create a custom plan for you.  Please note that your General Education requirements, including second language, are determined by when you were admitted to the university.  Your Academic Advisor can help you navigate the requirements relevant for you. For a full list of official degree requirements, check out the University General Catalog."
+    },
+    {
+      "program_name": "Operations & Supply Chain Management",
+      "years": [
+        {
+          "year_name": "First Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "ENGL 101* First Year Composition",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 111* Computers and Internetworked Society",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 112* Computers and Internetworked Society Lab",
+                  "units": "1"
+                },
+                {
+                  "name": "MATH 112 College Algebra Concepts and Applications",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education and/or Second Language",
+                  "units": "3-7"
+                }
+              ],
+              "total_units": "13-17"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ENGL 102* First Year Composition",
+                  "units": "3"
+                },
+                {
+                  "name": "MATH 116* Calculus Concepts for Business Majors",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education and/or Second Language",
+                  "units": "3-7"
+                },
+                {
+                  "name": "BNAD 100 Language and Context of Business",
+                  "units": "1"
+                }
+              ],
+              "total_units": "13-17"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Sophomore Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "BNAN 276* Statistical Inference in Management",
+                  "units": "3"
+                },
+                {
+                  "name": "ACCT 200* Introduction to Financial Accounting",
+                  "units": "3"
+                },
+                {
+                  "name": "ECON 200* Basic Economic Issues",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "BNAD 200 Career Management in Business",
+                  "units": "1"
+                }
+              ],
+              "total_units": "16"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ACCT 210* Introduction to Managerial Accounting",
+                  "units": "3"
+                },
+                {
+                  "name": "BNAN 277* Analytical Methods for Business",
+                  "units": "4"
+                },
+                {
+                  "name": "BCOM 214* Fundamentals of Business Communication",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education or Ethics**",
+                  "units": "3"
+                }
+              ],
+              "total_units": "16"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Professional Phase",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "MGMT 310A Organization Behavior and Management",
+                  "units": "3"
+                },
+                {
+                  "name": "MKTG 361 Introduction to Marketing",
+                  "units": "3"
+                },
+                {
+                  "name": "BCOM 314R Business Communication",
+                  "units": "3"
+                },
+                {
+                  "name": "FIN 311 Introduction to Finance",
+                  "units": "3"
+                },
+                {
+                  "name": "OSCM 373 Basic Operations Management",
+                  "units": "3"
+                }
+              ],
+              "total_units": "15"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ECON 300 Microeconomic Analysis for Business Decisions",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 304 Using and Managing Information Systems",
+                  "units": "3"
+                },
+                {
+                  "name": "OSCM 474 Manufacturing Operations Management",
+                  "units": "3"
+                },
+                {
+                  "name": "OSCM Major Elective Course",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                }
+              ],
+              "total_units": "15"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Professional Phase",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "MGMT 402 Integrating Business Fundamentals with Ethics and Law in Management",
+                  "units": "3"
+                },
+                {
+                  "name": "ECON 330 Macroeconomic and Global Institutions and Policy",
+                  "units": "3"
+                },
+                {
+                  "name": "ENTR 485 Innovating: Creating the Future",
+                  "units": "3"
+                },
+                {
+                  "name": "OSCM 475 Service Operations Management",
+                  "units": "3"
+                },
+                {
+                  "name": "OSCM 477 The Supply Chain and Logistics",
+                  "units": "3"
+                }
+              ],
+              "total_units": "15"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "OSCM Major Elective Course",
+                  "units": "3"
+                },
+                {
+                  "name": "OSCM Major Elective Course",
+                  "units": "3"
+                },
+                {
+                  "name": "Minor, Electives, or remaining General Education requirements",
+                  "units": "3-6"
+                }
+              ],
+              "total_units": "9-12"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        }
+      ],
+      "description": "This sample plan is based on 14-17 credits per semester, but each student and their academic plan is unique. Please meet with your Academic Advisor to create a custom plan for you.  Please note that your general education, including second language, requirements are determined by when you were admitted to the university.  Your Academic Advisor can help you navigate the requirements relevant for you. For a full list of official degree requirements, check out the University General Catalog."
+    },
+    {
+      "program_name": "Foundational Economics Four-Semester Plan (for students starting in or beyond College Algebra)",
+      "years": [
+        {
+          "year_name": "First Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "ENGL 101* First Year Composition",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 111* Computers and Internetworked Society",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 112* Computers and Internetworked Society Lab",
+                  "units": "1"
+                },
+                {
+                  "name": "MATH 112 College Algebra Concepts and Applications (requires grade of C or better)",
+                  "units": "3"
+                },
+                {
+                  "name": "Second Language",
+                  "units": "4"
+                },
+                {
+                  "name": "UNIV 101 Introduction to the General Education Experience",
+                  "units": "1"
+                }
+              ],
+              "total_units": "15"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ENGL 102* First Year Composition",
+                  "units": "3"
+                },
+                {
+                  "name": "MATH 113 Brief Calculus or MATH 116* Calculus Concepts for Business Majors",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education or minor course",
+                  "units": "3"
+                },
+                {
+                  "name": "Second Language",
+                  "units": "4"
+                }
+              ],
+              "total_units": "16"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Sophomore Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "BNAN 276* Statistical Inference in Management",
+                  "units": "3"
+                },
+                {
+                  "name": "ECON 200* Basic Economic Issues",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education or minor course",
+                  "units": "3"
+                },
+                {
+                  "name": "Second Language",
+                  "units": "4"
+                }
+              ],
+              "total_units": "16"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "BCOM 212* Fundamentals of Communication",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "Second Language",
+                  "units": "4"
+                },
+                {
+                  "name": "UNIV 301 General Education Portfolio",
+                  "units": "1"
+                }
+              ],
+              "total_units": "14"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        }
+      ],
+      "description": "This sample plan is based on 14-16 credits per semester, but each student and their academic plan is unique.   Please meet with your Academic Advisor to create a custom plan for you.  Please note that your General Education requirements, including second language, are determined by when you were admitted to the university.  Your Academic Advisor can help you navigate the requirements relevant for you. For a full list of official degree requirements, check out the University General Catalog."
+    },
+    {
+      "program_name": "Foundational Economics Five-Semester Plan (for students starting below College Algebra)",
+      "years": [
+        {
+          "year_name": "First Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "ENGL 101* First Year Composition\nMATH 100 Preparation for University-Level Mathematics\nSAS 100AX Math Success Strategies\nMIS 111* Computers and Internetworked Society\nMIS 112* Computers and Internetworked Society Lab\nA student's performance in MATH 100 and SAS 100AX will determine future UA MATH courses.  Students can register for a late-start 10-week or 7-week General Education course if desired.",
+                  "units": "3"
+                }
+              ],
+              "total_units": "12"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ENGL 102* First Year Composition",
+                  "units": "3"
+                },
+                {
+                  "name": "MATH 112 College Algebra Concepts and Applications (requires grade of C or better)",
+                  "units": "3"
+                },
+                {
+                  "name": "UNIV 101 Introduction to the General Education Experience",
+                  "units": "1"
+                },
+                {
+                  "name": "1-2 General Education courses",
+                  "units": "3-6"
+                },
+                {
+                  "name": "Second Language",
+                  "units": "4"
+                }
+              ],
+              "total_units": "14-17"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Sophomore Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "MATH 113* Brief Calculus or 116* Calculus Concepts for Business Majors",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "Second Language",
+                  "units": "4"
+                },
+                {
+                  "name": "Minor Course",
+                  "units": "3"
+                }
+              ],
+              "total_units": "16"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "BNAN 276* Statistical Inference in Management",
+                  "units": "3"
+                },
+                {
+                  "name": "ECON 200* Basic Economic Issues",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "Second Language",
+                  "units": "4"
+                },
+                {
+                  "name": "Minor Course",
+                  "units": "3"
+                }
+              ],
+              "total_units": "16"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Junior Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "BCOM 212* Fundamentals of Communication",
+                  "units": "3"
+                },
+                {
+                  "name": "UNIV 301 General Education Portfolio",
+                  "units": "1"
+                },
+                {
+                  "name": "General Educations",
+                  "units": "3"
+                },
+                {
+                  "name": "Second Language",
+                  "units": "4"
+                },
+                {
+                  "name": "Minor Course",
+                  "units": "3"
+                }
+              ],
+              "total_units": "14"
+            }
+          ]
+        }
+      ],
+      "description": "This sample plan is based on 15-16 credits per semester, but each student and their academic plan is unique.   Please meet with your Academic Advisor to create a custom plan for you.  Please note that your General Education requirements, including second language, are determined by when you were admitted to the university.  Your Academic Advisor can help you navigate the requirements relevant for you. For a full list of official degree requirements, check out the University General Catalog."
+    },
+    {
+      "program_name": "BA Economics",
+      "years": [
+        {
+          "year_name": "First Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "ENGL 101* First Year Composition",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 111* Computers and Internetworked Society",
+                  "units": "3"
+                },
+                {
+                  "name": "MIS 112* Computers and Internetworked Society Lab",
+                  "units": "1"
+                },
+                {
+                  "name": "MATH 112 College Algebra Concepts and Applications (requires grade of C or better)",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education and/or Second Language",
+                  "units": "3-7"
+                }
+              ],
+              "total_units": "13-17"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ENGL 102* First Year Composition\nMath 113 or MATH 116* Calculus Concepts for Business Majors\nGeneral Education\nGeneral Education\nSecond Language",
+                  "units": "3"
+                }
+              ],
+              "total_units": "16"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Sophomore Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "BNAN 276* Statistical Inference in Management",
+                  "units": "3"
+                },
+                {
+                  "name": "ECON 200* Basic Economic Issues",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "Second Language",
+                  "units": "4"
+                },
+                {
+                  "name": "Minor Course",
+                  "units": "3"
+                }
+              ],
+              "total_units": "16"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "BCOM 212* Fundamentals of Communication",
+                  "units": "3"
+                },
+                {
+                  "name": "Second Language",
+                  "units": "4"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "Minor Course",
+                  "units": "3"
+                }
+              ],
+              "total_units": "16"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Junior Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "ECON 361 Intermediate Microeconomics",
+                  "units": "3"
+                },
+                {
+                  "name": "Economics Elective",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "Minor Course",
+                  "units": "3"
+                }
+              ],
+              "total_units": "15"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "ECON 332 Intermediate Macroeconomics",
+                  "units": "3"
+                },
+                {
+                  "name": "Economics Elective",
+                  "units": "3"
+                },
+                {
+                  "name": "General Education",
+                  "units": "3"
+                },
+                {
+                  "name": "Minor Course",
+                  "units": "3"
+                },
+                {
+                  "name": "Elective",
+                  "units": "3"
+                }
+              ],
+              "total_units": "15"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        },
+        {
+          "year_name": "Senior Year",
+          "semesters": [
+            {
+              "semester_name": "1st Semester",
+              "courses": [
+                {
+                  "name": "Economics Elective (400 Level)",
+                  "units": "3"
+                },
+                {
+                  "name": "Economics Elective",
+                  "units": "3"
+                },
+                {
+                  "name": "Minor Course",
+                  "units": "3"
+                },
+                {
+                  "name": "Elective",
+                  "units": "3"
+                },
+                {
+                  "name": "Elective",
+                  "units": "3"
+                }
+              ],
+              "total_units": "15"
+            },
+            {
+              "semester_name": "2nd Semester",
+              "courses": [
+                {
+                  "name": "Economics Elective (400 Level)",
+                  "units": "3"
+                },
+                {
+                  "name": "Economics Elective (400 Level)",
+                  "units": "3"
+                },
+                {
+                  "name": "Economics Elective",
+                  "units": "3"
+                },
+                {
+                  "name": "Remaining General Education requirements",
+                  "units": "3"
+                },
+                {
+                  "name": "Minor courses or Elective units to reach 120 unit minimum",
+                  "units": "3"
+                }
+              ],
+              "total_units": "15"
+            },
+            {
+              "semester_name": "Summer",
+              "courses": []
+            }
+          ]
+        }
+      ],
+      "description": "This is only a sample plan and requirements are subject to change and may vary based on catalog year, placement tests, AP/CLEP credit, transfer work, summer school, etc. The official degree requirements, including General Education requirements, are found in the University General Catalog and all University of Arizona students should refer to their Academic Advisement Report through UAccess for their specific requirements for graduation."
+    }
+  ]
+}
