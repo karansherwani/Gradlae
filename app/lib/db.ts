@@ -12,13 +12,16 @@ interface QuizAttempt {
     questionsUsed: string[]; // Store question hashes to prevent reuse
 }
 
+
 interface User {
     id: string;
     authMethod: string;
     identifier: string;
     password: string;
     fullName: string;
-    studentId: string;
+    studentId?: string;     
+    staffId?: string;        
+    role?: string;          
 }
 
 interface UserQuizData {
@@ -241,4 +244,3 @@ export async function getUserTranscript(userId: string): Promise<TranscriptCours
     const userData = allData.find(d => d.userId === userId);
     return userData?.courses || [];
 }
-
