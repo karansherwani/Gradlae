@@ -58,5 +58,14 @@
     "password": "cKG7pTFStqW%jbCq",
     "fullName": "Dvcnmf",
     "studentId": "A00350465"
+  },
+  {
+    "id": "1770093899682",
+    "authMethod": "staff",
+    "identifier": "HarshKaul",
+    "password": "Harsh123",
+    "fullName": "Prof. HarshKaul",
+    "staffId": "STAFF_203513",
+    "role": "instructor"
   }
 ]
