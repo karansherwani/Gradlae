@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import styles from '../styles/auth.module.css';
 
-type AuthMethod = 'email' | 'netid' | null;
+type AuthMethod = 'email' | 'netid' | 'staff' | null;
 type Mode = 'signin' | 'signup' | 'reset';
 
 export default function AuthPage() {
@@ -15,6 +15,7 @@ export default function AuthPage() {
   const [mode, setMode] = useState<Mode>('signin');
   const [email, setEmail] = useState('');
   const [netId, setNetId] = useState('');
+  const [staffId, setStaffId] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
@@ -108,6 +109,7 @@ export default function AuthPage() {
           authMethod,
           email: email || undefined,
           netId: netId || undefined,
+          staffId: staffId || undefined,
           password,
           isSignup: mode === 'signup',
         }),
@@ -117,14 +119,22 @@ export default function AuthPage() {
         const data = await response.json();
 
         // ✅ STORE USER EMAIL FOR QUIZ PAGE
-        const userEmail = email || `${netId}@${selectedUniversity}.edu`;
+        const userEmail = email || `${netId}@${selectedUniversity}.edu` || `${staffId}@${selectedUniversity}.edu`;
         localStorage.setItem('userEmail', userEmail);
 
-        localStorage.setItem('studentName', data.fullName || data.email || netId);
+        localStorage.setItem('studentName', data.fullName || data.email || netId || staffId);
         localStorage.setItem('userId', data.userId || '');
         localStorage.setItem('studentEmail', data.email || userEmail);
         localStorage.setItem('loginMethod', authMethod || 'email');
         localStorage.setItem('authToken', data.token || '');
+        
+        // Store user type for staff
+        if (authMethod === 'staff') {
+          localStorage.setItem('userType', 'staff');
+          localStorage.setItem('staffRole', data.role || 'instructor');
+        } else {
+          localStorage.setItem('userType', 'student');
+        }
 
         if (data.classes) {
           localStorage.setItem('studentClasses', JSON.stringify(data.classes));
@@ -137,7 +147,9 @@ export default function AuthPage() {
 
         // Small delay to ensure localStorage is saved
         setTimeout(() => {
-          window.location.href = '/dashboard';
+          // Redirect staff to staff dashboard if available, otherwise regular dashboard
+          const dashboardRoute = authMethod === 'staff' ? '/staff/dashboard' : '/dashboard';
+          window.location.href = dashboardRoute;
         }, 100);
       } else {
         const errorData = await response.json();
@@ -164,6 +176,7 @@ export default function AuthPage() {
         body: JSON.stringify({
           email: email || undefined,
           netId: netId || undefined,
+          staffId: staffId || undefined,
           otp: resetStep === 'verify' ? otp : undefined,
           newPassword: resetStep === 'verify' ? password : undefined,
         }),
@@ -242,6 +255,13 @@ export default function AuthPage() {
                 <p>Sign in with your school credentials</p>
                 <span className={styles.arrow}>→</span>
               </button>
+
+              <button className={styles.methodCard} onClick={() => setAuthMethod('staff')}>
+                <div className={styles.methodIcon}>👨‍🏫</div>
+                <h3>Staff Login</h3>
+                <p>For faculty and administrators</p>
+                <span className={styles.arrow}>→</span>
+              </button>
             </div>
 
             <div className={styles.divider}>
@@ -286,11 +306,15 @@ export default function AuthPage() {
             {mode === 'signin'
               ? authMethod === 'email'
                 ? 'Email Sign In'
-                : 'NetID Sign In'
+                : authMethod === 'netid'
+                  ? 'NetID Sign In'
+                  : 'Staff Sign In'
               : mode === 'signup'
                 ? authMethod === 'email'
                   ? 'Create Email Account'
-                  : 'Create NetID Account'
+                  : authMethod === 'netid'
+                    ? 'Create NetID Account'
+                    : 'Create Staff Account'
                 : 'Reset Password'}
           </h2>
           <p>
@@ -304,14 +328,26 @@ export default function AuthPage() {
           {mode === 'reset' ? (
             <form onSubmit={handleReset}>
               <div className={styles.formGroup}>
-                <label>{authMethod === 'email' ? 'Email Address' : 'NetID'}</label>
+                <label>
+                  {authMethod === 'email' ? 'Email Address' : authMethod === 'netid' ? 'NetID' : 'Staff ID'}
+                </label>
                 <input
                   type="text"
-                  value={authMethod === 'email' ? email : netId}
+                  value={authMethod === 'email' ? email : authMethod === 'netid' ? netId : staffId}
                   onChange={(e) =>
-                    authMethod === 'email' ? setEmail(e.target.value) : setNetId(e.target.value)
+                    authMethod === 'email'
+                      ? setEmail(e.target.value)
+                      : authMethod === 'netid'
+                        ? setNetId(e.target.value)
+                        : setStaffId(e.target.value)
                   }
-                  placeholder={authMethod === 'email' ? 'your.email@example.com' : 'e.g., jsmith'}
+                  placeholder={
+                    authMethod === 'email'
+                      ? 'your.email@example.com'
+                      : authMethod === 'netid'
+                        ? 'e.g., jsmith'
+                        : 'e.g., staff123'
+                  }
                   required
                   disabled={loading || resetStep === 'verify'}
                 />
@@ -387,7 +423,7 @@ export default function AuthPage() {
                     disabled={loading}
                   />
                 </div>
-              ) : (
+              ) : authMethod === 'netid' ? (
                 <div className={styles.formGroup}>
                   <label htmlFor="netId">NetID / Student ID</label>
                   <input
@@ -400,6 +436,20 @@ export default function AuthPage() {
                     disabled={loading}
                   />
                   <p className={styles.fieldHint}>Your unique identifier at {uni.name}</p>
+                </div>
+              ) : (
+                <div className={styles.formGroup}>
+                  <label htmlFor="staffId">Staff ID / Employee Number</label>
+                  <input
+                    id="staffId"
+                    type="text"
+                    value={staffId}
+                    onChange={(e) => setStaffId(e.target.value)}
+                    placeholder="e.g., staff123 or 00012345"
+                    required
+                    disabled={loading}
+                  />
+                  <p className={styles.fieldHint}>Your faculty or staff identifier at {uni.name}</p>
                 </div>
               )}
 
@@ -470,7 +520,7 @@ export default function AuthPage() {
                 disabled={
                   loading ||
                   !password ||
-                  (!email && !netId) ||
+                  (!email && !netId && !staffId) ||
                   (mode === 'signup' && !confirmPassword)
                 }
               >
