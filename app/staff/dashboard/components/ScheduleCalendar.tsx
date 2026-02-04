@@ -9,7 +9,7 @@ interface TimeSlot {
   day: string;
   date: string;
   time: string;
-  duration: number; // in minutes
+  duration: number; 
   isBooked: boolean;
   studentName?: string;
   studentEmail?: string;
@@ -250,20 +250,9 @@ export default function ScheduleCalendar({ staffId, staffName }: { staffId: stri
             <div className={styles.statLabel}>Booked Sessions</div>
           </div>
         </div>
-
-        <div className={styles.statCard}>
-          <div className={styles.statIcon} style={{ background: 'rgba(34, 197, 94, 0.1)' }}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2">
-              <line x1="12" y1="1" x2="12" y2="23" />
-              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-            </svg>
-          </div>
-          <div>
-            <div className={styles.statValue}>${timeSlots.filter(s => s.isBooked).length * 20}</div>
-            <div className={styles.statLabel}>Earnings This Week</div>
-          </div>
+        
         </div>
-      </div>
+      
 
       {/* Create Slot Modal */}
       {showCreateModal && (

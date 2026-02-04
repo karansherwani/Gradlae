@@ -268,63 +268,6 @@ export default function StaffProfile({ staffId, staffName }: { staffId: string; 
           )}
         </div>
 
-        {/* Availability Settings Card */}
-        <div className={styles.profileCard}>
-          <h3 className={styles.cardTitle}>Availability Settings</h3>
-          
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Hourly Rate</label>
-            <div className={styles.priceInput}>
-              <span className={styles.priceDollar}>$</span>
-              <input
-                type="number"
-                className={styles.input}
-                value={profile.price}
-                onChange={(e) => setProfile({ ...profile, price: parseInt(e.target.value) || 20 })}
-                disabled={!isEditing}
-                min="10"
-                max="100"
-              />
-              <span className={styles.priceLabel}>per hour</span>
-            </div>
-          </div>
-
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Meeting Types</label>
-            <div className={styles.checkboxGroup}>
-              <label className={styles.checkbox}>
-                <input
-                  type="checkbox"
-                  checked={profile.supportsOnline}
-                  onChange={(e) => setProfile({ ...profile, supportsOnline: e.target.checked })}
-                  disabled={!isEditing}
-                />
-                <span>Online (Zoom)</span>
-              </label>
-              <label className={styles.checkbox}>
-                <input
-                  type="checkbox"
-                  checked={profile.supportsInPerson}
-                  onChange={(e) => setProfile({ ...profile, supportsInPerson: e.target.checked })}
-                  disabled={!isEditing}
-                />
-                <span>In-Person (Campus)</span>
-              </label>
-            </div>
-          </div>
-
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Office Hours (Optional)</label>
-            <input
-              type="text"
-              className={styles.input}
-              placeholder="e.g., Mon/Wed 2-4 PM, Gould-Simpson 930"
-              value={profile.officeHours}
-              onChange={(e) => setProfile({ ...profile, officeHours: e.target.value })}
-              disabled={!isEditing}
-            />
-          </div>
-        </div>
       </div>
 
       {/* Preview Card */}
