@@ -1,378 +1,317 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from '../../../styles/staff-dashboard.module.css';
 
-interface StaffProfileData {
+interface TimeSlot {
+  id: string;
   staffId: string;
-  name: string;
-  avatar: string;
-  major: string;
-  bio: string;
-  courses: string[];
-  price: number;
-  supportsInPerson: boolean;
-  supportsOnline: boolean;
-  email: string;
-  phone?: string;
-  officeHours?: string;
-  specializations?: string[];
+  day: string;
+  date: string;
+  time: string;
+  duration: number; 
+  isBooked: boolean;
+  studentName?: string;
+  studentEmail?: string;
 }
 
-export default function StaffProfile({ staffId, staffName }: { staffId: string; staffName: string }) {
-  const [profile, setProfile] = useState<StaffProfileData>({
-    staffId,
-    name: staffName,
-    avatar: staffName.split(' ').map(n => n[0]).join('').toUpperCase(),
-    major: '',
-    bio: '',
-    courses: [],
-    price: 20,
-    supportsInPerson: true,
-    supportsOnline: true,
-    email: '',
-    phone: '',
-    officeHours: '',
-    specializations: []
-  });
-
-  const [isEditing, setIsEditing] = useState(false);
-  const [newCourse, setNewCourse] = useState('');
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+export default function ScheduleCalendar({ staffId, staffName }: { staffId: string; staffName: string }) {
+  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedTime, setSelectedTime] = useState('09:00');
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [currentWeek, setCurrentWeek] = useState(new Date());
 
   useEffect(() => {
-    loadProfile();
+    loadTimeSlots();
   }, [staffId]);
 
-  const loadProfile = async () => {
+  const loadTimeSlots = async () => {
     try {
-      const response = await fetch(`/api/staff/profile?staffId=${staffId}`);
+      const response = await fetch(`/api/staff/timeslots?staffId=${staffId}`);
       if (response.ok) {
         const data = await response.json();
-        if (data.profile) {
-          setProfile({ ...profile, ...data.profile });
-        }
+        console.log('📅 Loaded time slots:', data.slots);
+        setTimeSlots(data.slots || []);
       }
     } catch (error) {
-      console.error('Error loading profile:', error);
+      console.error('Error loading time slots:', error);
     }
   };
 
-  const saveProfile = async () => {
-    setSaveStatus('saving');
+  const createTimeSlot = async () => {
+    if (!selectedDate || !selectedTime) {
+      alert('Please select both date and time');
+      return;
+    }
+
+    const selectedDateObj = new Date(selectedDate);
+    const dayName = selectedDateObj.toLocaleDateString('en-US', { weekday: 'long' });
+    const dateFormatted = selectedDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+    console.log('Creating slot:', { dayName, dateFormatted, selectedTime });
+
     try {
-      const response = await fetch('/api/staff/profile', {
+      const response = await fetch('/api/staff/timeslots', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(profile),
+        body: JSON.stringify({
+          staffId,
+          staffName,
+          day: dayName,
+          date: dateFormatted,
+          time: formatTime(selectedTime),
+          duration: 60,
+        }),
       });
 
       if (response.ok) {
-        setSaveStatus('saved');
-        setIsEditing(false);
-        setTimeout(() => setSaveStatus('idle'), 3000);
+        console.log('✅ Slot created successfully');
+        setShowCreateModal(false);
+        await loadTimeSlots(); // Reload to show new slot
+        setSelectedDate('');
+        setSelectedTime('09:00');
       } else {
-        setSaveStatus('error');
+        const error = await response.json();
+        alert(error.message || 'Failed to create time slot');
       }
     } catch (error) {
-      console.error('Error saving profile:', error);
-      setSaveStatus('error');
+      console.error('Error creating time slot:', error);
+      alert('Failed to create time slot');
     }
   };
 
-  const addCourse = () => {
-    if (newCourse.trim() && !profile.courses.includes(newCourse.trim().toUpperCase())) {
-      setProfile({
-        ...profile,
-        courses: [...profile.courses, newCourse.trim().toUpperCase()]
+  const deleteTimeSlot = async (slotId: string) => {
+    if (!confirm('Are you sure you want to delete this time slot?')) return;
+
+    try {
+      const response = await fetch(`/api/staff/timeslots?slotId=${slotId}`, {
+        method: 'DELETE',
       });
-      setNewCourse('');
+
+      if (response.ok) {
+        loadTimeSlots();
+      }
+    } catch (error) {
+      console.error('Error deleting time slot:', error);
     }
   };
 
-  const removeCourse = (course: string) => {
-    setProfile({
-      ...profile,
-      courses: profile.courses.filter(c => c !== course)
-    });
+  const formatTime = (time24: string): string => {
+    const [hours, minutes] = time24.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12;
+    return `${hour12}:${minutes} ${ampm}`;
   };
+
+  const getWeekDays = () => {
+    const days = [];
+    const start = new Date(currentWeek);
+    start.setDate(start.getDate() - start.getDay()); // Start from Sunday
+
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(start);
+      date.setDate(start.getDate() + i);
+      days.push(date);
+    }
+    return days;
+  };
+
+  const weekDays = getWeekDays();
 
   return (
-    <div className={styles.profileContainer}>
-      <div className={styles.profileHeader}>
+    <div className={styles.scheduleContainer}>
+      <div className={styles.scheduleHeader}>
         <div>
-          <h1 className={styles.pageTitle}>My Profile</h1>
-          <p className={styles.pageSubtitle}>Manage your tutor profile visible to students</p>
+          <h1 className={styles.pageTitle}>My Schedule</h1>
+          <p className={styles.pageSubtitle}>Create and manage your tutoring availability</p>
         </div>
-        <div className={styles.profileActions}>
-          {isEditing ? (
-            <>
-              <button 
-                className={styles.cancelBtn} 
-                onClick={() => {
-                  setIsEditing(false);
-                  loadProfile();
-                }}
-              >
-                Cancel
-              </button>
-              <button 
-                className={styles.saveBtn} 
-                onClick={saveProfile}
-                disabled={saveStatus === 'saving'}
-              >
-                {saveStatus === 'saving' ? 'Saving...' : 'Save Changes'}
-              </button>
-            </>
-          ) : (
-            <button className={styles.editBtn} onClick={() => setIsEditing(true)}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-              </svg>
-              Edit Profile
-            </button>
-          )}
-        </div>
+        <button className={styles.createBtn} onClick={() => setShowCreateModal(true)}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Create Time Slot
+        </button>
       </div>
 
-      {saveStatus === 'saved' && (
-        <div className={styles.successAlert}>
-          ✓ Profile updated successfully!
-        </div>
-      )}
+      {/* Week Navigation */}
+      <div className={styles.weekNav}>
+        <button
+          className={styles.weekNavBtn}
+          onClick={() => {
+            const newWeek = new Date(currentWeek);
+            newWeek.setDate(newWeek.getDate() - 7);
+            setCurrentWeek(newWeek);
+          }}
+        >
+          ← Previous Week
+        </button>
+        <span className={styles.weekLabel}>
+          {weekDays[0].toLocaleDateString('en-US', { month: 'long', day: 'numeric' })} -{' '}
+          {weekDays[6].toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+        </span>
+        <button
+          className={styles.weekNavBtn}
+          onClick={() => {
+            const newWeek = new Date(currentWeek);
+            newWeek.setDate(newWeek.getDate() + 7);
+            setCurrentWeek(newWeek);
+          }}
+        >
+          Next Week →
+        </button>
+      </div>
 
-      {saveStatus === 'error' && (
-        <div className={styles.errorAlert}>
-          × Failed to save profile. Please try again.
-        </div>
-      )}
+      {/* Calendar Grid */}
+      <div className={styles.calendarGrid}>
+        {weekDays.map((date, index) => {
+          const daySlots = timeSlots.filter(slot => {
+            // Compare using the formatted date string that matches what we save
+            const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            // Also check if the slot's date matches this format
+            return slot.date === formattedDate || slot.date.includes(formattedDate);
+          });
 
-      <div className={styles.profileGrid}>
-        {/* Basic Info Card */}
-        <div className={styles.profileCard}>
-          <h3 className={styles.cardTitle}>Basic Information</h3>
-          
-          <div className={styles.avatarSection}>
-            <div className={styles.profileAvatar}>
-              {profile.avatar}
-            </div>
-            <div>
-              <div className={styles.label}>Display Name</div>
-              <input
-                type="text"
-                className={styles.input}
-                value={profile.name}
-                onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                disabled={!isEditing}
-              />
-            </div>
-          </div>
+          const isToday = date.toDateString() === new Date().toDateString();
 
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Title / Major</label>
-            <input
-              type="text"
-              className={styles.input}
-              placeholder="e.g., Senior @ UofA, Computer Science"
-              value={profile.major}
-              onChange={(e) => setProfile({ ...profile, major: e.target.value })}
-              disabled={!isEditing}
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Email</label>
-            <input
-              type="email"
-              className={styles.input}
-              placeholder="your.email@arizona.edu"
-              value={profile.email}
-              onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-              disabled={!isEditing}
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Phone (Optional)</label>
-            <input
-              type="tel"
-              className={styles.input}
-              placeholder="(520) 123-4567"
-              value={profile.phone}
-              onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-              disabled={!isEditing}
-            />
-          </div>
-        </div>
-
-        {/* Bio Card */}
-        <div className={styles.profileCard}>
-          <h3 className={styles.cardTitle}>About Me</h3>
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Bio</label>
-            <textarea
-              className={styles.textarea}
-              placeholder="Tell students about your experience, teaching style, and what makes you a great tutor..."
-              rows={6}
-              value={profile.bio}
-              onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-              disabled={!isEditing}
-            />
-            <div className={styles.charCount}>
-              {profile.bio.length} / 500 characters
-            </div>
-          </div>
-        </div>
-
-        {/* Courses Card */}
-        <div className={styles.profileCard}>
-          <h3 className={styles.cardTitle}>Courses I Teach</h3>
-          
-          <div className={styles.coursesTagContainer}>
-            {profile.courses.map(course => (
-              <div key={course} className={styles.courseTagEdit}>
-                {course}
-                {isEditing && (
-                  <button
-                    className={styles.removeTagBtn}
-                    onClick={() => removeCourse(course)}
-                  >
-                    ×
-                  </button>
+          return (
+            <div key={index} className={styles.dayColumn}>
+              <div className={`${styles.dayHeader} ${isToday ? styles.dayHeaderToday : ''}`}>
+                <div className={styles.dayName}>
+                  {date.toLocaleDateString('en-US', { weekday: 'short' })}
+                </div>
+                <div className={styles.dayNumber}>{date.getDate()}</div>
+              </div>
+              <div className={styles.daySlots}>
+                {daySlots.length === 0 ? (
+                  <div className={styles.noSlots}>No slots</div>
+                ) : (
+                  daySlots.map(slot => (
+                    <div
+                      key={slot.id}
+                      className={`${styles.slotCard} ${slot.isBooked ? styles.slotBooked : styles.slotAvailable}`}
+                    >
+                      <div className={styles.slotTime}>{slot.time}</div>
+                      {slot.isBooked ? (
+                        <div className={styles.slotStudent}>
+                          <div className={styles.slotStudentName}>{slot.studentName}</div>
+                          <div className={styles.slotStatus}>Booked</div>
+                        </div>
+                      ) : (
+                        <div className={styles.slotActions}>
+                          <div className={styles.slotStatus}>Available</div>
+                          <button
+                            className={styles.deleteBtn}
+                            onClick={() => deleteTimeSlot(slot.id)}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))
                 )}
               </div>
-            ))}
-          </div>
+            </div>
+          );
+        })}
+      </div>
 
-          {isEditing && (
-            <div className={styles.addCourseForm}>
+      {/* Stats Cards */}
+      <div className={styles.statsGrid}>
+        <div className={styles.statCard}>
+          <div className={styles.statIcon} style={{ background: 'rgba(12, 35, 75, 0.1)' }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0C234B" strokeWidth="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+          </div>
+          <div>
+            <div className={styles.statValue}>{timeSlots.filter(s => !s.isBooked).length}</div>
+            <div className={styles.statLabel}>Available Slots</div>
+          </div>
+        </div>
+
+        <div className={styles.statCard}>
+          <div className={styles.statIcon} style={{ background: 'rgba(171, 5, 32, 0.1)' }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#AB0520" strokeWidth="2">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+          </div>
+          <div>
+            <div className={styles.statValue}>{timeSlots.filter(s => s.isBooked).length}</div>
+            <div className={styles.statLabel}>Booked Sessions</div>
+          </div>
+        </div>
+        
+        </div>
+      
+
+      {/* Create Slot Modal */}
+      {showCreateModal && (
+        <div className={styles.modalOverlay} onClick={() => setShowCreateModal(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <h2 className={styles.modalTitle}>Create Time Slot</h2>
+            <p className={styles.modalSubtitle}>Add a new 1-hour tutoring slot to your schedule</p>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Date</label>
               <input
-                type="text"
+                type="date"
                 className={styles.input}
-                placeholder="e.g., CSC 337"
-                value={newCourse}
-                onChange={(e) => setNewCourse(e.target.value.toUpperCase())}
-                onKeyPress={(e) => e.key === 'Enter' && addCourse()}
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                min={new Date().toISOString().split('T')[0]}
               />
-              <button className={styles.addBtn} onClick={addCourse}>
-                + Add
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Time</label>
+              <select
+                className={styles.input}
+                value={selectedTime}
+                onChange={(e) => setSelectedTime(e.target.value)}
+              >
+                {Array.from({ length: 14 }, (_, i) => i + 8).map(hour => (
+                  <React.Fragment key={hour}>
+                    <option value={`${hour.toString().padStart(2, '0')}:00`}>
+                      {formatTime(`${hour.toString().padStart(2, '0')}:00`)}
+                    </option>
+                    <option value={`${hour.toString().padStart(2, '0')}:30`}>
+                      {formatTime(`${hour.toString().padStart(2, '0')}:30`)}
+                    </option>
+                  </React.Fragment>
+                ))}
+              </select>
+            </div>
+
+            <div className={styles.modalInfo}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="16" x2="12" y2="12" />
+                <line x1="12" y1="8" x2="12.01" y2="8" />
+              </svg>
+              All slots are 1 hour long and will appear on the Book a Session page for students to book.
+            </div>
+
+            <div className={styles.modalActions}>
+              <button className={styles.cancelBtn} onClick={() => setShowCreateModal(false)}>
+                Cancel
+              </button>
+              <button className={styles.confirmBtn} onClick={createTimeSlot}>
+                Create Slot
               </button>
             </div>
-          )}
-
-          {profile.courses.length === 0 && (
-            <div className={styles.emptyMessage}>
-              No courses added yet. Add courses that you can tutor!
-            </div>
-          )}
-        </div>
-
-        {/* Availability Settings Card */}
-        <div className={styles.profileCard}>
-          <h3 className={styles.cardTitle}>Availability Settings</h3>
-          
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Hourly Rate</label>
-            <div className={styles.priceInput}>
-              <span className={styles.priceDollar}>$</span>
-              <input
-                type="number"
-                className={styles.input}
-                value={profile.price}
-                onChange={(e) => setProfile({ ...profile, price: parseInt(e.target.value) || 20 })}
-                disabled={!isEditing}
-                min="10"
-                max="100"
-              />
-              <span className={styles.priceLabel}>per hour</span>
-            </div>
-          </div>
-
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Meeting Types</label>
-            <div className={styles.checkboxGroup}>
-              <label className={styles.checkbox}>
-                <input
-                  type="checkbox"
-                  checked={profile.supportsOnline}
-                  onChange={(e) => setProfile({ ...profile, supportsOnline: e.target.checked })}
-                  disabled={!isEditing}
-                />
-                <span>Online (Zoom)</span>
-              </label>
-              <label className={styles.checkbox}>
-                <input
-                  type="checkbox"
-                  checked={profile.supportsInPerson}
-                  onChange={(e) => setProfile({ ...profile, supportsInPerson: e.target.checked })}
-                  disabled={!isEditing}
-                />
-                <span>In-Person (Campus)</span>
-              </label>
-            </div>
-          </div>
-
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Office Hours (Optional)</label>
-            <input
-              type="text"
-              className={styles.input}
-              placeholder="e.g., Mon/Wed 2-4 PM, Gould-Simpson 930"
-              value={profile.officeHours}
-              onChange={(e) => setProfile({ ...profile, officeHours: e.target.value })}
-              disabled={!isEditing}
-            />
           </div>
         </div>
-      </div>
-
-      {/* Preview Card */}
-      <div className={styles.previewCard}>
-        <h3 className={styles.cardTitle}>Student View Preview</h3>
-        <p className={styles.previewSubtitle}>This is how students will see your profile on the Book a Session page</p>
-        
-        <div className={styles.mentorPreview}>
-          <div className={styles.previewHeader}>
-            <div className={styles.previewAvatar}>{profile.avatar}</div>
-            <div className={styles.previewInfo}>
-              <h4 className={styles.previewName}>{profile.name}</h4>
-              <div className={styles.previewRating}>
-                <span className={styles.starIcon}>★</span>
-                <span>5.0</span>
-                <span className={styles.reviews}>(0 reviews)</span>
-              </div>
-            </div>
-            <div className={styles.previewPrice}>
-              <span className={styles.previewPriceAmount}>${profile.price}</span>
-              <span className={styles.previewPricePeriod}>/session</span>
-            </div>
-          </div>
-          <p className={styles.previewBio}>{profile.major}. {profile.bio || 'No bio added yet.'}</p>
-          <div className={styles.previewCourses}>
-            {profile.courses.length > 0 ? (
-              profile.courses.map(course => (
-                <span key={course} className={styles.previewCourseTag}>{course}</span>
-              ))
-            ) : (
-              <span className={styles.emptyMessage}>No courses added</span>
-            )}
-          </div>
-          <div className={styles.previewFooter}>
-            <div className={styles.previewFooterItem}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M23 7l-7 5 7 5V7z" />
-                <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
-              </svg>
-              {profile.supportsInPerson && profile.supportsOnline
-                ? "In-Person / Online"
-                : profile.supportsOnline
-                  ? "Online Only"
-                  : "In-Person Only"}
-            </div>
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
