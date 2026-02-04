@@ -20,6 +20,12 @@ export interface CourseGrade {
     grade: string;
     credits: number;
     term: string;
+    isRetake?: boolean;      // Flag if this course was retaken
+    originalGrade?: string;  // Original grade if retaken
+    originalTerm?: string;   // Original term if retaken
+    allGrades?: string[];    // All grades if taken multiple times (for averaging)
+    bestGrade?: string;      // Best grade achieved (for display)
+    bestGradeTerm?: string;  // Term when best grade was achieved
 }
 
 /**
@@ -202,17 +208,74 @@ export async function parseTranscriptPDF(buffer: Buffer): Promise<ParsedTranscri
         }
 
         // De-duplicate courses by keeping the most recent occurrence
-        // Build a map with course code as key, but keep courses in reverse order
-        // so the last occurrence (most recent) is kept
+        // Track retakes: if a course appears multiple times, mark it as a retake
+        // and store all grades for proper GPA calculation
         const uniqueCoursesMap = new Map<string, CourseGrade>();
+        const allGradesMap = new Map<string, { grade: string; term: string }[]>(); // Store all grades with terms
+        const originalCoursesMap = new Map<string, CourseGrade>(); // Store first occurrence
 
-        // Process in reverse to prioritize most recent terms when de-duplicating
+        // Grade points for finding best grade
+        const gradePoints: Record<string, number> = {
+            'A+': 4.0, 'A': 4.0, 'A-': 3.7,
+            'B+': 3.3, 'B': 3.0, 'B-': 2.7,
+            'C+': 2.3, 'C': 2.0, 'C-': 1.7,
+            'D+': 1.3, 'D': 1.0, 'D-': 0.7,
+            'E': 0.0, 'F': 0.0, 'W': -1, 'IP': -1, 'P': 2.0, 'S': 2.0
+        };
+
+        // First pass: collect all grades with terms for each course and find earliest occurrence
+        for (const course of courses) {
+            const key = course.course;
+            if (!originalCoursesMap.has(key)) {
+                originalCoursesMap.set(key, course);
+            }
+            // Collect all grades with terms (skip IP - in progress and W - withdrawn)
+            if (course.grade !== 'IP' && course.grade !== 'W') {
+                const grades = allGradesMap.get(key) || [];
+                grades.push({ grade: course.grade, term: course.term });
+                allGradesMap.set(key, grades);
+            }
+        }
+
+        // Second pass: process in reverse to keep most recent, mark retakes with all grades
         for (let i = courses.length - 1; i >= 0; i--) {
             const course = courses[i];
             const key = course.course;
-            // Only add if not already in map (since we're going backwards, first hit is most recent)
+
             if (!uniqueCoursesMap.has(key)) {
-                uniqueCoursesMap.set(key, course);
+                const allGradesWithTerms = allGradesMap.get(key) || [];
+                const allGrades = allGradesWithTerms.map(g => g.grade);
+                const original = originalCoursesMap.get(key);
+
+                // Find best grade and its term
+                let bestGrade = course.grade;
+                let bestGradeTerm = course.term;
+                if (allGradesWithTerms.length > 0) {
+                    let bestPoints = -2;
+                    for (const g of allGradesWithTerms) {
+                        const points = gradePoints[g.grade] ?? 0;
+                        if (points > bestPoints) {
+                            bestPoints = points;
+                            bestGrade = g.grade;
+                            bestGradeTerm = g.term;
+                        }
+                    }
+                }
+
+                if (original && original.term !== course.term && allGrades.length > 1) {
+                    // This is a retake - mark it and store all grades
+                    uniqueCoursesMap.set(key, {
+                        ...course,
+                        isRetake: true,
+                        originalGrade: original.grade,
+                        originalTerm: original.term,
+                        allGrades: allGrades,
+                        bestGrade: bestGrade,
+                        bestGradeTerm: bestGradeTerm,
+                    });
+                } else {
+                    uniqueCoursesMap.set(key, course);
+                }
             }
         }
 

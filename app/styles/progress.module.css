@@ -460,9 +460,9 @@
 .removeCourseBtn {
     width: 32px;
     height: 32px;
-    border: none;
-    background: #fee2e2;
-    color: #dc2626;
+    border: 2px solid #e2e8f0;
+    background: #f8fafc;
+    color: #94a3b8;
     border-radius: 6px;
     font-size: 1.25rem;
     cursor: pointer;
@@ -473,8 +473,9 @@
 }
 
 .removeCourseBtn:hover {
-    background: #fecaca;
-    transform: scale(1.05);
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #64748b;
 }
 
 .addGPACourseBtn {

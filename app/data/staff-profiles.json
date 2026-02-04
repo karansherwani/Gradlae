@@ -13,5 +13,39 @@
     "phone": "",
     "officeHours": "",
     "specializations": []
+  },
+  {
+    "staffId": "1770098072761",
+    "name": "KELLY JAMES",
+    "avatar": "PS",
+    "major": "JFB",
+    "bio": "HJiiiiiii",
+    "courses": [
+      "CSC 323"
+    ],
+    "price": 25,
+    "supportsInPerson": true,
+    "supportsOnline": true,
+    "email": "karankumar11aa@gmail.com",
+    "phone": "5555555555",
+    "officeHours": "",
+    "specializations": []
+  },
+  {
+    "staffId": "1770173271137",
+    "name": "Prof. Random",
+    "avatar": "PR",
+    "major": "kjrenvo",
+    "bio": "cyx",
+    "courses": [
+      "CSC 233"
+    ],
+    "price": 20,
+    "supportsInPerson": true,
+    "supportsOnline": true,
+    "email": "a@arizona.edu",
+    "phone": "5454545454",
+    "officeHours": "",
+    "specializations": []
   }
 ]

@@ -24,6 +24,10 @@ interface TranscriptCourse {
     grade: string;
     credits: number;
     term: string;
+    isRetake?: boolean;
+    originalGrade?: string;
+    originalTerm?: string;
+    allGrades?: string[];
 }
 
 interface GPACalculatorCourse {
@@ -70,6 +74,7 @@ export default function ProgressPage() {
     // Transcript data
     const [transcriptCourses, setTranscriptCourses] = useState<TranscriptCourse[]>([]);
     const [loadingTranscript, setLoadingTranscript] = useState(true);
+    const [hasTranscript, setHasTranscript] = useState(false);
 
     // GPA Calculator State
     const [previousCredits, setPreviousCredits] = useState<string>('');
@@ -124,6 +129,7 @@ export default function ProgressPage() {
 
             if (data.hasTranscript && data.courses?.length > 0) {
                 setTranscriptCourses(data.courses);
+                setHasTranscript(true);
 
                 // Get current semester courses (in-progress or most recent term)
                 const currentCourses = data.courses.filter((c: TranscriptCourse) =>
@@ -144,14 +150,45 @@ export default function ProgressPage() {
                 }
 
                 // Calculate previous credits and GPA from completed courses
+                // Retake logic:
+                // - If original grade is C, D, or E: use the best grade, count credits once
+                // - If original grade is B or better: average the grade points, count credits once
                 const completedCourses = data.courses.filter((c: TranscriptCourse) =>
                     c.grade !== 'IP' && GRADE_POINTS[c.grade] !== undefined
                 );
 
                 if (completedCourses.length > 0) {
-                    const totalCredits = completedCourses.reduce((sum: number, c: TranscriptCourse) => sum + c.credits, 0);
-                    const totalPoints = completedCourses.reduce((sum: number, c: TranscriptCourse) =>
-                        sum + (GRADE_POINTS[c.grade] || 0) * c.credits, 0);
+                    const goodGradeThreshold = 2.7; // B- or better
+                    let totalCredits = 0;
+                    let totalPoints = 0;
+
+                    for (const course of completedCourses) {
+                        if (course.grade === 'W') continue; // Skip withdrawals
+
+                        const credits = course.credits;
+
+                        if (course.isRetake && course.allGrades && course.allGrades.length > 1) {
+                            // This is a retake - apply special logic
+                            const allPoints = course.allGrades.map((g: string) => GRADE_POINTS[g] ?? 0);
+                            const originalPoints = GRADE_POINTS[course.originalGrade || ''] ?? 0;
+
+                            if (originalPoints < goodGradeThreshold) {
+                                // Original grade was C, D, or E - use the BEST grade
+                                const bestPoints = Math.max(...allPoints);
+                                totalPoints += bestPoints * credits;
+                            } else {
+                                // Original grade was B or better - AVERAGE the points
+                                const avgPoints = allPoints.reduce((sum: number, p: number) => sum + p, 0) / allPoints.length;
+                                totalPoints += avgPoints * credits;
+                            }
+                            totalCredits += credits; // Count credits only once
+                        } else {
+                            // Normal course (not a retake)
+                            totalPoints += (GRADE_POINTS[course.grade] || 0) * credits;
+                            totalCredits += credits;
+                        }
+                    }
+
                     const gpa = totalCredits > 0 ? totalPoints / totalCredits : 0;
 
                     setPreviousCredits(totalCredits.toString());
@@ -455,9 +492,9 @@ export default function ProgressPage() {
                             </div>
                         ) : gpaCalculatorCourses.length === 0 ? (
                             <div className={styles.emptyGPACourses}>
-                                <p>No courses found. Add courses to calculate your GPA.</p>
+                                <p>{hasTranscript ? 'No current semester courses found in transcript.' : 'No transcript uploaded. Add courses manually to calculate your GPA.'}</p>
                                 <button onClick={addGPACourse} className={styles.addGPACourseBtn}>
-                                    + Add Course
+                                    + Add Course Manually
                                 </button>
                             </div>
                         ) : (

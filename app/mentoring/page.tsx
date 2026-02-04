@@ -21,6 +21,7 @@ interface TimeSlot {
 
 interface Mentor {
     id: number;
+    staffId?: string;
     name: string;
     avatar: string;
     avatarColor: 'blue' | 'red';
@@ -37,7 +38,8 @@ interface Mentor {
     timeSlots: TimeSlot[];
 }
 
-const MENTORS: Mentor[] = [
+// Fallback mentors (shown when no dynamic mentors are available)
+const DEFAULT_MENTORS: Mentor[] = [
     {
         id: 1,
         name: "Santiago Ponce",
@@ -51,7 +53,7 @@ const MENTORS: Mentor[] = [
         slotsAvailable: 3,
         supportsInPerson: true,
         supportsOnline: true,
-        price: 20,
+        price: 25,
         reviews: [
             { id: 1, user: "John D.", text: "Sarah explained complex statistical models in a way that finally clicked for me.", rating: 5, date: "Dec 28, 2024" },
             { id: 2, user: "Maria L.", text: "Super patient and very knowledgeable about MATH 466!", rating: 4.8, date: "Dec 15, 2024" }
@@ -75,7 +77,7 @@ const MENTORS: Mentor[] = [
         slotsAvailable: 3,
         supportsInPerson: false,
         supportsOnline: true,
-        price: 20,
+        price: 25,
         reviews: [
             { id: 1, user: "Chris P.", text: "Helped me understand pointers finally!", rating: 5, date: "Dec 12, 2024" }
         ],
@@ -98,7 +100,7 @@ const MENTORS: Mentor[] = [
         slotsAvailable: 3,
         supportsInPerson: true,
         supportsOnline: true,
-        price: 20,
+        price: 25,
         reviews: [
             { id: 1, user: "Kevin S.", text: "The best math tutor I've ever had. So clear.", rating: 5, date: "Nov 20, 2024" }
         ],
@@ -109,7 +111,7 @@ const MENTORS: Mentor[] = [
     },
     {
         id: 4,
-        name: "Eris Peto",
+        name: "Harsh Kaul",
         avatar: "EP",
         avatarColor: 'blue',
         rating: 4.7,
@@ -120,7 +122,7 @@ const MENTORS: Mentor[] = [
         slotsAvailable: 2,
         supportsInPerson: true,
         supportsOnline: false,
-        price: 20,
+        price: 25,
         reviews: [
             { id: 1, user: "David G.", text: "Calculus was a nightmare until I started meeting with Michael.", rating: 5, date: "Dec 5, 2024" }
         ],
@@ -132,6 +134,8 @@ const MENTORS: Mentor[] = [
 ];
 
 export default function MentoringPage() {
+    const [mentors, setMentors] = useState<Mentor[]>([]);
+    const [isLoadingMentors, setIsLoadingMentors] = useState(true);
     const [selectedMentor, setSelectedMentor] = useState<Mentor | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -141,6 +145,30 @@ export default function MentoringPage() {
     const [groupEmails, setGroupEmails] = useState<string[]>(['', '', '']);
     const [isProcessingPayment, setIsProcessingPayment] = useState(false);
     const [paymentSuccess, setPaymentSuccess] = useState(false);
+
+    // Fetch mentors from API on mount
+    useEffect(() => {
+        const fetchMentors = async () => {
+            try {
+                const response = await fetch('/api/mentors');
+                if (response.ok) {
+                    const dynamicMentors = await response.json();
+                    // Combine dynamic mentors with default mentors
+                    // Dynamic mentors (from staff profiles) come first
+                    setMentors([...dynamicMentors, ...DEFAULT_MENTORS]);
+                } else {
+                    // Fallback to default mentors on error
+                    setMentors(DEFAULT_MENTORS);
+                }
+            } catch (error) {
+                console.error('Error fetching mentors:', error);
+                setMentors(DEFAULT_MENTORS);
+            } finally {
+                setIsLoadingMentors(false);
+            }
+        };
+        fetchMentors();
+    }, []);
 
     // Check for Stripe redirect
     useEffect(() => {
@@ -165,7 +193,7 @@ export default function MentoringPage() {
         pass: { label: '5-Session Pass', price: 100, description: '5 sessions (Save $0!)' },
     };
 
-    const filteredMentors = MENTORS.filter(m =>
+    const filteredMentors = mentors.filter(m =>
         m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         m.courses.some(c => c.toLowerCase().includes(searchQuery.toLowerCase()))
     );
@@ -239,13 +267,27 @@ export default function MentoringPage() {
                 <div className={styles.heroContent}>
                     <h1>Book a Mentoring Session</h1>
                     <p className={styles.heroSubtext}>
-                        Connect with UofA students who excelled in your courses. Fixed rate: $20 per session.
+                        Connect with UofA students who excelled in your courses. Fixed rate: $25 per session.
                     </p>
                 </div>
             </section>
 
             <main className={styles.main}>
-                {!selectedMentor ? (
+                {isLoadingMentors ? (
+                    <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+                        <div style={{
+                            width: '40px',
+                            height: '40px',
+                            border: '3px solid rgba(12, 35, 75, 0.2)',
+                            borderTopColor: 'var(--uofa-blue)',
+                            borderRadius: '50%',
+                            animation: 'spin 1s linear infinite',
+                            margin: '0 auto 16px'
+                        }} />
+                        <p style={{ color: '#6B7280' }}>Loading mentors...</p>
+                        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+                    </div>
+                ) : !selectedMentor ? (
                     <>
                         <div className={styles.searchWrapper}>
                             <div className={styles.searchInputContainer}>
@@ -390,7 +432,7 @@ export default function MentoringPage() {
                                         style={{ flex: '1 1 150px' }}
                                     >
                                         <div style={{ fontWeight: '600' }}>Individual</div>
-                                        <div style={{ fontSize: '1.25rem', fontWeight: '700', color: sessionType === 'individual' ? 'white' : 'var(--uofa-blue)' }}>$20</div>
+                                        <div style={{ fontSize: '1.25rem', fontWeight: '700', color: sessionType === 'individual' ? 'white' : 'var(--uofa-blue)' }}>$25</div>
                                         <div style={{ fontSize: '0.75rem', opacity: 0.8 }}>One-on-one</div>
                                     </button>
                                     <button
@@ -466,7 +508,7 @@ export default function MentoringPage() {
                             <strong> {bookedSlot.day}, {bookedSlot.date}</strong> at <strong>{bookedSlot.time}</strong>.
                         </p>
                         <div className={styles.bursarBadge} style={{ background: 'rgba(171, 5, 32, 0.1)', color: 'var(--uofa-red)' }}>
-                            $20.00 charged to Bursar Account
+                            $25.00 charged to Bursar Account
                         </div>
                         <p style={{ fontSize: '0.9rem', color: '#374151' }}>
                             A confirmation email with the {meetingType === 'Online' ? 'Zoom link' : 'meeting location'} has been sent to your university email.

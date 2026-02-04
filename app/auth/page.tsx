@@ -409,18 +409,20 @@ export default function AuthPage() {
               </button>
             </form>
           ) : (
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} name="login-form" autoComplete="on">
               {authMethod === 'email' ? (
                 <div className={styles.formGroup}>
                   <label htmlFor="email">Email Address</label>
                   <input
                     id="email"
+                    name="email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="your.email@example.com"
                     required
                     disabled={loading}
+                    autoComplete="email"
                   />
                 </div>
               ) : authMethod === 'netid' ? (
@@ -428,12 +430,14 @@ export default function AuthPage() {
                   <label htmlFor="netId">NetID / Student ID</label>
                   <input
                     id="netId"
+                    name="username"
                     type="text"
                     value={netId}
                     onChange={(e) => setNetId(e.target.value)}
                     placeholder="e.g., jsmith"
                     required
                     disabled={loading}
+                    autoComplete="username"
                   />
                   <p className={styles.fieldHint}>Your unique identifier at {uni.name}</p>
                 </div>
@@ -458,6 +462,7 @@ export default function AuthPage() {
                 <div className={styles.passwordWrapper}>
                   <input
                     id="password"
+                    name="password"
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}

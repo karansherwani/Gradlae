@@ -8,7 +8,7 @@ import styles from '../styles/placements.module.css';
 import { getCourses, Course, getPrerequisites } from '../lib/courseData';
 import { getRecommendedBatch, PrerequisiteInfo } from '../lib/batchLogic';
 
-type Step = 'choose' | 'upload' | 'uaccess' | 'results';
+type Step = 'upload' | 'results';
 
 interface CourseGrade {
   course: string;
@@ -16,14 +16,19 @@ interface CourseGrade {
   grade: string;
   credits: number;
   term: string;
+  isRetake?: boolean;
+  originalGrade?: string;
+  originalTerm?: string;
+  allGrades?: string[];
+  bestGrade?: string;
+  bestGradeTerm?: string;
 }
 
 export default function PlacementsPage() {
   const router = useRouter();
-  const [step, setStep] = useState<Step>('choose');
+  const [step, setStep] = useState<Step>('upload');
   const [grades, setGrades] = useState<CourseGrade[]>([]);
   const [uploading, setUploading] = useState(false);
-  const [connecting, setConnecting] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -33,6 +38,8 @@ export default function PlacementsPage() {
   const [plannedCourses, setPlannedCourses] = useState<Course[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loadingTranscript, setLoadingTranscript] = useState(true);
+  const [transcriptVerified, setTranscriptVerified] = useState(true);
+  const [verificationMessage, setVerificationMessage] = useState<string | null>(null);
 
   // Check for saved transcript on load
   useEffect(() => {
@@ -176,13 +183,32 @@ export default function PlacementsPage() {
         throw new Error(data.error || 'Upload failed');
       }
 
+      // Check verification status FIRST - reject if not verified
+      if (data.verification && !data.verification.verified) {
+        setTranscriptVerified(false);
+        setVerificationMessage(data.verification.message);
+        setUploadError(`⚠️ This transcript does not belong to you. ${data.verification.message} Please upload your own transcript.`);
+        setSelectedFile(null);
+        return; // Don't proceed - stay on upload page
+      }
+
+      // Verification passed - proceed with parsing
+      setTranscriptVerified(true);
+      setVerificationMessage(null);
+
       // Transform API response to grades format
-      const courseGrades: CourseGrade[] = data.courses?.map((c: { course: string; description: string; grade: string; credits: number; term: string }) => ({
+      const courseGrades: CourseGrade[] = data.courses?.map((c: { course: string; description: string; grade: string; credits: number; term: string; isRetake?: boolean; originalGrade?: string; originalTerm?: string; allGrades?: string[]; bestGrade?: string; bestGradeTerm?: string }) => ({
         course: c.course,
         description: c.description || '',
         grade: c.grade,
         credits: c.credits || 3,
         term: c.term || 'Unknown Term',
+        isRetake: c.isRetake,
+        originalGrade: c.originalGrade,
+        originalTerm: c.originalTerm,
+        allGrades: c.allGrades,
+        bestGrade: c.bestGrade,
+        bestGradeTerm: c.bestGradeTerm,
       })) || [];
 
       setGrades(courseGrades);
@@ -195,53 +221,12 @@ export default function PlacementsPage() {
     }
   };
 
-  // Mock UAccess connection
-  const handleUAccessConnect = () => {
-    setConnecting(true);
-    setTimeout(() => {
-      setGrades([
-        // Fall 2023
-        { course: 'AREC 150C3', description: 'Global Economy of Food', grade: 'A', credits: 3, term: 'Fall 2023' },
-        { course: 'CSC 110', description: 'Computer Programming I', grade: 'B', credits: 4, term: 'Fall 2023' },
-        { course: 'ENGL 106', description: 'Fnd Wrt Engl Additional Lang', grade: 'A', credits: 3, term: 'Fall 2023' },
-        { course: 'MATH 125', description: 'Calculus I', grade: 'A', credits: 3, term: 'Fall 2023' },
-        { course: 'PFFP 150B2', description: 'Personal Finance Foundations', grade: 'A', credits: 3, term: 'Fall 2023' },
-        { course: 'UNIV 101', description: 'Intro to General Ed Experience', grade: 'A', credits: 1, term: 'Fall 2023' },
-        { course: 'GAME 251', description: 'Intro to Game Design', grade: 'W', credits: 3, term: 'Fall 2023' },
-        // Spring 2024
-        { course: 'ACCT 200', description: 'Intro to Financial Acct', grade: 'A', credits: 3, term: 'Spring 2024' },
-        { course: 'CSC 120', description: 'Intro to Computer Prog II', grade: 'B', credits: 4, term: 'Spring 2024' },
-        { course: 'CSC 144', description: 'Discrete Math for Comp Sci I', grade: 'B', credits: 3, term: 'Spring 2024' },
-        { course: 'ECON 200', description: 'Basic Economic Issues', grade: 'A', credits: 3, term: 'Spring 2024' },
-        { course: 'ENGL 107', description: 'Fnd Wrt Engl Additional Lang', grade: 'A', credits: 3, term: 'Spring 2024' },
-        { course: 'MATH 129', description: 'Calculus II', grade: 'A', credits: 3, term: 'Spring 2024' },
-        // Fall 2024
-        { course: 'CSC 210', description: 'Software Development', grade: 'E', credits: 4, term: 'Fall 2024' },
-        { course: 'CSC 244', description: 'Discrete Math for Comp Sci II', grade: 'A', credits: 3, term: 'Fall 2024' },
-        { course: 'ENGL 108', description: 'Fnd Wrt Engl Additional Lang', grade: 'A', credits: 3, term: 'Fall 2024' },
-        { course: 'ENVS 210', description: 'Environmental Essentials', grade: 'A', credits: 3, term: 'Fall 2024' },
-        { course: 'MATH 313', description: 'Intro to Linear Algebra', grade: 'A', credits: 3, term: 'Fall 2024' },
-        // Spring 2025
-        { course: 'CHEM 151', description: 'General Chemistry I', grade: 'A', credits: 4, term: 'Spring 2025' },
-        { course: 'DATA 363', description: 'Intro to Statistical Methods', grade: 'B', credits: 3, term: 'Spring 2025' },
-        { course: 'DNC 101', description: 'Dance Appreciation', grade: 'A', credits: 3, term: 'Spring 2025' },
-        { course: 'EAS 160A1', description: 'The World of Buddhism', grade: 'A', credits: 3, term: 'Spring 2025' },
-        { course: 'ISTA 322', description: 'Data Engineering', grade: 'B', credits: 3, term: 'Spring 2025' },
-        { course: 'MATH 223', description: 'Vector Calculus', grade: 'B', credits: 4, term: 'Spring 2025' },
-        // Fall 2025 (Current)
-        { course: 'CSC 337', description: 'Web Programming', grade: 'A', credits: 3, term: 'Fall 2025' },
-        { course: 'DATA 201', description: 'Foundations of Data Science', grade: 'C', credits: 3, term: 'Fall 2025' },
-        { course: 'DATA 375', description: 'Intro to Statistcal Computing', grade: 'A', credits: 3, term: 'Fall 2025' },
-        { course: 'MATH 464', description: 'Theory of Probability', grade: 'A', credits: 3, term: 'Fall 2025' },
-        { course: 'MATH 323', description: 'Formal Math Reasoning', grade: 'B', credits: 3, term: 'Fall 2025' },
-        { course: 'MATH 355', description: 'Analysis of Ordinary Differential Equations', grade: 'A', credits: 3, term: 'Fall 2025' },
-      ]);
-      setConnecting(false);
-      setStep('results');
-    }, 2500);
-  };
+
 
   // Calculate recommended track based on GPA
+  // Retake logic:
+  // - If original grade is C, D, or E: use the best grade, count credits once
+  // - If original grade is B or better: average the grade points, count credits once
   const calculateRecommendation = () => {
     const gradePoints: Record<string, number> = {
       'A+': 4.0, 'A': 4.0, 'A-': 3.7,
@@ -251,9 +236,40 @@ export default function PlacementsPage() {
       'E': 0.0, 'F': 0.0
     };
 
-    const totalPoints = grades.reduce((sum, g) =>
-      sum + (gradePoints[g.grade] || 0) * g.credits, 0);
-    const totalCredits = grades.reduce((sum, g) => sum + g.credits, 0);
+    // Grade threshold for "good" grades (B- or better)
+    const goodGradeThreshold = 2.7;
+
+    let totalPoints = 0;
+    let totalCredits = 0;
+
+    for (const course of grades) {
+      // Skip IP (in progress) and W (withdrawn) grades
+      if (course.grade === 'IP' || course.grade === 'W') continue;
+
+      const credits = course.credits;
+
+      if (course.isRetake && course.allGrades && course.allGrades.length > 1) {
+        // This is a retake - apply special logic
+        const allPoints = course.allGrades.map(g => gradePoints[g] ?? 0);
+        const originalPoints = gradePoints[course.originalGrade || ''] ?? 0;
+
+        if (originalPoints < goodGradeThreshold) {
+          // Original grade was C, D, or E - use the BEST grade
+          const bestPoints = Math.max(...allPoints);
+          totalPoints += bestPoints * credits;
+        } else {
+          // Original grade was B or better - AVERAGE the points
+          const avgPoints = allPoints.reduce((sum, p) => sum + p, 0) / allPoints.length;
+          totalPoints += avgPoints * credits;
+        }
+        totalCredits += credits; // Count credits only once
+      } else {
+        // Normal course (not a retake)
+        totalPoints += (gradePoints[course.grade] || 0) * credits;
+        totalCredits += credits;
+      }
+    }
+
     const gpa = totalCredits > 0 ? totalPoints / totalCredits : 0;
 
     if (gpa >= 3.5) return 'fast';
@@ -290,29 +306,6 @@ export default function PlacementsPage() {
       </section>
 
       <main className={styles.main}>
-        {/* Step 1: Choose Method */}
-        {step === 'choose' && (
-          <div className={styles.chooseSection}>
-            <h2>How would you like to provide your grades?</h2>
-            <p className={styles.hint}>Choose one of the options below to get a personalized track recommendation</p>
-
-            <div className={styles.optionsGrid}>
-              <div className={styles.optionCard} onClick={() => setStep('upload')}>
-                <div className={styles.optionIcon}>📄</div>
-                <h3>Upload Transcript</h3>
-                <p>Upload your unofficial transcript (PDF) and we'll extract your grades automatically</p>
-                <span className={styles.optionAction}>Select →</span>
-              </div>
-
-              <div className={styles.optionCard} onClick={() => setStep('uaccess')}>
-                <div className={styles.optionIcon}>🔗</div>
-                <h3>Connect UAccess</h3>
-                <p>Securely connect to your UAccess account to import grades and academic info</p>
-                <span className={styles.optionAction}>Select →</span>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Step 2a: Upload Transcript */}
         {step === 'upload' && (
@@ -373,50 +366,12 @@ export default function PlacementsPage() {
                 </Button>
               )}
 
-              <Button
-                variant="ghost"
-                onClick={() => { setStep('choose'); setSelectedFile(null); setUploadError(null); }}
-                className="w-full mt-4"
-              >
-                ← Choose different method
-              </Button>
+
             </CardContent>
           </Card>
         )}
 
-        {/* Step 2b: Connect UAccess */}
-        {step === 'uaccess' && (
-          <div className={styles.uaccessSection}>
-            <h2>Connect to UAccess</h2>
-            <p className={styles.hint}>Securely import your grades from UAccess</p>
 
-            <div className={styles.uaccessCard}>
-              <div className={styles.uaccessLogo}>🔐</div>
-              <h3>University of Arizona</h3>
-              <p>UAccess Student Portal</p>
-
-              {connecting ? (
-                <div className={styles.connecting}>
-                  <div className={styles.spinner}></div>
-                  <p>Connecting to UAccess...</p>
-                </div>
-              ) : (
-                <>
-                  <button className={styles.connectBtn} onClick={handleUAccessConnect}>
-                    Connect with NetID
-                  </button>
-                  <p className={styles.securityNote}>
-                    🔒 Secure connection - we never store your password
-                  </p>
-                </>
-              )}
-            </div>
-
-            <button className={styles.backLink} onClick={() => setStep('choose')}>
-              ← Choose different method
-            </button>
-          </div>
-        )}
 
         {/* Step 3: Results */}
         {step === 'results' && (
@@ -428,6 +383,29 @@ export default function PlacementsPage() {
                 <h3>Transcript Imported Successfully!</h3>
                 <p>Found {grades.length} courses across {[...new Set(grades.map(g => g.term))].length} semesters</p>
               </div>
+              <button
+                className={styles.updateTranscriptBtn}
+                onClick={() => {
+                  setStep('upload');
+                  setSelectedFile(null);
+                  setUploadError(null);
+                }}
+                style={{
+                  marginLeft: 'auto',
+                  padding: '8px 16px',
+                  background: 'rgba(255,255,255,0.2)',
+                  border: '1px solid rgba(255,255,255,0.3)',
+                  borderRadius: '8px',
+                  color: 'white',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                📄 Update Transcript
+              </button>
             </div>
 
             {/* Plan Next Semester Section */}
@@ -595,15 +573,33 @@ export default function PlacementsPage() {
                         <div key={i} className={styles.courseRow}>
                           <div className={styles.courseInfo}>
                             <span className={styles.courseCode}>{g.course}</span>
-                            <span className={styles.courseDesc}>{g.description}</span>
+                            <span className={styles.courseDesc}>
+                              {g.description}
+                              {g.isRetake && (
+                                <span style={{
+                                  marginLeft: '8px',
+                                  fontSize: '0.75rem',
+                                  padding: '2px 6px',
+                                  borderRadius: '4px',
+                                  background: 'rgba(59, 130, 246, 0.1)',
+                                  color: '#3b82f6'
+                                }}>
+                                  Retake (Best: {g.bestGrade} in {g.bestGradeTerm})
+                                </span>
+                              )}
+                            </span>
                           </div>
                           <div className={styles.courseRight}>
                             <span className={styles.credits}>{g.credits} credits</span>
                             {g.grade === 'IP' ? (
                               <span className={styles.inProgressBadge}>In Progress</span>
+                            ) : g.grade === 'W' ? (
+                              <span className={styles.gradeBadge} style={{ background: '#9ca3af', color: 'white' }}>
+                                W
+                              </span>
                             ) : (
                               <span className={`${styles.gradeBadge} ${g.grade === 'E' ? styles.gradeE : ''}`}>
-                                {g.grade}
+                                {g.isRetake ? g.bestGrade : g.grade}
                               </span>
                             )}
                           </div>
@@ -615,28 +611,104 @@ export default function PlacementsPage() {
               })}
 
 
-            <div className={styles.recommendationCard}>
-              {calculateRecommendation() === 'fast' && (
-                <div className={styles.trackBadge} style={{ background: '#22c55e' }}>
-                  ⚡ Fast Track (7 weeks)
+            {/* Recommendation Card - Only show if transcript is verified */}
+            {transcriptVerified ? (
+              <div className={styles.recommendationCard}>
+                {calculateRecommendation() === 'fast' && (
+                  <div className={styles.trackBadge} style={{ background: '#22c55e' }}>
+                    ⚡ Fast Track (7 weeks)
+                  </div>
+                )}
+                {calculateRecommendation() === 'standard' && (
+                  <div className={styles.trackBadge} style={{ background: '#3b82f6' }}>
+                  </div>
+                )}
+                {calculateRecommendation() === 'supported' && (
+                  <div className={styles.trackBadge} style={{ background: '#f97316' }}>
+                    🎯 Supported Track (Full Semester + Tutoring)
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div style={{
+                padding: '20px',
+                background: 'rgba(220, 38, 38, 0.1)',
+                border: '1px solid rgba(220, 38, 38, 0.3)',
+                borderRadius: '12px',
+                marginBottom: '20px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                  <span style={{ fontSize: '1.5rem' }}>⚠️</span>
+                  <h3 style={{ margin: 0, color: '#DC2626' }}>Transcript Verification Failed</h3>
                 </div>
-              )}
-              {calculateRecommendation() === 'standard' && (
-                <div className={styles.trackBadge} style={{ background: '#3b82f6' }}>
-                </div>
-              )}
-              {calculateRecommendation() === 'supported' && (
-                <div className={styles.trackBadge} style={{ background: '#f97316' }}>
-                  🎯 Supported Track (Full Semester + Tutoring)
-                </div>
-              )}
-            </div>
+                <p style={{ margin: '0 0 16px 0', color: '#6b7280' }}>
+                  {verificationMessage || 'This transcript does not appear to match your profile. Please upload your own transcript to get personalized recommendations.'}
+                </p>
+                <button
+                  onClick={() => {
+                    setStep('upload');
+                    setSelectedFile(null);
+                    setUploadError(null);
+                  }}
+                  style={{
+                    padding: '10px 20px',
+                    background: '#DC2626',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '0.95rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  📤 Upload Your Own Transcript
+                </button>
+              </div>
+            )}
 
             <div className={styles.actions}>
               <button className={styles.enrollBtn} onClick={() => alert('✅ Enrolled successfully!')}>
               </button>
-              <button className={styles.backLink} onClick={() => setStep('choose')}>
-                Try Different Method
+            </div>
+
+            {/* Upload New Transcript Section */}
+            <div style={{
+              marginTop: '40px',
+              padding: '24px',
+              background: 'linear-gradient(135deg, rgba(171, 5, 32, 0.05) 0%, rgba(0, 33, 71, 0.05) 100%)',
+              borderRadius: '12px',
+              border: '1px solid rgba(0, 33, 71, 0.1)',
+              textAlign: 'center'
+            }}>
+              <h3 style={{ margin: '0 0 8px 0', color: 'var(--uofa-blue, #002147)' }}>📄 Update Your Transcript</h3>
+              <p style={{ margin: '0 0 16px 0', color: '#6b7280', fontSize: '0.9rem' }}>
+                Have a new transcript? Upload it to keep your course history and GPA up to date.
+              </p>
+              <button
+                onClick={() => {
+                  setStep('upload');
+                  setSelectedFile(null);
+                  setUploadError(null);
+                }}
+                style={{
+                  padding: '12px 24px',
+                  background: 'var(--uofa-blue, #002147)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '1rem',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                📤 Upload New Transcript
               </button>
             </div>
           </div>

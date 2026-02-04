@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "id": "slot_1770146642390_gl77dbr2w",
+    "staffId": "1770098072761",
+    "staffName": "Prof. Staff",
+    "day": "Thursday",
+    "date": "Feb 5",
+    "time": "9:00 AM",
+    "duration": 60,
+    "isBooked": false
+  },
+  {
+    "id": "slot_1770173282580_fb1smkk2k",
+    "staffId": "1770173271137",
+    "staffName": "Prof. Random",
+    "day": "Wednesday",
+    "date": "Feb 4",
+    "time": "9:30 AM",
+    "duration": 60,
+    "isBooked": false
+  }
+]

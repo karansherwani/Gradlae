@@ -67,5 +67,23 @@
     "fullName": "Prof. HarshKaul",
     "staffId": "STAFF_203513",
     "role": "instructor"
+  },
+  {
+    "id": "1770098072761",
+    "authMethod": "staff",
+    "identifier": "staff",
+    "password": "123456",
+    "fullName": "Prof. Staff",
+    "staffId": "STAFF_440231",
+    "role": "instructor"
+  },
+  {
+    "id": "1770173271137",
+    "authMethod": "staff",
+    "identifier": "random",
+    "password": "112233",
+    "fullName": "Prof. Random",
+    "staffId": "STAFF_277588",
+    "role": "instructor"
   }
 ]
