@@ -3,10 +3,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from '../styles/advisor.module.css';
+import { StudentProfile, CompletedCourse } from '@/types';
 
 interface Message {
     id: string;
-    role: 'user' | 'ai';
+    role: 'user' | 'assistant';
     content: string;
     timestamp: Date;
 }
@@ -19,104 +20,28 @@ const QUICK_PROMPTS = [
     { icon: '⏱️', text: 'Which batch is right for me?' },
 ];
 
-const AI_RESPONSES: { [key: string]: string } = {
-    'plan': `Great question! To help you plan your next semester effectively, I'll need to consider a few things:
+// Mock student profile - in production, fetch from user session/database
+function getMockStudentProfile(studentName: string): StudentProfile {
+    const completedCourses: CompletedCourse[] = [
+        { courseId: 'CSC-101', courseName: 'Introduction to Computer Science', grade: 'A', units: 3, semester: 'Fall 2025', term: 'Fall', year: 2025 },
+        { courseId: 'CSC-110', courseName: 'Programming I', grade: 'A-', units: 4, semester: 'Fall 2025', term: 'Fall', year: 2025 },
+        { courseId: 'MATH-122A', courseName: 'Calculus I', grade: 'B+', units: 3, semester: 'Fall 2025', term: 'Fall', year: 2025 },
+        { courseId: 'ENGL-101', courseName: 'Composition', grade: 'A', units: 3, semester: 'Fall 2025', term: 'Fall', year: 2025 },
+    ];
 
-**1. Current Progress:** Based on your transcript, I can see which courses you've completed and your GPA trends.
-
-**2. Prerequisites:** I'll check which courses you're now eligible to take.
-
-**3. Workload Balance:** I recommend taking 12-15 credits depending on your other commitments.
-
-Would you like me to suggest specific courses, or would you prefer to tell me what areas you want to focus on?`,
-
-    'prerequisites': `For CS courses at University of Arizona, here's a general prerequisite chain:
-
-**Foundational Courses:**
-• CSC 101 → CSC 110 → CSC 120 → CSC 210
-• MATH 122A/B (Calculus) is required for most upper-division courses
-
-**Upper Division Prerequisites:**
-• CSC 210 is required for: CSC 335, CSC 345, CSC 352
-• CSC 252 requires: CSC 210 + MATH 243
-
-Based on your transcript, I can give you personalized recommendations. What specific courses are you interested in?`,
-
-    'recommend': `Based on your academic profile, here are my top recommendations:
-
-**High Priority:**
-1. **CSC 335 - Object-Oriented Programming** - Builds on your CSC 210 foundation
-2. **CSC 345 - Analysis of Algorithms** - Essential for technical interviews
-
-**Good Additions:**
-3. **MATH 313 - Linear Algebra** - Useful for AI/ML tracks
-4. **CSC 352 - Systems Programming** - Great for understanding low-level concepts
-
-Would you like me to explain why any of these would be particularly good for your goals?`,
-
-    'graduation': `I'd be happy to help create a 4-year graduation plan! Here's a typical CS track:
-
-**Year 1:** Foundation courses (CSC 101, 110, MATH series)
-**Year 2:** Core CS courses (CSC 120, 210, 252)
-**Year 3:** Upper division + electives (CSC 335, 345, 352)
-**Year 4:** Specialization + capstone
-
-📊 **Your Current Status:** Based on your transcript, you appear to be on track!
-
-To customize this plan, tell me:
-1. Any specific concentration (AI, Systems, Security)?
-2. Planning to do internships?
-3. Double major or minor interests?`,
-
-    'batch': `Great question about batch placement! Let me explain the options:
-
-**Batch A (Fast Track - 7 weeks):**
-• Intensive pace for students with strong prerequisite mastery
-• Requires 85%+ in prerequisite courses
-• Best for: Students with solid foundations who can handle accelerated learning
-
-**Batch B (Standard Track - Full Semester):**
-• Balanced pace covering all material thoroughly
-• Recommended for most students
-• Can take optional quiz to qualify for Batch A
-
-**Batch C (Supported Track - Full Semester + Tutoring):**
-• Extended support with additional mentoring
-• Extra tutoring sessions included
-• Best for: Students who benefit from additional guidance
-
-Based on your GPA and prerequisites, I can recommend your optimal batch. Would you like a personalized assessment?`,
-
-    'default': `I'm here to help with your academic planning! I can assist you with:
-
-• **Course Planning:** Suggesting courses for next semester
-• **Prerequisites:** Checking what you need for specific courses  
-• **Graduation Tracking:** Creating a path to graduation
-• **Batch Recommendations:** Finding your optimal course pace
-
-What would you like to explore?`
-};
-
-function getAIResponse(userMessage: string): string {
-    const msg = userMessage.toLowerCase();
-
-    if (msg.includes('plan') && (msg.includes('semester') || msg.includes('next'))) {
-        return AI_RESPONSES['plan'];
-    }
-    if (msg.includes('prerequisite') || msg.includes('prereq')) {
-        return AI_RESPONSES['prerequisites'];
-    }
-    if (msg.includes('recommend') || msg.includes('suggest') || msg.includes('should i take')) {
-        return AI_RESPONSES['recommend'];
-    }
-    if (msg.includes('graduation') || msg.includes('4-year') || msg.includes('four year') || msg.includes('graduate')) {
-        return AI_RESPONSES['graduation'];
-    }
-    if (msg.includes('batch') || msg.includes('track') || msg.includes('pace')) {
-        return AI_RESPONSES['batch'];
-    }
-
-    return AI_RESPONSES['default'];
+    return {
+        id: '1',
+        name: studentName,
+        email: `${studentName.toLowerCase().replace(' ', '.')}@arizona.edu`,
+        major: 'Computer Science',
+        degreePlanId: 'cs-bs-2025',
+        startYear: 2025,
+        startTerm: 'Fall',
+        currentSemester: 2,
+        completedCourses,
+        interests: ['Machine Learning', 'Web Development'],
+        careerGoals: 'Software Engineer at a tech company'
+    };
 }
 
 export default function AdvisorPage() {
@@ -126,6 +51,7 @@ export default function AdvisorPage() {
     const [isTyping, setIsTyping] = useState(false);
     const [loading, setLoading] = useState(true);
     const [studentName, setStudentName] = useState('');
+    const [studentProfile, setStudentProfile] = useState<StudentProfile | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -137,10 +63,14 @@ export default function AdvisorPage() {
         const cleanName = name.startsWith('Student ') ? name.replace('Student ', '') : name;
         setStudentName(cleanName);
 
+        // Initialize student profile
+        const profile = getMockStudentProfile(cleanName);
+        setStudentProfile(profile);
+
         // Add initial welcome message
         const welcomeMessage: Message = {
             id: 'welcome',
-            role: 'ai',
+            role: 'assistant',
             content: `Hello ${cleanName}! 👋 I'm your AI Academic Advisor. I'm here to help you plan your academic journey at University of Arizona.\n\nI can help you with:\n• Planning your next semester\n• Understanding prerequisites\n• Course recommendations\n• Creating a graduation timeline\n\nWhat would you like to explore today?`,
             timestamp: new Date(),
         };
@@ -153,7 +83,7 @@ export default function AdvisorPage() {
     }, [messages, isTyping]);
 
     const handleSendMessage = async (content: string) => {
-        if (!content.trim()) return;
+        if (!content.trim() || !studentProfile) return;
 
         const userMessage: Message = {
             id: `user-${Date.now()}`,
@@ -166,18 +96,55 @@ export default function AdvisorPage() {
         setInputValue('');
         setIsTyping(true);
 
-        // Simulate AI thinking time
-        await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000));
+        try {
+            // Prepare messages for API
+            const chatMessages = [...messages, userMessage].map(msg => ({
+                id: msg.id,
+                role: msg.role,
+                content: msg.content,
+                timestamp: msg.timestamp
+            }));
 
-        const aiResponse: Message = {
-            id: `ai-${Date.now()}`,
-            role: 'ai',
-            content: getAIResponse(content),
-            timestamp: new Date(),
-        };
+            // Call the chat API
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    messages: chatMessages,
+                    studentProfile: studentProfile
+                })
+            });
 
-        setIsTyping(false);
-        setMessages(prev => [...prev, aiResponse]);
+            if (!response.ok) {
+                throw new Error('Failed to get AI response');
+            }
+
+            const data = await response.json();
+
+            const aiResponse: Message = {
+                id: `assistant-${Date.now()}`,
+                role: 'assistant',
+                content: data.message,
+                timestamp: new Date(),
+            };
+
+            setIsTyping(false);
+            setMessages(prev => [...prev, aiResponse]);
+
+        } catch (error) {
+            console.error('Error sending message:', error);
+            setIsTyping(false);
+            
+            const errorMessage: Message = {
+                id: `error-${Date.now()}`,
+                role: 'assistant',
+                content: "I'm sorry, I'm having trouble connecting right now. Please try again in a moment.",
+                timestamp: new Date(),
+            };
+            setMessages(prev => [...prev, errorMessage]);
+        }
     };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -227,13 +194,13 @@ export default function AdvisorPage() {
                         {messages.map((message) => (
                             <div
                                 key={message.id}
-                                className={`${styles.message} ${message.role === 'ai' ? styles.messageAi : styles.messageUser}`}
+                                className={`${styles.message} ${message.role === 'assistant' ? styles.messageAi : styles.messageUser}`}
                             >
-                                <div className={`${styles.avatar} ${message.role === 'ai' ? styles.avatarAi : styles.avatarUser}`}>
-                                    {message.role === 'ai' ? '🤖' : studentName.charAt(0).toUpperCase()}
+                                <div className={`${styles.avatar} ${message.role === 'assistant' ? styles.avatarAi : styles.avatarUser}`}>
+                                    {message.role === 'assistant' ? '🤖' : studentName.charAt(0).toUpperCase()}
                                 </div>
                                 <div className={styles.messageContent}>
-                                    <div className={`${styles.messageBubble} ${message.role === 'ai' ? styles.messageBubbleAi : styles.messageBubbleUser}`}>
+                                    <div className={`${styles.messageBubble} ${message.role === 'assistant' ? styles.messageBubbleAi : styles.messageBubbleUser}`}>
                                         {message.content.split('\n').map((line, i) => (
                                             <span key={i}>
                                                 {line}
@@ -302,7 +269,7 @@ export default function AdvisorPage() {
                             </button>
                         </div>
                         <p className={styles.footerHint}>
-                            Press Enter to send • AI responses are simulated for demo purposes
+                            Press Enter to send • Powered by AI
                         </p>
                     </div>
                 </div>

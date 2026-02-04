@@ -1,0 +1,154 @@
+{
+  "prerequisites": {
+    "MATH-129": {
+      "type": "OR",
+      "children": [
+        { "type": "COURSE", "value": "MATH-122B", "minGrade": "C" },
+        { "type": "COURSE", "value": "MATH-125", "minGrade": "C" }
+      ]
+    },
+    "ECE-101": {
+      "type": "OR",
+      "children": [
+        { "type": "COURSE", "value": "MATH-112" },
+        { "type": "COURSE", "value": "MATH-120R" },
+        { "type": "COURSE", "value": "MATH-122B" },
+        { "type": "COURSE", "value": "MATH-125" }
+      ]
+    },
+    "PHYS-141": {
+      "type": "OR",
+      "children": [
+        { "type": "COURSE", "value": "MATH-122B" },
+        { "type": "COURSE", "value": "MATH-125" }
+      ]
+    },
+    "PHYS-161H": {
+      "type": "OR",
+      "children": [
+        { "type": "COURSE", "value": "MATH-122B" },
+        { "type": "COURSE", "value": "MATH-125" }
+      ]
+    },
+    "ENGL-102": {
+      "type": "OR",
+      "children": [
+        { "type": "COURSE", "value": "ENGL-101" },
+        { "type": "COURSE", "value": "ENGL-107" }
+      ]
+    },
+    "ENGL-108": {
+      "type": "OR",
+      "children": [
+        { "type": "COURSE", "value": "ENGL-101" },
+        { "type": "COURSE", "value": "ENGL-107" }
+      ]
+    },
+    "ECE-274A": {
+      "type": "AND",
+      "children": [
+        { "type": "COURSE", "value": "ECE-101" },
+        { "type": "COURSE", "value": "MATH-129" }
+      ]
+    },
+    "MATH-243": {
+      "type": "OR",
+      "children": [
+        { "type": "COURSE", "value": "MATH-122B" },
+        { "type": "COURSE", "value": "MATH-125" },
+        { "type": "COURSE", "value": "MATH-129" }
+      ]
+    },
+    "PHYS-241": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "OR",
+          "children": [
+            { "type": "COURSE", "value": "PHYS-141" },
+            { "type": "COURSE", "value": "PHYS-161H" }
+          ]
+        },
+        { "type": "COURSE", "value": "MATH-129" }
+      ]
+    },
+    "PHYS-261H": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "OR",
+          "children": [
+            { "type": "COURSE", "value": "PHYS-141" },
+            { "type": "COURSE", "value": "PHYS-161H" }
+          ]
+        },
+        { "type": "COURSE", "value": "MATH-129" }
+      ]
+    },
+    "ECE-201": {
+      "type": "AND",
+      "children": [
+        { "type": "COURSE", "value": "MATH-112" },
+        { "type": "COURSE", "value": "ECE-101", "minGrade": "C" }
+      ]
+    },
+    "ECE-220": {
+      "type": "AND",
+      "children": [
+        { "type": "COURSE", "value": "MATH-129" },
+        { "type": "COURSE", "value": "PHYS-241" }
+      ]
+    },
+    "MATH-254": {
+      "type": "COURSE",
+      "value": "MATH-129",
+      "minGrade": "C"
+    },
+    "CSC-355": {
+      "type": "COURSE",
+      "value": "MATH-243"
+    },
+    "ECE-369A": {
+      "type": "AND",
+      "children": [
+        { "type": "COURSE", "value": "ECE-201" },
+        { "type": "COURSE", "value": "ECE-274A" }
+      ]
+    },
+    "ECE-310": {
+      "type": "AND",
+      "children": [
+        { "type": "COURSE", "value": "ECE-101" },
+        { "type": "COURSE", "value": "MATH-254" },
+        { "type": "COURSE", "value": "ECE-220" }
+      ]
+    },
+    "ECE-401C": {
+      "type": "AND",
+      "children": [
+        { "type": "COURSE", "value": "ECE-201" },
+        { "type": "COURSE", "value": "CSC-355" }
+      ]
+    },
+    "ECE-402C": {
+      "type": "COURSE",
+      "value": "ECE-201",
+      "minGrade": "C"
+    },
+    "ECE-304C": {
+      "type": "AND",
+      "children": [
+        { "type": "COURSE", "value": "MATH-243" },
+        { "type": "COURSE", "value": "ECE-201" }
+      ]
+    },
+    "SFWE-302": {
+      "type": "COURSE",
+      "value": "ECE-201"
+    },
+    "SFWE-402": {
+      "type": "COURSE",
+      "value": "ECE-275"
+    }
+  }
+}

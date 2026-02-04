@@ -1,0 +1,406 @@
+{
+  "plans": [
+    {
+      "id": "bs-cse-2025-26",
+      "name": "B.S. in Computer Science and Engineering",
+      "catalogYear": "2025-26",
+      "totalUnits": 128,
+      "semesters": [
+        {
+          "number": 1,
+          "name": "1st Semester",
+          "courses": [
+            {
+              "courseId": "MATH-122A",
+              "title": "Calculus I with Applications",
+              "category": "required",
+              "units": 3,
+              "prerequisites": "Appropriate Math Placement",
+              "options": ["MATH-122A", "MATH-122B", "MATH-125"]
+            },
+            {
+              "courseId": "CHEM-151",
+              "title": "Chemical Thinking I",
+              "category": "required",
+              "units": 4,
+              "prerequisites": "Appropriate Math Placement",
+              "options": ["CHEM-151", "CHEM-161", "CHEM-163", "MSE-109"]
+            },
+            {
+              "courseId": "ENGL-101",
+              "title": "First-Year Composition",
+              "category": "required",
+              "units": 3,
+              "options": ["ENGL-101", "ENGL-107", "ENGL-109H"]
+            },
+            {
+              "courseId": "ENGR-102A",
+              "title": "Introduction to Engineering",
+              "category": "required",
+              "units": 3,
+              "prerequisites": "Pre- or Co-requisite of MATH 112 or higher",
+              "options": ["ENGR-102A", "ENGR-102B", "ENGR-102"]
+            },
+            {
+              "courseId": "UNIV-101",
+              "title": "Intro to the General Education Experience",
+              "category": "required",
+              "units": 1
+            }
+          ],
+          "totalUnits": {
+            "min": 14,
+            "max": 16
+          }
+        },
+        {
+          "number": 2,
+          "name": "2nd Semester",
+          "courses": [
+            {
+              "courseId": "MATH-129",
+              "title": "Calculus II",
+              "category": "required",
+              "units": 3,
+              "prerequisites": "MATH 122B or 125 with C or higher"
+            },
+            {
+              "courseId": "ECE-101",
+              "title": "Programming 1",
+              "category": "required",
+              "units": 4,
+              "prerequisites": "MATH 112, 120R, 122B or 125"
+            },
+            {
+              "courseId": "PHYS-141",
+              "title": "Introductory Mechanics",
+              "category": "required",
+              "units": 4,
+              "prerequisites": "MATH 122B, 125 or Appropriate Math Placement",
+              "options": ["PHYS-141", "PHYS-161H"]
+            },
+            {
+              "courseId": "ENGL-102",
+              "title": "First Year Composition",
+              "category": "required",
+              "units": 3,
+              "prerequisites": "ENGL 101 or ENGL 107",
+              "options": ["ENGL-102", "ENGL-108"]
+            },
+            {
+              "category": "elective",
+              "electiveType": "General Education: Exploring Perspectives (Artist)",
+              "units": 3
+            }
+          ],
+          "totalUnits": {
+            "min": 17,
+            "max": 17
+          }
+        },
+        {
+          "number": 3,
+          "name": "3rd Semester",
+          "courses": [
+            {
+              "courseId": "ECE-274A",
+              "title": "Digital Logic",
+              "category": "required",
+              "units": 4,
+              "prerequisites": "ECE 101, concurrent enrollment or MATH 129"
+            },
+            {
+              "courseId": "MATH-243",
+              "title": "Discrete Mathematics",
+              "category": "required",
+              "units": 3,
+              "prerequisites": "MATH 122B or 125 or 129"
+            },
+            {
+              "courseId": "PHYS-241",
+              "title": "Introductory Electricity and Magnetism",
+              "category": "required",
+              "units": 4,
+              "prerequisites": "PHYS 141 or 161H; MATH 129",
+              "options": ["PHYS-241", "PHYS-261H"]
+            },
+            {
+              "courseId": "ECE-201",
+              "title": "Programming 2",
+              "category": "required",
+              "units": 3,
+              "prerequisites": "MATH 112; ECE 101 with C or higher"
+            },
+            {
+              "category": "elective",
+              "electiveType": "General Education: Exploring Perspectives (Humanist)",
+              "units": 3
+            }
+          ],
+          "totalUnits": {
+            "min": 17,
+            "max": 17
+          }
+        },
+        {
+          "number": 4,
+          "name": "4th Semester",
+          "courses": [
+            {
+              "category": "elective",
+              "electiveType": "Math Elective",
+              "units": 3,
+              "options": ["MATH-313", "MATH-315", "MATH-322"]
+            },
+            {
+              "courseId": "ECE-220",
+              "title": "Basic Circuits",
+              "category": "required",
+              "units": 5,
+              "prerequisites": "MATH 129, PHYS 241"
+            },
+            {
+              "courseId": "MATH-254",
+              "title": "Intro to Ordinary Differential Equations",
+              "category": "required",
+              "units": 3,
+              "prerequisites": "MATH 129 or 223 with C or higher"
+            },
+            {
+              "category": "elective",
+              "electiveType": "General Education: Building Connections",
+              "units": 3
+            }
+          ],
+          "totalUnits": {
+            "min": 14,
+            "max": 14
+          }
+        },
+        {
+          "number": 5,
+          "name": "5th Semester",
+          "courses": [
+            {
+              "courseId": "CSC-355",
+              "title": "Discrete Structures and Basic Algorithms",
+              "category": "required",
+              "units": 3
+            },
+            {
+              "courseId": "ECE-369A",
+              "title": "Fundamental of Computer Organization",
+              "category": "required",
+              "units": 4,
+              "prerequisites": "ECE 201, ECE 274A"
+            },
+            {
+              "courseId": "ECE-310",
+              "title": "Applications of Engineering Mathematics",
+              "category": "required",
+              "units": 4,
+              "prerequisites": "ECE 101, MATH 254, ECE 220"
+            },
+            {
+              "courseId": "ECE-401C",
+              "title": "Data Management",
+              "category": "required",
+              "units": 3,
+              "prerequisites": "ECE 201, concurrent enrollment in CSC 355"
+            },
+            {
+              "category": "elective",
+              "electiveType": "General Education: Building Connections",
+              "units": 3
+            }
+          ],
+          "totalUnits": {
+            "min": 17,
+            "max": 17
+          }
+        },
+        {
+          "number": 6,
+          "name": "6th Semester",
+          "courses": [
+            {
+              "courseId": "ECE-402C",
+              "title": "Operating System Design",
+              "category": "required",
+              "units": 3,
+              "prerequisites": "ECE 201 grade of C or higher"
+            },
+            {
+              "courseId": "ECE-311",
+              "title": "Engineering Ethics and Contemporary Issues",
+              "category": "required",
+              "units": 1
+            },
+            {
+              "category": "elective",
+              "electiveType": "Upper Division Computing Electives",
+              "units": 3
+            },
+            {
+              "courseId": "ECE-304C",
+              "title": "Theory of Computation",
+              "category": "required",
+              "units": 3,
+              "prerequisites": "MATH 243, ECE 201"
+            },
+            {
+              "courseId": "SFWE-302",
+              "title": "Software Architecture and Design",
+              "category": "required",
+              "units": 3
+            },
+            {
+              "category": "elective",
+              "electiveType": "General Education: Building Connections",
+              "units": 3
+            }
+          ],
+          "totalUnits": {
+            "min": 16,
+            "max": 16
+          }
+        },
+        {
+          "number": 7,
+          "name": "7th Semester",
+          "courses": [
+            {
+              "courseId": "ENGR-498A",
+              "title": "Interdisciplinary Capstone",
+              "category": "required",
+              "units": 3,
+              "prerequisites": "Senior Status"
+            },
+            {
+              "category": "elective",
+              "electiveType": "General Education: Exploring Perspectives (Social Scientist)",
+              "units": 3
+            },
+            {
+              "category": "elective",
+              "electiveType": "Upper Division Elective",
+              "units": 3
+            },
+            {
+              "category": "elective",
+              "electiveType": "Upper Division Computing Electives",
+              "units": 3
+            },
+            {
+              "courseId": "UNIV-301",
+              "title": "General Education Portfolio",
+              "category": "required",
+              "units": 1
+            }
+          ],
+          "totalUnits": {
+            "min": 13,
+            "max": 13
+          }
+        },
+        {
+          "number": 8,
+          "name": "8th Semester",
+          "courses": [
+            {
+              "courseId": "ENGR-498B",
+              "title": "Interdisciplinary Capstone",
+              "category": "required",
+              "units": 3,
+              "prerequisites": "Senior Status"
+            },
+            {
+              "category": "elective",
+              "electiveType": "Upper Division Elective",
+              "units": 3
+            },
+            {
+              "courseId": "SFWE-402",
+              "title": "Software DevSecOps",
+              "category": "required",
+              "units": 3,
+              "prerequisites": "ECE 275"
+            },
+            {
+              "category": "elective",
+              "electiveType": "Upper Division Computing Electives",
+              "units": 3
+            }
+          ],
+          "totalUnits": {
+            "min": 12,
+            "max": 12
+          }
+        }
+      ],
+      "electiveCategories": [
+        {
+          "id": "upper-division-computing",
+          "name": "Upper Division Computing Electives",
+          "requiredUnits": 9,
+          "description": "300-400 level CSC, ECE, or SFWE courses",
+          "rules": [
+            "Must be 300-level or higher",
+            "Must be approved by major advisor",
+            "Typically CSC, ECE, or SFWE courses"
+          ]
+        },
+        {
+          "id": "upper-division-elective",
+          "name": "Upper Division Elective",
+          "requiredUnits": 6,
+          "description": "Any 300-400 level course",
+          "rules": [
+            "Must be 300-level or higher",
+            "Consult major advisor for course approval"
+          ]
+        },
+        {
+          "id": "math-elective",
+          "name": "Math Elective",
+          "requiredUnits": 3,
+          "description": "Choose from approved math courses",
+          "eligibleCourses": ["MATH-313", "MATH-315", "MATH-322"]
+        },
+        {
+          "id": "gen-ed-artist",
+          "name": "General Education: Exploring Perspectives (Artist)",
+          "requiredUnits": 3,
+          "description": "Courses exploring artistic perspectives"
+        },
+        {
+          "id": "gen-ed-humanist",
+          "name": "General Education: Exploring Perspectives (Humanist)",
+          "requiredUnits": 3,
+          "description": "Courses exploring humanistic perspectives"
+        },
+        {
+          "id": "gen-ed-social-scientist",
+          "name": "General Education: Exploring Perspectives (Social Scientist)",
+          "requiredUnits": 3,
+          "description": "Courses exploring social science perspectives"
+        },
+        {
+          "id": "gen-ed-building-connections",
+          "name": "General Education: Building Connections",
+          "requiredUnits": 9,
+          "description": "Interdisciplinary courses connecting multiple fields",
+          "rules": [
+            "Some technical electives may also fulfill this requirement",
+            "Work closely with academic advisor to select courses"
+          ]
+        }
+      ],
+      "notes": [
+        "Advanced Standing is required for 300- and 400-level engineering courses",
+        "Each foundational science course satisfies Gen Ed: Exploring Perspectives (Natural Scientist)",
+        "GEOS251, MCB181R/L, PHYS102/181 do not satisfy General Education requirements"
+      ]
+    }
+  ]
+}
