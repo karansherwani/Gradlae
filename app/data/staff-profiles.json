@@ -18,16 +18,19 @@
     "staffId": "1770098072761",
     "name": "KELLY JAMES",
     "avatar": "PS",
-    "major": "JFB",
-    "bio": "HJiiiiiii",
+    "major": "Finance & Business Management ",
+    "bio": "I'm a business major, and I love helping peers succeed in their academic goals!!",
     "courses": [
-      "CSC 323"
+      "FIN 301",
+      "ACCT 250",
+      "ACCT 200",
+      "ECON 200"
     ],
     "price": 25,
     "supportsInPerson": true,
     "supportsOnline": true,
-    "email": "karankumar11aa@gmail.com",
-    "phone": "5555555555",
+    "email": "kjames@arizona.edu",
+    "phone": "4759347234",
     "officeHours": "",
     "specializations": []
   },

@@ -169,8 +169,9 @@ export async function POST(request: NextRequest) {
 
         // Initialize verification result
         let verification: VerificationResult | null = null;
+        let savedToDatabase = false;
 
-        // Save to MongoDB if userId is provided
+        // Verify and optionally save to MongoDB if userId is provided
         if (userId) {
             try {
                 await connectToDatabase();
@@ -187,30 +188,36 @@ export async function POST(request: NextRequest) {
                     });
 
                     console.log('Transcript verification result:', verification);
+
+                    // Only save transcript if verification passes
+                    if (verification.verified) {
+                        // Transform courses to MongoDB format
+                        const transcriptCourses = transcript.courses.map((c: { course: string; description?: string; grade: string; credits?: number; term?: string }) => ({
+                            courseNumber: c.course,
+                            courseName: c.description || '',
+                            grade: c.grade,
+                            credits: c.credits || 3,
+                            term: c.term || 'Unknown',
+                        }));
+
+                        // Update or create user with transcript
+                        await User.findOneAndUpdate(
+                            { email: userId.toLowerCase() },
+                            {
+                                $set: { transcript: transcriptCourses },
+                            },
+                            { upsert: true, new: true }
+                        );
+
+                        savedToDatabase = true;
+                        console.log(`✅ Transcript saved for user: ${userId}`);
+                    } else {
+                        console.log(`❌ Transcript NOT saved - verification failed for user: ${userId}`);
+                    }
                 }
-
-                // Transform courses to MongoDB format
-                const transcriptCourses = transcript.courses.map((c: { course: string; description?: string; grade: string; credits?: number; term?: string }) => ({
-                    courseNumber: c.course,
-                    courseName: c.description || '',
-                    grade: c.grade,
-                    credits: c.credits || 3,
-                    term: c.term || 'Unknown',
-                }));
-
-                // Update or create user with transcript
-                await User.findOneAndUpdate(
-                    { email: userId.toLowerCase() },
-                    {
-                        $set: { transcript: transcriptCourses },
-                    },
-                    { upsert: true, new: true }
-                );
-
-                console.log(`✅ Transcript saved for user: ${userId}`);
             } catch (dbError) {
-                console.error('Database save error:', dbError);
-                // Continue even if DB save fails - still return parsed data
+                console.error('Database error:', dbError);
+                // Continue even if DB operation fails - still return parsed data
             }
         }
 
@@ -218,7 +225,7 @@ export async function POST(request: NextRequest) {
             success: true,
             courses: transcript.courses,
             totalCourses: transcript.courses.length,
-            savedToDatabase: !!userId,
+            savedToDatabase: savedToDatabase,
             verification: verification || {
                 verified: false,
                 message: 'No user profile found for verification. Please complete your profile first.',

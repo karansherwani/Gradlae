@@ -42,10 +42,16 @@ export default function StaffDashboard() {
         </div>
         <div className={styles.headerRight}>
           <span className={styles.staffName}>👋 {staffName}</span>
-          <button 
+          <button
             className={styles.logoutBtn}
             onClick={() => {
-              localStorage.clear();
+              const authKeys = [
+                'studentName', 'userEmail', 'userId', 'studentEmail',
+                'loginMethod', 'authToken', 'userType', 'staffRole',
+                'studentClasses', 'studentGrades', 'selectedUniversity',
+                'studentProfile', 'transcriptData'
+              ];
+              authKeys.forEach(key => localStorage.removeItem(key));
               router.push('/auth');
             }}
           >
@@ -127,8 +133,8 @@ export default function StaffDashboard() {
             <ScheduleCalendar staffId={staffId} staffName={staffName} />
           )}
           {activeTab === 'appointments' && (
-            <AppointmentsSidebar 
-              staffId={staffId} 
+            <AppointmentsSidebar
+              staffId={staffId}
               onCountUpdate={setUpcomingCount}
             />
           )}

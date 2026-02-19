@@ -611,64 +611,6 @@ export default function PlacementsPage() {
               })}
 
 
-            {/* Recommendation Card - Only show if transcript is verified */}
-            {transcriptVerified ? (
-              <div className={styles.recommendationCard}>
-                {calculateRecommendation() === 'fast' && (
-                  <div className={styles.trackBadge} style={{ background: '#22c55e' }}>
-                    ⚡ Fast Track (7 weeks)
-                  </div>
-                )}
-                {calculateRecommendation() === 'standard' && (
-                  <div className={styles.trackBadge} style={{ background: '#3b82f6' }}>
-                  </div>
-                )}
-                {calculateRecommendation() === 'supported' && (
-                  <div className={styles.trackBadge} style={{ background: '#f97316' }}>
-                    🎯 Supported Track (Full Semester + Tutoring)
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div style={{
-                padding: '20px',
-                background: 'rgba(220, 38, 38, 0.1)',
-                border: '1px solid rgba(220, 38, 38, 0.3)',
-                borderRadius: '12px',
-                marginBottom: '20px'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                  <span style={{ fontSize: '1.5rem' }}>⚠️</span>
-                  <h3 style={{ margin: 0, color: '#DC2626' }}>Transcript Verification Failed</h3>
-                </div>
-                <p style={{ margin: '0 0 16px 0', color: '#6b7280' }}>
-                  {verificationMessage || 'This transcript does not appear to match your profile. Please upload your own transcript to get personalized recommendations.'}
-                </p>
-                <button
-                  onClick={() => {
-                    setStep('upload');
-                    setSelectedFile(null);
-                    setUploadError(null);
-                  }}
-                  style={{
-                    padding: '10px 20px',
-                    background: '#DC2626',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '8px',
-                    fontSize: '0.95rem',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px'
-                  }}
-                >
-                  📤 Upload Your Own Transcript
-                </button>
-              </div>
-            )}
-
             <div className={styles.actions}>
               <button className={styles.enrollBtn} onClick={() => alert('✅ Enrolled successfully!')}>
               </button>
