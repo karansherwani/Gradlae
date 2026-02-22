@@ -1,7 +1,7 @@
 'use client';
 
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import styles from '../styles/results.module.css';
 
 const SECTIONS = {
@@ -25,7 +25,7 @@ const SECTIONS = {
   },
 };
 
-export default function ResultsPage() {
+function ResultsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const score = searchParams.get('score') || '0';
@@ -88,5 +88,13 @@ export default function ResultsPage() {
         Back to Dashboard
       </button>
     </div>
+  );
+}
+
+export default function ResultsPage() {
+  return (
+    <Suspense fallback={<div className={styles.container}>Loading results...</div>}>
+      <ResultsContent />
+    </Suspense>
   );
 }

@@ -214,6 +214,16 @@ export async function POST(request: NextRequest) {
                     } else {
                         console.log(`❌ Transcript NOT saved - verification failed for user: ${userId}`);
                     }
+                } else {
+                    // No profile set up yet — skip verification, allow upload
+                    verification = {
+                        verified: true,
+                        nameMatch: false,
+                        studentIdMatch: false,
+                        dobMatch: false,
+                        message: 'Profile not completed — transcript accepted without verification.',
+                        extractedInfo: transcript.studentInfo,
+                    };
                 }
             } catch (dbError) {
                 console.error('Database error:', dbError);
@@ -227,8 +237,8 @@ export async function POST(request: NextRequest) {
             totalCourses: transcript.courses.length,
             savedToDatabase: savedToDatabase,
             verification: verification || {
-                verified: false,
-                message: 'No user profile found for verification. Please complete your profile first.',
+                verified: true,
+                message: 'Profile not found — transcript accepted without verification.',
                 extractedInfo: transcript.studentInfo,
             },
         });

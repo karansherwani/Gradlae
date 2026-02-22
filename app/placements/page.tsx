@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import styles from '../styles/placements.module.css';
-import { getCourses, Course, getPrerequisites } from '../lib/courseData';
+import { fetchCourses, setCourses, getCourses, Course, getPrerequisites } from '../lib/courseData';
 import { getRecommendedBatch, PrerequisiteInfo } from '../lib/batchLogic';
 
 type Step = 'upload' | 'results';
@@ -76,8 +76,24 @@ export default function PlacementsPage() {
     checkSavedTranscript();
   }, []);
 
-  // Get all courses for search
-  const allCourses = useMemo(() => getCourses(), []);
+  // Fetch courses from CSV via API
+  const [allCourses, setAllCourses] = useState<Course[]>([]);
+  const [coursesLoading, setCoursesLoading] = useState(true);
+
+  useEffect(() => {
+    const loadCourses = async () => {
+      try {
+        const courses = await fetchCourses();
+        setCourses(courses); // Populate the cache for utility functions
+        setAllCourses(courses);
+      } catch (error) {
+        console.error('Error loading courses:', error);
+      } finally {
+        setCoursesLoading(false);
+      }
+    };
+    loadCourses();
+  }, []);
 
   // Filter courses based on search query
   const searchResults = useMemo(() => {
@@ -425,7 +441,7 @@ export default function PlacementsPage() {
                   <input
                     type="text"
                     className={styles.searchInput}
-                    placeholder={`Search ${allCourses.length} courses (e.g., CSC 210, Chemistry)...`}
+                    placeholder={coursesLoading ? 'Loading courses...' : `Search ${allCourses.length} courses (e.g., CSC 210, Chemistry)...`}
                     value={searchQuery}
                     onChange={(e) => {
                       setSearchQuery(e.target.value);

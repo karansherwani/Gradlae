@@ -42,6 +42,7 @@ export interface IUser extends Document {
     profile: IUserProfile;
     transcript: ITranscriptCourse[];
     savedCourses: ISavedCourse[];
+    notes: string;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -110,6 +111,10 @@ const UserSchema = new Schema<IUser>(
         savedCourses: {
             type: [SavedCourseSchema],
             default: [],
+        },
+        notes: {
+            type: String,
+            default: '',
         },
     },
     {
