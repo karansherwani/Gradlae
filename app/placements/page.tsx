@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useMemo, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -76,35 +76,55 @@ export default function PlacementsPage() {
     checkSavedTranscript();
   }, []);
 
-  // Fetch courses from CSV via API
+  // Fetch courses from CSV via API — search-driven now
   const [allCourses, setAllCourses] = useState<Course[]>([]);
-  const [coursesLoading, setCoursesLoading] = useState(true);
+  const [coursesLoading, setCoursesLoading] = useState(false);
 
+  // Load initial batch so prerequisite lookup works
   useEffect(() => {
-    const loadCourses = async () => {
+    const loadInitial = async () => {
       try {
         const courses = await fetchCourses();
-        setCourses(courses); // Populate the cache for utility functions
+        setCourses(courses);
         setAllCourses(courses);
       } catch (error) {
-        console.error('Error loading courses:', error);
-      } finally {
-        setCoursesLoading(false);
+        console.error('Error loading initial courses:', error);
       }
     };
-    loadCourses();
+    loadInitial();
   }, []);
 
-  // Filter courses based on search query
-  const searchResults = useMemo(() => {
-    if (searchQuery.length < 2) return [];
-    const query = searchQuery.toLowerCase();
-    return allCourses.filter(c =>
-      c.courseCode.toLowerCase().includes(query) ||
-      c.courseName.toLowerCase().includes(query) ||
-      c.department.toLowerCase().includes(query)
-    ).slice(0, 10); // Limit to 10 results
-  }, [searchQuery, allCourses]);
+  // API-driven search results
+  const [searchResults, setSearchResults] = useState<Course[]>([]);
+
+  useEffect(() => {
+    if (searchQuery.length < 2) {
+      setSearchResults([]);
+      return;
+    }
+    let cancelled = false;
+    const timeout = setTimeout(async () => {
+      setCoursesLoading(true);
+      try {
+        const results = await fetchCourses(searchQuery);
+        if (!cancelled) {
+          setSearchResults(results.slice(0, 10));
+          // Merge into allCourses for prereq lookup
+          setAllCourses(prev => {
+            const existing = new Set(prev.map(c => c.courseCode));
+            const newOnes = results.filter(c => !existing.has(c.courseCode));
+            return [...prev, ...newOnes];
+          });
+          setCourses([...allCourses, ...results]);
+        }
+      } catch (error) {
+        console.error('Search error:', error);
+      } finally {
+        if (!cancelled) setCoursesLoading(false);
+      }
+    }, 300); // 300ms debounce
+    return () => { cancelled = true; clearTimeout(timeout); };
+  }, [searchQuery]);
 
   // Check if a prerequisite is met based on transcript grades
   const checkPrerequisite = (prereqCode: string): { met: boolean; grade: string } => {

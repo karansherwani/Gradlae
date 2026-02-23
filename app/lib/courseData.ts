@@ -1,35 +1,49 @@
 export interface Course {
-    courseCode: string;
+    courseCode: string;    // e.g. "CSC 110"
     courseName: string;
     department: string;
-    track: string;
     credits: number;
+    description: string;
+    // Legacy fields kept for backward compat – may be empty
+    track: string;
     level: string;
     prerequisite1: string;
     prerequisite2: string;
-    description: string;
 }
 
-// Fetch courses from the API (reads from CSV file on server)
-export async function fetchCourses(): Promise<Course[]> {
-    const response = await fetch('/api/courses');
+// Fetch courses from the API (reads from CSV on server, searches 18K+ courses)
+export async function fetchCourses(query?: string): Promise<Course[]> {
+    const url = query && query.length >= 2
+        ? `/api/courses?q=${encodeURIComponent(query)}&limit=50`
+        : '/api/courses';
+
+    const response = await fetch(url);
     if (!response.ok) {
         throw new Error('Failed to fetch courses');
     }
     const data = await response.json();
-    return data.courses;
+
+    // Map from the new API shape to the UI shape
+    return (data.courses || []).map((c: Record<string, string | number>) => ({
+        courseCode: `${c.subject || ''} ${c.catalogNumber || ''}`.trim() || c.courseCode || '',
+        courseName: c.title || c.courseName || '',
+        department: c.offeringUnit || c.department || '',
+        credits: c.minUnits || c.credits || 0,
+        description: c.description || '',
+        track: c.track || '',
+        level: c.level || '',
+        prerequisite1: c.enrollmentRequirements || c.prerequisite1 || '',
+        prerequisite2: c.courseRequisites || c.prerequisite2 || '',
+    })) as Course[];
 }
 
-// Cache for courses loaded via getCourses (kept for backward compatibility with server-side code)
+// Cache for courses loaded via getCourses (kept for backward compatibility)
 let coursesCache: Course[] | null = null;
 
-// Synchronous getter — uses cache populated by setCourses or returns empty array
-// For client components, call fetchCourses() and setCourses() first
 export function getCourses(): Course[] {
     return coursesCache || [];
 }
 
-// Set courses cache (called after fetching from API)
 export function setCourses(courses: Course[]): void {
     coursesCache = courses;
 }
@@ -61,15 +75,12 @@ export function getPrerequisites(courseCode: string): Course[] {
     const courses = getCourses();
     const prerequisites: Course[] = [];
 
-    // Parse prerequisite strings and find matching courses
     const parsePrereqString = (prereqStr: string): string[] => {
-        if (!prereqStr || prereqStr === 'None') return [];
+        if (!prereqStr || prereqStr === 'None' || prereqStr === '-') return [];
 
-        // Handle "OR" separated prerequisites
         return prereqStr
             .split(' or ')
             .map(p => {
-                // Extract course code (e.g., "MATH 113" from "MATH 113 or placement test")
                 const match = p.match(/[A-Z]{2,4}\s\d{3}[A-Z]?/);
                 return match ? match[0] : '';
             })
