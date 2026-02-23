@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { findUser, saveUser } from '../../../lib/db';
+import connectToDatabase from '@/app/lib/mongodb';
+import User from '@/app/models/User';
+import bcrypt from 'bcryptjs';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    
-   
     const { university, authMethod, email, netId, staffId, password } = body;
 
     // Validate required fields
@@ -30,7 +30,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-   
     if (authMethod === 'staff' && !staffId) {
       return NextResponse.json(
         { message: 'Staff ID is required' },
@@ -38,111 +37,109 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    
-    const identifier = authMethod === 'email' 
-      ? email 
-      : authMethod === 'netid' 
-        ? netId 
-        : staffId;
+    // Build an email-like identifier for MongoDB (the User model uses email as the unique key)
+    let userEmail: string;
+    if (authMethod === 'email') {
+      userEmail = email.toLowerCase().trim();
+    } else if (authMethod === 'netid') {
+      userEmail = `${netId.toLowerCase().trim()}@${university || 'uofa'}.edu`;
+    } else if (authMethod === 'staff') {
+      userEmail = `${staffId.toLowerCase().trim()}@${university || 'uofa'}.edu`;
+    } else {
+      return NextResponse.json(
+        { message: 'Invalid authentication method' },
+        { status: 400 }
+      );
+    }
 
     const isSignup = body.isSignup;
 
+    // Connect to MongoDB
+    await connectToDatabase();
+
     if (isSignup) {
-      if (await findUser(identifier)) {
+      // ─── SIGN UP ─────────────────────────────────────────────────────
+      const existingUser = await User.findOne({ email: userEmail });
+      if (existingUser) {
         return NextResponse.json({ message: 'User already exists' }, { status: 409 });
       }
 
-      
-      let fullName: string;
-      let userEmail: string;
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, 12);
 
+      // Build name
+      let fullName: string;
       if (authMethod === 'email') {
         fullName = email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1);
-        userEmail = email;
       } else if (authMethod === 'netid') {
         fullName = netId.charAt(0).toUpperCase() + netId.slice(1);
-        userEmail = `${netId}@${university}.edu`;
-      } else if (authMethod === 'staff') {
-        fullName = `Prof. ${staffId.charAt(0).toUpperCase() + staffId.slice(1)}`;
-        userEmail = `${staffId}@${university}.edu`;
       } else {
-        return NextResponse.json(
-          { message: 'Invalid authentication method' },
-          { status: 400 }
-        );
+        fullName = `Prof. ${staffId.charAt(0).toUpperCase() + staffId.slice(1)}`;
       }
 
-      const newUser = {
-        id: Date.now().toString(),
-        authMethod,
-        identifier,
-        password, // In prod, hash this
-        fullName: fullName,
-        studentId: authMethod === 'staff' ? undefined : 'A00' + Math.random().toString().slice(2, 8),
-        staffId: authMethod === 'staff' ? 'STAFF_' + Math.random().toString().slice(2, 8) : undefined,
-        role: authMethod === 'staff' ? 'instructor' : 'student',
-      };
+      const studentId = authMethod === 'staff' ? '' : 'A00' + Math.random().toString().slice(2, 8);
+      const staffIdGenerated = authMethod === 'staff' ? 'STAFF_' + Math.random().toString().slice(2, 8) : '';
+      const role = authMethod === 'staff' ? 'instructor' : 'student';
 
-      await saveUser(newUser);
+      const newUser = await User.create({
+        email: userEmail,
+        password: hashedPassword,
+        authProvider: 'credentials',
+        profile: {
+          fullName,
+          studentId,
+        },
+      });
 
-      // Return successful session immediately after signup
       return NextResponse.json({
         success: true,
         token: 'auth_token_' + Date.now(),
-        userId: newUser.id,
-        fullName: newUser.fullName,
+        userId: newUser._id.toString(),
+        fullName,
         email: userEmail,
-        studentId: newUser.studentId,
-        staffId: newUser.staffId,
-        role: newUser.role,
-        classes: authMethod === 'staff' 
-          ? ['CS101', 'CS202']  // Classes they teach
-          : [],  // Empty for new students
+        studentId,
+        staffId: staffIdGenerated || undefined,
+        role,
+        classes: authMethod === 'staff'
+          ? ['CS101', 'CS202']
+          : [],
         grades: authMethod === 'staff' ? {} : [],
       }, { status: 200 });
 
     } else {
-      // Sign In
-      const user = await findUser(identifier);
+      // ─── SIGN IN ─────────────────────────────────────────────────────
+      const user = await User.findOne({ email: userEmail });
 
       if (!user) {
-        return NextResponse.json({ message: 'User not found' }, { status: 404 });
+        return NextResponse.json({ message: 'User not found. Please sign up first.' }, { status: 404 });
       }
 
-      if (user.password !== password) {
+      // Check password
+      const isValid = await bcrypt.compare(password, user.password || '');
+      if (!isValid) {
         return NextResponse.json({ message: 'Invalid password' }, { status: 401 });
       }
 
-    
-      const userEmail = user.authMethod === 'email' 
-        ? user.identifier 
-        : `${user.identifier}@${university}.edu`;
+      const fullName = user.profile?.fullName || userEmail.split('@')[0];
+      const role = authMethod === 'staff' ? 'instructor' : 'student';
 
       return NextResponse.json({
         success: true,
         token: 'auth_token_' + Date.now(),
-        userId: user.id,
-        fullName: user.fullName,
+        userId: user._id.toString(),
+        fullName,
         email: userEmail,
-        studentId: user.studentId,
-        staffId: user.staffId,
-        role: user.role || (user.authMethod === 'staff' ? 'instructor' : 'student'),
-        
-        classes: user.authMethod === 'staff' || user.role === 'instructor'
+        studentId: user.profile?.studentId || '',
+        role,
+        classes: authMethod === 'staff' || role === 'instructor'
           ? [
-              { code: 'CS 101', name: 'Intro to Programming', credits: 3, section: 'A', enrolled: 45 },
-              { code: 'CS 202', name: 'Data Structures', credits: 4, section: 'B', enrolled: 38 }
-            ]
-          : [
-              { code: 'MATH 201', name: 'Calculus II', credits: 4, grade: 'A-', professor: 'Dr. Sarah Chen' },
-              { code: 'PHYS 151', name: 'Physics I', credits: 4, grade: 'B+', professor: 'Prof. John Williams' }
-            ],
-        grades: user.authMethod === 'staff' || user.role === 'instructor'
-          ? {}  // Staff don't have grades
-          : [
-              { courseCode: 'MATH 201', grade: 'A-' },
-              { courseCode: 'PHYS 151', grade: 'B+' }
-            ],
+            { code: 'CS 101', name: 'Intro to Programming', credits: 3, section: 'A', enrolled: 45 },
+            { code: 'CS 202', name: 'Data Structures', credits: 4, section: 'B', enrolled: 38 }
+          ]
+          : [],
+        grades: authMethod === 'staff' || role === 'instructor'
+          ? {}
+          : [],
       }, { status: 200 });
     }
   } catch (error) {

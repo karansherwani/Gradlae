@@ -85,5 +85,14 @@
     "fullName": "Prof. Random",
     "staffId": "STAFF_277588",
     "role": "instructor"
+  },
+  {
+    "id": "1771814792338",
+    "authMethod": "netid",
+    "identifier": "alex",
+    "password": "nw$AH97WYA2tUDAQ",
+    "fullName": "Alex",
+    "studentId": "A00038945",
+    "role": "student"
   }
 ]

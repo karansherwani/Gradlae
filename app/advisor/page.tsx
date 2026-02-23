@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from '../styles/advisor.module.css';
-import ApiKeyInput from '../components/ApiKeyInput';
 import AdvisorChat from '../components/AdvisorChat';
 
 interface TranscriptCourse {
@@ -18,16 +17,69 @@ const QUICK_PROMPTS = [
     { text: 'Help me plan my next semester' },
     { text: 'What prerequisites do I need for CS courses?' },
     { text: 'Recommend courses for my major' },
-    { text: 'Create a 4-year graduation plan' },
-    { text: 'Which batch is right for me?' },
+    { text: 'Create a graduation plan for me' },
+    { text: 'How many credits do I still need?' },
 ];
+
+// ─── Credit helpers (same logic as in AdvisorChat) ──────────────────────
+function computeCorrectedCredits(courses: TranscriptCourse[]) {
+    const passing = courses.filter(c => c.grade !== 'W' && c.grade !== 'IP');
+    const seen = new Map<string, TranscriptCourse>();
+    for (const c of passing) {
+        const key = c.course.trim().toUpperCase();
+        if (!seen.has(key)) {
+            seen.set(key, c);
+        }
+    }
+    const unique = Array.from(seen.values());
+    const earnedCredits = unique.reduce((s, c) => s + c.credits, 0);
+    const inProgress = courses.filter(c => c.grade === 'IP');
+    const ipCredits = inProgress.reduce((s, c) => s + c.credits, 0);
+
+    return { earnedCredits, uniqueCompleted: unique, inProgress, ipCredits };
+}
+
+function buildTranscriptContext(
+    courses: TranscriptCourse[],
+    studentName: string,
+): string {
+    const { earnedCredits, uniqueCompleted, inProgress, ipCredits } = computeCorrectedCredits(courses);
+
+    const allTerms = [...new Set(courses.map(c => c.term))];
+    const semesterCount = allTerms.length;
+
+    // Standing based on earned credits
+    let standing: string;
+    if (earnedCredits >= 90) standing = 'Senior';
+    else if (earnedCredits >= 60) standing = 'Junior';
+    else if (earnedCredits >= 30) standing = 'Sophomore';
+    else standing = 'Freshman';
+
+    let ctx = `Name: ${studentName}\n`;
+    ctx += `Completed Semesters: ${semesterCount}\n`;
+    ctx += `Academic Standing: ${standing} (based on ${earnedCredits} earned credits)\n`;
+    ctx += `Earned Credits: ${earnedCredits} (unique passed courses, excludes W and duplicate attempts)\n`;
+    if (ipCredits > 0) {
+        ctx += `In-Progress Credits: ${ipCredits} (not counted in earned total)\n`;
+    }
+    ctx += `\nCOMPLETED COURSES (${uniqueCompleted.length} unique):\n`;
+    for (const c of uniqueCompleted) {
+        ctx += `  ${c.course}: ${c.description} (Grade: ${c.grade}, ${c.credits} cr, ${c.term})\n`;
+    }
+    if (inProgress.length > 0) {
+        ctx += `\nIN-PROGRESS COURSES:\n`;
+        for (const c of inProgress) {
+            ctx += `  ${c.course}: ${c.description} (${c.credits} cr, ${c.term})\n`;
+        }
+    }
+
+    return ctx;
+}
 
 export default function AdvisorPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [studentName, setStudentName] = useState('');
-    const [hasApiKey, setHasApiKey] = useState(false);
-    const [showApiKeySettings, setShowApiKeySettings] = useState(false);
     const [welcomeMessage, setWelcomeMessage] = useState('');
     const [studentContext, setStudentContext] = useState('');
     const [hasTranscript, setHasTranscript] = useState<boolean | null>(null);
@@ -42,11 +94,7 @@ export default function AdvisorPage() {
             const cleanName = name.startsWith('Student ') ? name.replace('Student ', '') : name;
             setStudentName(cleanName);
 
-            // Check for saved API key
-            const savedKey = localStorage.getItem('openai_api_key');
-            setHasApiKey(!!savedKey);
-
-            // Try to load transcript data
+            // Try to load transcript data from database
             const userId = localStorage.getItem('userId') || localStorage.getItem('userEmail');
             if (userId) {
                 try {
@@ -56,45 +104,34 @@ export default function AdvisorPage() {
                     if (data.hasTranscript && data.courses?.length > 0) {
                         setHasTranscript(true);
 
-                        // Build student context string from transcript
                         const courses: TranscriptCourse[] = data.courses;
-                        const completedCourses = courses.filter(c => c.grade !== 'IP');
-                        const inProgressCourses = courses.filter(c => c.grade === 'IP');
-                        const uniqueTerms = [...new Set(courses.map(c => c.term))];
-                        const totalCredits = completedCourses.reduce((s, c) => s + c.credits, 0);
-
-                        const yearLabels = ['Freshman', 'Sophomore', 'Junior', 'Senior'];
-                        const yearIndex = Math.min(Math.floor(uniqueTerms.length / 2), 3);
-                        const yearLabel = yearLabels[yearIndex];
-
-                        let ctx = `Name: ${cleanName}\n`;
-                        ctx += `Standing: ${yearLabel} (${uniqueTerms.length} semesters completed)\n`;
-                        ctx += `Completed Courses: ${completedCourses.length} (${totalCredits} credits)\n\n`;
-                        ctx += `COMPLETED COURSES:\n`;
-                        for (const c of completedCourses) {
-                            ctx += `  ${c.course}: ${c.description} (Grade: ${c.grade}, ${c.credits} credits, ${c.term})\n`;
-                        }
-                        if (inProgressCourses.length > 0) {
-                            ctx += `\nIN PROGRESS:\n`;
-                            for (const c of inProgressCourses) {
-                                ctx += `  ${c.course}: ${c.description} (${c.credits} credits, ${c.term})\n`;
-                            }
-                        }
-
+                        const ctx = buildTranscriptContext(courses, cleanName);
                         setStudentContext(ctx);
+
+                        // Use corrected credit numbers for welcome message
+                        const { earnedCredits, uniqueCompleted, inProgress } = computeCorrectedCredits(courses);
+                        const allTerms = [...new Set(courses.map(c => c.term))];
+                        const semesterCount = allTerms.length;
+
+                        let standing: string;
+                        if (earnedCredits >= 90) standing = 'Senior';
+                        else if (earnedCredits >= 60) standing = 'Junior';
+                        else if (earnedCredits >= 30) standing = 'Sophomore';
+                        else standing = 'Freshman';
 
                         setWelcomeMessage(
                             `Hello ${cleanName}! I'm your AI Academic Advisor, powered by real course data from the University of Arizona.\n\n` +
-                            `I can see from your transcript that you're a ${yearLabel} with ${completedCourses.length} completed courses (${totalCredits} credits).` +
-                            (inProgressCourses.length > 0 ? `\nYou're currently enrolled in: ${inProgressCourses.map(c => c.course).join(', ')}` : '') +
+                            `From your transcript: you're a ${standing} (semester ${semesterCount}) with ${uniqueCompleted.length} completed courses and ${earnedCredits} earned credits.` +
+                            (inProgress.length > 0 ? `\nCurrently enrolled in: ${inProgress.map(c => c.course).join(', ')}` : '') +
                             `\n\nI can help you with:\n• Planning your next semester\n• Understanding prerequisites\n• Course recommendations based on your transcript\n• Creating a personalized graduation timeline\n\nWhat would you like to explore today?`
                         );
                     } else {
                         setHasTranscript(false);
                         setWelcomeMessage(
                             `Hello ${cleanName}! I'm your AI Academic Advisor, powered by real course data from the University of Arizona.\n\n` +
-                            `I notice you haven't uploaded your transcript yet. To provide personalized course recommendations and accurate planning, I'll need access to your academic history.\n\n` +
-                            `Please upload your transcript on the My Courses page to get started, or feel free to ask general questions about courses and prerequisites.`
+                            `I don't have your transcript yet. You can upload it right here using the 📎 button below, or on the My Courses page.\n\n` +
+                            `With your transcript I can give you personalized advice about remaining requirements, credit counts, and graduation planning.\n\n` +
+                            `Feel free to ask general questions about courses and prerequisites in the meantime!`
                         );
                     }
                 } catch (error) {
@@ -102,14 +139,14 @@ export default function AdvisorPage() {
                     setHasTranscript(false);
                     setWelcomeMessage(
                         `Hello ${cleanName}! I'm your AI Academic Advisor.\n\n` +
-                        `I can help you with:\n• Planning your next semester\n• Understanding prerequisites\n• Course recommendations\n• Creating a graduation timeline\n\nWhat would you like to explore today?`
+                        `Upload your transcript with the 📎 button below for personalized advice, or ask me general questions about courses and planning!`
                     );
                 }
             } else {
                 setHasTranscript(false);
                 setWelcomeMessage(
                     `Hello ${cleanName}! I'm your AI Academic Advisor.\n\n` +
-                    `I can help you with course planning, prerequisites, and graduation timelines.\n\nWhat would you like to explore today?`
+                    `I can help you with course planning, prerequisites, and graduation timelines.\n\nUpload your transcript with the 📎 button for personalized recommendations!`
                 );
             }
 
@@ -118,6 +155,12 @@ export default function AdvisorPage() {
 
         initializeAdvisor();
     }, [router]);
+
+    // Called when AdvisorChat parses a new transcript
+    const handleTranscriptParsed = (ctx: string) => {
+        setStudentContext(ctx);
+        setHasTranscript(true);
+    };
 
     if (loading) {
         return <div className={styles.loading}>Loading...</div>;
@@ -134,16 +177,6 @@ export default function AdvisorPage() {
                     </div>
                 </div>
                 <div className={styles.headerRight}>
-                    <button
-                        className={styles.backButton}
-                        onClick={() => setShowApiKeySettings(!showApiKeySettings)}
-                        style={{
-                            background: hasApiKey ? 'rgba(5, 150, 105, 0.1)' : 'rgba(234, 179, 8, 0.1)',
-                            borderColor: hasApiKey ? 'rgba(5, 150, 105, 0.3)' : 'rgba(234, 179, 8, 0.3)',
-                        }}
-                    >
-                        {hasApiKey ? '🔑 API Key Set' : '⚙️ Set API Key'}
-                    </button>
                     <button className={styles.backButton} onClick={() => router.push('/dashboard')}>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <path d="M19 12H5M12 19l-7-7 7-7" />
@@ -156,56 +189,7 @@ export default function AdvisorPage() {
             {/* Main Chat Area */}
             <main className={styles.main}>
                 <div className={styles.chatContainer}>
-                    {/* API Key Settings Banner */}
-                    {showApiKeySettings && (
-                        <div style={{ padding: '0 0 12px 0' }}>
-                            <ApiKeyInput onKeyChange={(has) => setHasApiKey(has)} />
-                            <p style={{
-                                fontSize: '0.75rem',
-                                color: '#9ca3af',
-                                marginTop: '6px',
-                                paddingLeft: '4px',
-                            }}>
-                                Your API key is stored only in your browser&apos;s localStorage — never sent to our server for storage.
-                            </p>
-                        </div>
-                    )}
-
-                    {/* No API key warning */}
-                    {!hasApiKey && !showApiKeySettings && (
-                        <div style={{
-                            padding: '12px 16px',
-                            background: 'rgba(234, 179, 8, 0.08)',
-                            border: '1px solid rgba(234, 179, 8, 0.2)',
-                            borderRadius: '10px',
-                            marginBottom: '12px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '10px',
-                            fontSize: '0.85rem',
-                        }}>
-                            <span>⚠️</span>
-                            <span>Set your OpenAI API key to use the AI advisor.</span>
-                            <button
-                                onClick={() => setShowApiKeySettings(true)}
-                                style={{
-                                    marginLeft: 'auto',
-                                    background: '#002147',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '6px',
-                                    padding: '6px 14px',
-                                    cursor: 'pointer',
-                                    fontSize: '0.8rem',
-                                    fontWeight: 500,
-                                }}
-                            >
-                                Set Key
-                            </button>
-                        </div>
-                    )}
-
-                    {/* Transcript Upload Banner */}
+                    {/* Transcript Upload Banner – shown when no transcript */}
                     {hasTranscript === false && (
                         <div className={styles.transcriptBanner}>
                             <div className={styles.transcriptBannerContent}>
@@ -219,13 +203,13 @@ export default function AdvisorPage() {
                                 </div>
                                 <div className={styles.transcriptBannerText}>
                                     <strong>Upload Your Transcript</strong>
-                                    <span>Get personalized course recommendations based on your academic history</span>
+                                    <span>Use the 📎 button below or upload on the My Courses page for personalized advice</span>
                                 </div>
                                 <button
                                     className={styles.transcriptBannerBtn}
                                     onClick={() => router.push('/placements')}
                                 >
-                                    Upload Transcript
+                                    Go to My Courses
                                 </button>
                             </div>
                         </div>
@@ -242,17 +226,14 @@ export default function AdvisorPage() {
                                             key={index}
                                             className={styles.promptButton}
                                             onClick={() => {
-                                                // The AdvisorChat handles sending
                                                 const textarea = document.querySelector(`.${styles.textInput}`) as HTMLTextAreaElement;
                                                 if (textarea) {
-                                                    // Set the value and trigger change
                                                     const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
                                                         window.HTMLTextAreaElement.prototype, 'value'
                                                     )?.set;
                                                     nativeInputValueSetter?.call(textarea, prompt.text);
                                                     textarea.dispatchEvent(new Event('input', { bubbles: true }));
                                                     textarea.dispatchEvent(new Event('change', { bubbles: true }));
-                                                    // Focus and submit
                                                     textarea.focus();
                                                     setTimeout(() => {
                                                         textarea.dispatchEvent(new KeyboardEvent('keypress', {
@@ -276,6 +257,7 @@ export default function AdvisorPage() {
                         studentName={studentName}
                         welcomeMessage={welcomeMessage}
                         studentContext={studentContext}
+                        onTranscriptParsed={handleTranscriptParsed}
                     />
                 </div>
             </main>

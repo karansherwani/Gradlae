@@ -1,5 +1,6 @@
 // app/api/advisor/route.ts
-// Real LLM-backed academic advisor that uses planner data + course catalog
+// LLM-backed academic advisor – uses planner data + course catalog + transcript
+// API key is read ONLY from server-side environment variables.
 
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
@@ -54,7 +55,7 @@ function buildPlannerContext(planner: PlannerData): string {
 
     const lines: string[] = [];
     lines.push(`DEGREE PLAN: ${plan.name}`);
-    lines.push(`Catalog Year: ${plan.catalogYear} | Total Units: ${plan.totalUnits}`);
+    lines.push(`Catalog Year: ${plan.catalogYear} | Total Units Required: ${plan.totalUnits}`);
     lines.push('');
 
     for (const sem of plan.semesters) {
@@ -119,7 +120,6 @@ function buildCourseSample(courses: CSVCourse[], maxCourses = 400): string {
             const catNum = parseInt(c.catalogNumber);
             return !priority.includes(c.subject) && catNum >= 100 && catNum < 500;
         });
-        // Take an even sampling
         const step = Math.max(1, Math.floor(otherCourses.length / remaining));
         for (let i = 0; i < otherCourses.length && selected.length < maxCourses; i += step) {
             selected.push(otherCourses[i]);
@@ -151,10 +151,14 @@ function buildCourseSample(courses: CSVCourse[], maxCourses = 400): string {
 }
 
 /**
- * Build the system prompt
+ * Build the system prompt – grounded in transcript, planner, and catalog data.
  */
-function buildSystemPrompt(plannerContext: string, catalogSample: string): string {
-    return `You are an AI academic advisor for students at the University of Arizona.
+function buildSystemPrompt(
+    plannerContext: string,
+    catalogSample: string,
+    studentContext?: string,
+): string {
+    let prompt = `You are an AI academic advisor for students at the University of Arizona.
 You have access to the student's degree plan and a sample of the course catalog.
 
 ${plannerContext}
@@ -162,11 +166,34 @@ ${plannerContext}
 AVAILABLE COURSE CATALOG (sample of relevant courses):
 ${catalogSample}
 
-YOUR ROLE:
+`;
+
+    if (studentContext) {
+        prompt += `STUDENT TRANSCRIPT AND ACADEMIC DATA:
+${studentContext}
+
+IMPORTANT CREDIT COUNTING RULES (already applied in the numbers above):
+- Courses with a grade of W (withdrawal) do NOT count toward earned credits.
+- If a course was taken multiple times, its credits are counted only ONCE.
+- "Earned credits" means only unique, passed courses.
+- In-progress courses are listed separately and are NOT included in earned credits.
+
+`;
+    } else {
+        prompt += `NOTE: No transcript has been uploaded yet. You do NOT have the student's academic history.
+If asked about specific credits, completed courses, or standing, let the student know
+you need their transcript for accurate answers. Do not guess or assume.
+
+`;
+    }
+
+    prompt += `YOUR ROLE:
 - Help students plan semesters, check prerequisites, and choose courses
-- Generate personalized 4-year graduation plans
+- Generate personalized graduation plans
 - Answer questions about degree requirements
 - Be conversational, supportive, and encouraging
+- Base all advice on the data provided above (transcript, planner, catalog)
+- If you lack data to answer accurately, say so instead of guessing
 
 CONSTRAINTS:
 - Maximum 21 credits per semester
@@ -175,6 +202,7 @@ CONSTRAINTS:
 - Use plain text formatting (no markdown ** or ## etc.)
 - Show degree plans in clear tabular format with course codes, titles, and units
 - Always complete the entire plan in one response
+- NEVER describe the student as a "senior" unless they truly have senior standing (120+ earned credits). Use the semester count and earned credits provided to determine standing.
 
 When showing schedules use this format:
 FALL 2025
@@ -185,6 +213,8 @@ MATH 129        | Calculus II                        | 3
                                               Total:    7
 
 Remember: Help students succeed and graduate on time!`;
+
+    return prompt;
 }
 
 // ─── API HANDLER ──────────────────────────────────────────────────────────
@@ -192,7 +222,7 @@ Remember: Help students succeed and graduate on time!`;
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { messages, apiKey, studentContext } = body;
+        const { messages, studentContext } = body;
 
         if (!messages || !Array.isArray(messages)) {
             return NextResponse.json(
@@ -201,13 +231,13 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Determine which API key to use
-        const effectiveKey = apiKey || process.env.OPENAI_API_KEY || process.env.ROUTELLM_API_KEY;
+        // Use ONLY server-side environment variable – never from client
+        const effectiveKey = process.env.OPENAI_API_KEY || process.env.ROUTELLM_API_KEY;
 
         if (!effectiveKey) {
             return NextResponse.json(
-                { error: 'No API key provided. Please enter your OpenAI API key in the advisor settings.' },
-                { status: 401 }
+                { error: 'The AI advisor is temporarily unavailable. Please try again later.' },
+                { status: 503 }
             );
         }
 
@@ -219,16 +249,10 @@ export async function POST(request: NextRequest) {
         const plannerContext = buildPlannerContext(plannerData);
         const catalogSample = buildCourseSample(allCourses);
 
-        // If the client provided student context (transcript info etc.), add it
-        let studentInfo = '';
-        if (studentContext) {
-            studentInfo = `\n\nSTUDENT INFO:\n${studentContext}`;
-        }
-
-        const systemPrompt = buildSystemPrompt(plannerContext, catalogSample) + studentInfo;
+        const systemPrompt = buildSystemPrompt(plannerContext, catalogSample, studentContext || undefined);
 
         // Determine API endpoint
-        const isRouteLLM = effectiveKey === process.env.ROUTELLM_API_KEY;
+        const isRouteLLM = effectiveKey === process.env.ROUTELLM_API_KEY && !process.env.OPENAI_API_KEY;
         const apiUrl = isRouteLLM
             ? 'https://routellm.abacus.ai/v1/chat/completions'
             : 'https://api.openai.com/v1/chat/completions';
@@ -255,17 +279,17 @@ export async function POST(request: NextRequest) {
 
         if (!response.ok) {
             const errText = await response.text();
-            console.error('AI API error:', response.status, errText);
+            console.error('AI API error:', response.status);
 
             if (response.status === 401) {
                 return NextResponse.json(
-                    { error: 'Invalid API key. Please check your OpenAI API key.' },
-                    { status: 401 }
+                    { error: 'AI service configuration error. Please contact support.' },
+                    { status: 503 }
                 );
             }
 
             return NextResponse.json(
-                { error: 'Failed to get AI response' },
+                { error: 'Failed to get AI response. Please try again.' },
                 { status: 502 }
             );
         }

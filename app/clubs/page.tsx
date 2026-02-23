@@ -132,9 +132,13 @@ export default function ClubsPage() {
     // Helper function to parse event date string into Date object
     const parseEventDate = (dateStr: string): Date | null => {
         try {
-            // Expected format: "Tue, Jan 27, 2026"
+            // Handle multi-day events like "Fri, Jan 30, 2026 6:00 PM –"
+            // Strip trailing time portions and dashes
+            let cleaned = dateStr.replace(/\d{1,2}:\d{2}\s*(AM|PM)?\s*[–\-]?\s*$/i, '').trim();
+
+            // Expected format after cleanup: "Tue, Jan 27, 2026"
             // Remove the day of week part
-            const datePart = dateStr.split(',').slice(1).join(',').trim(); // "Jan 27, 2026"
+            const datePart = cleaned.split(',').slice(1).join(',').trim(); // "Jan 27, 2026"
             const date = new Date(datePart);
             if (!isNaN(date.getTime())) {
                 return date;
@@ -187,13 +191,16 @@ export default function ClubsPage() {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
+        // Skip events with unparseable dates (likely old/non-standard entries)
+        if (!eventDate) {
+            return false;
+        }
+
         // Only show future events (today and onwards)
-        if (eventDate) {
-            const eventDateOnly = new Date(eventDate);
-            eventDateOnly.setHours(0, 0, 0, 0);
-            if (eventDateOnly < today) {
-                return false;
-            }
+        const eventDateOnly = new Date(eventDate);
+        eventDateOnly.setHours(0, 0, 0, 0);
+        if (eventDateOnly < today) {
+            return false;
         }
 
         const categoryMatch = selectedCategories.includes('All') ||
