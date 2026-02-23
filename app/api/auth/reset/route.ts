@@ -1,28 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
-import connectToDatabase from '@/app/lib/mongodb';
-import User from '@/app/models/User';
-import bcrypt from 'bcryptjs';
+import { findUser, updateUserPassword } from '../../../lib/db';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    
+   
     const { email, netId, staffId, newPassword, otp } = body;
-
-    // Build email identifier (same logic as login route)
-    const identifier = email || (netId ? `${netId.toLowerCase().trim()}@uofa.edu` : null) || (staffId ? `${staffId.toLowerCase().trim()}@uofa.edu` : null);
-
-    if (!identifier) {
-      return NextResponse.json(
-        { message: 'Email, NetID, or Staff ID is required' },
-        { status: 400 }
-      );
-    }
-
-    await connectToDatabase();
 
     // Step 1: Request OTP (Mock)
     if (!newPassword && !otp) {
-      const user = await User.findOne({ email: identifier.toLowerCase() });
+      
+      const identifier = email || netId || staffId;
+      
+      if (!identifier) {
+        return NextResponse.json(
+          { message: 'Email, NetID, or Staff ID is required' },
+          { status: 400 }
+        );
+      }
+
+      const user = await findUser(identifier);
 
       if (!user) {
         return NextResponse.json({ message: 'User not found' }, { status: 404 });
@@ -43,16 +41,22 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ message: 'Invalid OTP' }, { status: 400 });
       }
 
-      const hashedPassword = await bcrypt.hash(newPassword, 12);
-      const result = await User.findOneAndUpdate(
-        { email: identifier.toLowerCase() },
-        { $set: { password: hashedPassword } }
-      );
+      
+      const identifier = email || netId || staffId;
 
-      if (result) {
-        return NextResponse.json({
-          success: true,
-          message: 'Password updated successfully'
+      if (!identifier) {
+        return NextResponse.json(
+          { message: 'Email, NetID, or Staff ID is required' },
+          { status: 400 }
+        );
+      }
+
+      const success = await updateUserPassword(identifier, newPassword);
+
+      if (success) {
+        return NextResponse.json({ 
+          success: true, 
+          message: 'Password updated successfully' 
         });
       } else {
         return NextResponse.json({ message: 'User not found' }, { status: 404 });
