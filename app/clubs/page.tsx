@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../components/AuthProvider';
 import styles from '../styles/clubs.module.css';
 
 interface Club {
@@ -41,7 +42,7 @@ interface Event {
 
 export default function ClubsPage() {
     const router = useRouter();
-    const [studentName, setStudentName] = useState('');
+    const { user, loading: authLoading } = useAuth();
     const [selectedCategories, setSelectedCategories] = useState<string[]>(['All']);
     const [activeTab, setActiveTab] = useState<'clubs' | 'events'>('clubs');
     const [clubs, setClubs] = useState<Club[]>([]);
@@ -53,12 +54,11 @@ export default function ClubsPage() {
     const [eventsLoading, setEventsLoading] = useState(true);
 
     useEffect(() => {
-        const name = localStorage.getItem('studentName');
-        if (!name) {
-            router.push('/');
+        if (authLoading) return;
+        if (!user) {
+            router.push('/auth');
             return;
         }
-        setStudentName(name);
 
         // Load clubs from public folder
         fetch('/data/uofa_clubs.json')
@@ -116,7 +116,7 @@ export default function ClubsPage() {
                 console.error('Error loading events:', error);
                 setEventsLoading(false);
             });
-    }, [router]);
+    }, [authLoading, user, router]);
 
     const toggleCategory = (category: string) => {
         if (category === 'All') {

@@ -3,8 +3,8 @@ import "./globals.css";
 import Provider from "./components/Provider";
 
 export const metadata: Metadata = {
-  title: "Adaptive Pace",
-  description: "Adaptive learning platform",
+  title: "PaceMatch – University of Arizona",
+  description: "Your personalized academic success platform at the University of Arizona",
 };
 
 export default function RootLayout({
@@ -14,6 +14,14 @@ export default function RootLayout({
 }) {
   return (
     <html>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body suppressHydrationWarning>
         <Provider>{children}</Provider>
       </body>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useAuth } from '../components/AuthProvider';
 import styles from '../styles/mentoring.module.css';
 
 interface Review {
@@ -134,6 +135,7 @@ const DEFAULT_MENTORS: Mentor[] = [
 ];
 
 export default function MentoringPage() {
+    const { user } = useAuth();
     const [mentors, setMentors] = useState<Mentor[]>([]);
     const [isLoadingMentors, setIsLoadingMentors] = useState(true);
     const [selectedMentor, setSelectedMentor] = useState<Mentor | null>(null);
@@ -209,7 +211,7 @@ export default function MentoringPage() {
 
         setIsProcessingPayment(true);
         try {
-            const userEmail = localStorage.getItem('userEmail') || localStorage.getItem('studentEmail');
+            const userEmail = user?.email || '';
 
             const response = await fetch('/api/payments/checkout', {
                 method: 'POST',

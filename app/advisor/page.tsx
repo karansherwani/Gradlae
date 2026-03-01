@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../components/AuthProvider';
 import styles from '../styles/advisor.module.css';
 import AdvisorChat from '../components/AdvisorChat';
 
@@ -78,75 +79,73 @@ function buildTranscriptContext(
 
 export default function AdvisorPage() {
     const router = useRouter();
+    const { user, dbUser, accessToken, loading: authLoading } = useAuth();
     const [loading, setLoading] = useState(true);
-    const [studentName, setStudentName] = useState('');
     const [welcomeMessage, setWelcomeMessage] = useState('');
     const [studentContext, setStudentContext] = useState('');
     const [hasTranscript, setHasTranscript] = useState<boolean | null>(null);
 
+    const studentName = dbUser?.name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || '';
+    const cleanName = studentName.startsWith('Student ') ? studentName.replace('Student ', '') : studentName;
+
     useEffect(() => {
+        if (authLoading) return;
+        if (!user) {
+            router.push('/auth');
+            return;
+        }
+
         const initializeAdvisor = async () => {
-            const name = localStorage.getItem('studentName');
-            if (!name) {
-                router.push('/');
+            if (!accessToken) {
+                setLoading(false);
                 return;
             }
-            const cleanName = name.startsWith('Student ') ? name.replace('Student ', '') : name;
-            setStudentName(cleanName);
 
-            // Try to load transcript data from database
-            const userId = localStorage.getItem('userId') || localStorage.getItem('userEmail');
-            if (userId) {
-                try {
-                    const response = await fetch(`/api/upload?userId=${encodeURIComponent(userId)}`);
-                    const data = await response.json();
+            try {
+                const response = await fetch(`/api/upload?userId=${encodeURIComponent(user.email || '')}`, {
+                    headers: { Authorization: `Bearer ${accessToken}` },
+                });
+                const data = await response.json();
 
-                    if (data.hasTranscript && data.courses?.length > 0) {
-                        setHasTranscript(true);
+                if (data.hasTranscript && data.courses?.length > 0) {
+                    setHasTranscript(true);
 
-                        const courses: TranscriptCourse[] = data.courses;
-                        const ctx = buildTranscriptContext(courses, cleanName);
-                        setStudentContext(ctx);
+                    const courses: TranscriptCourse[] = data.courses;
+                    const ctx = buildTranscriptContext(courses, cleanName);
+                    setStudentContext(ctx);
 
-                        // Use corrected credit numbers for welcome message
-                        const { earnedCredits, uniqueCompleted, inProgress } = computeCorrectedCredits(courses);
-                        const allTerms = [...new Set(courses.map(c => c.term))];
-                        const semesterCount = allTerms.length;
+                    // Use corrected credit numbers for welcome message
+                    const { earnedCredits, uniqueCompleted, inProgress } = computeCorrectedCredits(courses);
+                    const allTerms = [...new Set(courses.map(c => c.term))];
+                    const semesterCount = allTerms.length;
 
-                        let standing: string;
-                        if (earnedCredits >= 90) standing = 'Senior';
-                        else if (earnedCredits >= 60) standing = 'Junior';
-                        else if (earnedCredits >= 30) standing = 'Sophomore';
-                        else standing = 'Freshman';
+                    let standing: string;
+                    if (earnedCredits >= 90) standing = 'Senior';
+                    else if (earnedCredits >= 60) standing = 'Junior';
+                    else if (earnedCredits >= 30) standing = 'Sophomore';
+                    else standing = 'Freshman';
 
-                        setWelcomeMessage(
-                            `Hello ${cleanName}! I'm your AI Academic Advisor, powered by real course data from the University of Arizona.\n\n` +
-                            `From your transcript: you're a ${standing} (semester ${semesterCount}) with ${uniqueCompleted.length} completed courses and ${earnedCredits} earned credits.` +
-                            (inProgress.length > 0 ? `\nCurrently enrolled in: ${inProgress.map(c => c.course).join(', ')}` : '') +
-                            `\n\nI can help you with:\n• Planning your next semester\n• Understanding prerequisites\n• Course recommendations based on your transcript\n• Creating a personalized graduation timeline\n\nWhat would you like to explore today?`
-                        );
-                    } else {
-                        setHasTranscript(false);
-                        setWelcomeMessage(
-                            `Hello ${cleanName}! I'm your AI Academic Advisor, powered by real course data from the University of Arizona.\n\n` +
-                            `I don't have your transcript yet. You can upload it right here using the 📎 button below, or on the My Courses page.\n\n` +
-                            `With your transcript I can give you personalized advice about remaining requirements, credit counts, and graduation planning.\n\n` +
-                            `Feel free to ask general questions about courses and prerequisites in the meantime!`
-                        );
-                    }
-                } catch (error) {
-                    console.error('Error loading transcript:', error);
+                    setWelcomeMessage(
+                        `Hello ${cleanName}! I'm your AI Academic Advisor, powered by real course data from the University of Arizona.\n\n` +
+                        `From your transcript: you're a ${standing} (semester ${semesterCount}) with ${uniqueCompleted.length} completed courses and ${earnedCredits} earned credits.` +
+                        (inProgress.length > 0 ? `\nCurrently enrolled in: ${inProgress.map(c => c.course).join(', ')}` : '') +
+                        `\n\nI can help you with:\n• Planning your next semester\n• Understanding prerequisites\n• Course recommendations based on your transcript\n• Creating a personalized graduation timeline\n\nWhat would you like to explore today?`
+                    );
+                } else {
                     setHasTranscript(false);
                     setWelcomeMessage(
-                        `Hello ${cleanName}! I'm your AI Academic Advisor.\n\n` +
-                        `Upload your transcript with the 📎 button below for personalized advice, or ask me general questions about courses and planning!`
+                        `Hello ${cleanName}! I'm your AI Academic Advisor, powered by real course data from the University of Arizona.\n\n` +
+                        `I don't have your transcript yet. You can upload it right here using the 📎 button below, or on the My Courses page.\n\n` +
+                        `With your transcript I can give you personalized advice about remaining requirements, credit counts, and graduation planning.\n\n` +
+                        `Feel free to ask general questions about courses and prerequisites in the meantime!`
                     );
                 }
-            } else {
+            } catch (error) {
+                console.error('Error loading transcript:', error);
                 setHasTranscript(false);
                 setWelcomeMessage(
                     `Hello ${cleanName}! I'm your AI Academic Advisor.\n\n` +
-                    `I can help you with course planning, prerequisites, and graduation timelines.\n\nUpload your transcript with the 📎 button for personalized recommendations!`
+                    `Upload your transcript with the 📎 button below for personalized advice, or ask me general questions about courses and planning!`
                 );
             }
 
@@ -154,7 +153,7 @@ export default function AdvisorPage() {
         };
 
         initializeAdvisor();
-    }, [router]);
+    }, [authLoading, user, accessToken]);
 
     // Called when AdvisorChat parses a new transcript
     const handleTranscriptParsed = (ctx: string) => {
@@ -254,7 +253,7 @@ export default function AdvisorPage() {
 
                     {/* Advisor Chat Component */}
                     <AdvisorChat
-                        studentName={studentName}
+                        studentName={cleanName}
                         welcomeMessage={welcomeMessage}
                         studentContext={studentContext}
                         onTranscriptParsed={handleTranscriptParsed}

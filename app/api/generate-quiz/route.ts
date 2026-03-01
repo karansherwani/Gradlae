@@ -1,31 +1,63 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateQuizForCourse } from '@/app/lib/quizGenerator';
-import { hasUserAttemptedQuiz } from '@/app/lib/db';
+import { supabaseAdmin } from '@/app/lib/supabaseServer';
+import { getUserFromRequest } from '@/app/lib/supabaseAuth';
 
 export async function POST(request: NextRequest) {
     try {
-        // Get data from request
         const { courseNumber, courseName } = await request.json();
-        const userId = request.headers.get('x-user-email');
 
-        if (!userId || !courseNumber || !courseName) {
+        // Try Bearer auth first
+        const user = await getUserFromRequest(request);
+        let userId: string;
+
+        if (user) {
+            userId = user.id;
+        } else {
+            // Fallback: x-user-email header (legacy)
+            const userEmail = request.headers.get('x-user-email');
+            if (!userEmail) {
+                return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+            }
+
+            const { data: userRow } = await supabaseAdmin
+                .from('users')
+                .select('id')
+                .eq('email', userEmail.toLowerCase())
+                .single();
+
+            if (!userRow) {
+                return NextResponse.json({ error: 'User not found' }, { status: 404 });
+            }
+            userId = userRow.id;
+        }
+
+        if (!courseNumber || !courseName) {
             return NextResponse.json(
-                { error: 'Missing required fields: x-user-email header, courseNumber, courseName' },
-                { status: 400 }
+                { error: 'Missing required fields: courseNumber, courseName' },
+                { status: 400 },
             );
         }
 
-        // User identification is handled via x-user-email header
-        // The Gemini API key is configured server-side in environment variables
-        // For production, consider adding JWT/session-based authentication
+        // Check if user already attempted this quiz (using Supabase)
+        const { data: attempt } = await supabaseAdmin
+            .from('quiz_attempts')
+            .select('id, score, total, percentage, created_at')
+            .eq('user_id', userId)
+            .eq('course_number', courseNumber)
+            .limit(1)
+            .single();
 
-        // Check if user already attempted this quiz
-        const hasAttempted = await hasUserAttemptedQuiz(userId, courseNumber);
-
-        if (hasAttempted) {
+        if (attempt) {
             return NextResponse.json(
-                { error: 'You have already completed this quiz' },
-                { status: 403 }
+                {
+                    error: 'You have already completed this quiz',
+                    previousScore: attempt.score,
+                    totalQuestions: attempt.total,
+                    percentage: attempt.percentage,
+                    attemptDate: attempt.created_at,
+                },
+                { status: 403 },
             );
         }
 
@@ -33,16 +65,15 @@ export async function POST(request: NextRequest) {
         const quiz = await generateQuizForCourse(
             userId,
             courseNumber,
-            courseName
+            courseName,
         );
 
         return NextResponse.json({
             success: true,
-            quiz: quiz,
+            quiz,
             generatedAt: new Date().toISOString(),
-            note: 'Questions are unique to your user ID'
+            note: 'Questions are unique to your user ID',
         });
-
     } catch (error) {
         console.error('Quiz API error:', error);
         let errorMessage = (error as Error).message;
@@ -52,20 +83,17 @@ export async function POST(request: NextRequest) {
         }
 
         return NextResponse.json(
-            {
-                error: 'Failed to generate quiz',
-                details: errorMessage
-            },
-            { status: 500 }
+            { error: 'Failed to generate quiz', details: errorMessage },
+            { status: 500 },
         );
     }
 }
 
-// Add a GET method for debugging
-export async function GET(request: NextRequest) {
+// GET method for debugging
+export async function GET() {
     return NextResponse.json({
         status: 'active',
         message: 'Quiz generation API is running',
-        note: 'Use POST method with userId, courseNumber, courseName'
+        note: 'Use POST method with courseNumber, courseName',
     });
 }

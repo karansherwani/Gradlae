@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../components/AuthProvider';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import styles from '../styles/placements.module.css';
@@ -26,6 +27,7 @@ interface CourseGrade {
 
 export default function PlacementsPage() {
   const router = useRouter();
+  const { user, accessToken, loading: authLoading } = useAuth();
   const [step, setStep] = useState<Step>('upload');
   const [grades, setGrades] = useState<CourseGrade[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -43,19 +45,25 @@ export default function PlacementsPage() {
 
   // Check for saved transcript on load
   useEffect(() => {
+    if (authLoading) return;
+    if (!user) {
+      router.push('/auth');
+      return;
+    }
+
     const checkSavedTranscript = async () => {
-      const userId = localStorage.getItem('userId') || localStorage.getItem('userEmail');
-      if (!userId) {
+      if (!accessToken) {
         setLoadingTranscript(false);
         return;
       }
 
       try {
-        const response = await fetch(`/api/upload?userId=${encodeURIComponent(userId)}`);
+        const response = await fetch('/api/upload?userId=' + encodeURIComponent(user.email || ''), {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
         const data = await response.json();
 
         if (data.hasTranscript && data.courses?.length > 0) {
-          // Transform to CourseGrade format
           const savedGrades: CourseGrade[] = data.courses.map((c: { course: string; description: string; grade: string; credits: number; term: string }) => ({
             course: c.course,
             description: c.description,
@@ -74,7 +82,7 @@ export default function PlacementsPage() {
     };
 
     checkSavedTranscript();
-  }, []);
+  }, [authLoading, user, accessToken]);
 
   // Fetch courses from CSV via API — search-driven now
   const [allCourses, setAllCourses] = useState<Course[]>([]);
@@ -204,12 +212,12 @@ export default function PlacementsPage() {
       const formData = new FormData();
       formData.append('file', selectedFile);
 
-      // Get userId from localStorage if available
-      const userId = localStorage.getItem('userId') || 'demo-user';
-      formData.append('userId', userId);
+      const headers: Record<string, string> = {};
+      if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
 
       const response = await fetch('/api/upload', {
         method: 'POST',
+        headers,
         body: formData,
       });
 

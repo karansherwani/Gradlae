@@ -2,96 +2,128 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../components/AuthProvider';
 import styles from '../styles/journal.module.css';
 
 interface JournalEntry {
     id: string;
     title: string;
     content: string;
-    createdAt: string;
-    updatedAt: string;
+    created_at: string;
+    updated_at: string;
 }
 
 export default function JournalPage() {
     const router = useRouter();
+    const { user, dbUser, accessToken, loading: authLoading } = useAuth();
     const [entries, setEntries] = useState<JournalEntry[]>([]);
     const [activeEntryId, setActiveEntryId] = useState<string | null>(null);
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [loading, setLoading] = useState(true);
     const [saved, setSaved] = useState(true);
-    const [studentName, setStudentName] = useState('');
 
-    // Load entries from localStorage
+    const displayName = dbUser?.name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || '';
+
+    // Load entries from Supabase
     useEffect(() => {
-        const name = localStorage.getItem('studentName');
-        if (!name) {
-            router.push('/');
+        if (authLoading) return;
+        if (!user) {
+            router.push('/auth');
             return;
         }
-        const cleanName = name.startsWith('Student ') ? name.replace('Student ', '') : name;
-        setStudentName(cleanName);
+        loadEntries();
+    }, [authLoading, user, accessToken]);
 
-        const stored = localStorage.getItem('journalEntries');
-        if (stored) {
-            try {
-                const parsed: JournalEntry[] = JSON.parse(stored);
-                setEntries(parsed);
-                // Open the most recently updated entry
-                if (parsed.length > 0) {
-                    const latest = parsed.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())[0];
+    const loadEntries = async () => {
+        if (!accessToken) {
+            setLoading(false);
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/user/journal', {
+                headers: { Authorization: `Bearer ${accessToken}` },
+            });
+            if (response.ok) {
+                const data = await response.json();
+                const fetchedEntries: JournalEntry[] = data.entries || [];
+                setEntries(fetchedEntries);
+
+                if (fetchedEntries.length > 0) {
+                    const latest = fetchedEntries[0]; // Already sorted by updated_at desc
                     setActiveEntryId(latest.id);
                     setTitle(latest.title);
                     setContent(latest.content);
                 }
-            } catch {
-                setEntries([]);
             }
+        } catch (error) {
+            console.error('Error loading journal entries:', error);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
-    }, [router]);
-
-    // Save to localStorage
-    const saveEntries = useCallback((updated: JournalEntry[]) => {
-        localStorage.setItem('journalEntries', JSON.stringify(updated));
-        setEntries(updated);
-        setSaved(true);
-    }, []);
+    };
 
     // Auto-save on content/title change (debounced)
     useEffect(() => {
-        if (!activeEntryId || loading) return;
+        if (!activeEntryId || loading || !accessToken) return;
         setSaved(false);
 
-        const timeout = setTimeout(() => {
-            setEntries(prev => {
-                const updated = prev.map(e =>
-                    e.id === activeEntryId
-                        ? { ...e, title: title || 'Untitled', content, updatedAt: new Date().toISOString() }
-                        : e
+        const timeout = setTimeout(async () => {
+            try {
+                await fetch('/api/user/journal', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                    body: JSON.stringify({
+                        entryId: activeEntryId,
+                        title: title || 'Untitled',
+                        content,
+                    }),
+                });
+                // Update local state
+                setEntries(prev =>
+                    prev.map(e =>
+                        e.id === activeEntryId
+                            ? { ...e, title: title || 'Untitled', content, updated_at: new Date().toISOString() }
+                            : e
+                    )
                 );
-                localStorage.setItem('journalEntries', JSON.stringify(updated));
                 setSaved(true);
-                return updated;
-            });
-        }, 600);
+            } catch (error) {
+                console.error('Error saving journal entry:', error);
+            }
+        }, 800);
 
         return () => clearTimeout(timeout);
-    }, [title, content, activeEntryId, loading]);
+    }, [title, content, activeEntryId, loading, accessToken]);
 
-    const createNewEntry = () => {
-        const newEntry: JournalEntry = {
-            id: `entry-${Date.now()}`,
-            title: '',
-            content: '',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-        };
-        const updated = [newEntry, ...entries];
-        saveEntries(updated);
-        setActiveEntryId(newEntry.id);
-        setTitle('');
-        setContent('');
+    const createNewEntry = async () => {
+        if (!accessToken) return;
+
+        try {
+            const response = await fetch('/api/user/journal', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+                body: JSON.stringify({ title: '', content: '' }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const newEntry = data.entry;
+                setEntries(prev => [newEntry, ...prev]);
+                setActiveEntryId(newEntry.id);
+                setTitle('');
+                setContent('');
+            }
+        } catch (error) {
+            console.error('Error creating journal entry:', error);
+        }
     };
 
     const selectEntry = (entry: JournalEntry) => {
@@ -100,20 +132,32 @@ export default function JournalPage() {
         setContent(entry.content);
     };
 
-    const deleteEntry = (entryId: string, e: React.MouseEvent) => {
+    const deleteEntry = async (entryId: string, e: React.MouseEvent) => {
         e.stopPropagation();
-        const updated = entries.filter(en => en.id !== entryId);
-        saveEntries(updated);
-        if (activeEntryId === entryId) {
-            if (updated.length > 0) {
-                setActiveEntryId(updated[0].id);
-                setTitle(updated[0].title);
-                setContent(updated[0].content);
-            } else {
-                setActiveEntryId(null);
-                setTitle('');
-                setContent('');
+        if (!accessToken) return;
+
+        try {
+            await fetch(`/api/user/journal?entryId=${entryId}`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${accessToken}` },
+            });
+
+            const updated = entries.filter(en => en.id !== entryId);
+            setEntries(updated);
+
+            if (activeEntryId === entryId) {
+                if (updated.length > 0) {
+                    setActiveEntryId(updated[0].id);
+                    setTitle(updated[0].title);
+                    setContent(updated[0].content);
+                } else {
+                    setActiveEntryId(null);
+                    setTitle('');
+                    setContent('');
+                }
             }
+        } catch (error) {
+            console.error('Error deleting journal entry:', error);
         }
     };
 
@@ -127,7 +171,7 @@ export default function JournalPage() {
         return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
     };
 
-    if (loading) {
+    if (authLoading || loading) {
         return <div className={styles.loading}>Loading...</div>;
     }
 
@@ -184,36 +228,34 @@ export default function JournalPage() {
                                 </button>
                             </div>
                         ) : (
-                            entries
-                                .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
-                                .map(entry => (
-                                    <div
-                                        key={entry.id}
-                                        className={`${styles.entryItem} ${activeEntryId === entry.id ? styles.entryItemActive : ''}`}
-                                        onClick={() => selectEntry(entry)}
-                                    >
-                                        <div className={styles.entryItemContent}>
-                                            <h4>{entry.title || 'Untitled'}</h4>
-                                            <p className={styles.entryPreview}>
-                                                {entry.content.slice(0, 80) || 'Empty entry...'}
-                                                {entry.content.length > 80 ? '...' : ''}
-                                            </p>
-                                            <span className={styles.entryDate}>
-                                                {formatDate(entry.updatedAt)} · {formatTime(entry.updatedAt)}
-                                            </span>
-                                        </div>
-                                        <button
-                                            className={styles.deleteBtn}
-                                            onClick={(e) => deleteEntry(entry.id, e)}
-                                            title="Delete entry"
-                                        >
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                <polyline points="3 6 5 6 21 6" />
-                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                                            </svg>
-                                        </button>
+                            entries.map(entry => (
+                                <div
+                                    key={entry.id}
+                                    className={`${styles.entryItem} ${activeEntryId === entry.id ? styles.entryItemActive : ''}`}
+                                    onClick={() => selectEntry(entry)}
+                                >
+                                    <div className={styles.entryItemContent}>
+                                        <h4>{entry.title || 'Untitled'}</h4>
+                                        <p className={styles.entryPreview}>
+                                            {entry.content.slice(0, 80) || 'Empty entry...'}
+                                            {entry.content.length > 80 ? '...' : ''}
+                                        </p>
+                                        <span className={styles.entryDate}>
+                                            {formatDate(entry.updated_at)} · {formatTime(entry.updated_at)}
+                                        </span>
                                     </div>
-                                ))
+                                    <button
+                                        className={styles.deleteBtn}
+                                        onClick={(e) => deleteEntry(entry.id, e)}
+                                        title="Delete entry"
+                                    >
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                            <polyline points="3 6 5 6 21 6" />
+                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            ))
                         )}
                     </div>
                 </aside>
@@ -232,9 +274,9 @@ export default function JournalPage() {
                             <div className={styles.editorMeta}>
                                 {entries.find(e => e.id === activeEntryId) && (
                                     <span>
-                                        Created {formatDate(entries.find(e => e.id === activeEntryId)!.createdAt)}
+                                        Created {formatDate(entries.find(e => e.id === activeEntryId)!.created_at)}
                                         {' · '}
-                                        Last edited {formatDate(entries.find(e => e.id === activeEntryId)!.updatedAt)}
+                                        Last edited {formatDate(entries.find(e => e.id === activeEntryId)!.updated_at)}
                                     </span>
                                 )}
                             </div>

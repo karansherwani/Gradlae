@@ -1,72 +1,95 @@
-/* AI Advisor Chat Interface Styles */
+/* ===================================================
+   AI ADVISOR — Premium UofA-Branded Chat Interface
+   =================================================== */
 
-.container {
-    min-height: 100vh;
-    background: var(--color-background);
-    display: flex;
-    flex-direction: column;
+/* ── Design Tokens (matching dashboard) ──────────── */
+:root {
+    --navy: #0C234B;
+    --navy-hover: #162F5A;
+    --navy-light: #E8ECF2;
+    --red: #AB0520;
+    --red-hover: #8B0015;
+    --red-light: #FCEDEF;
+
+    --bg: #F5F6F8;
+    --surface: #FFFFFF;
+    --surface-alt: #F0F1F4;
+
+    --ink: #1A1D23;
+    --ink-2: #4A4F5C;
+    --ink-3: #7C8291;
+    --ink-inverse: #FFFFFF;
+
+    --line: #E2E4EA;
+    --line-light: #ECEEF2;
+
+    --shadow-card: 0 1px 3px rgba(12, 35, 75, 0.06), 0 1px 2px rgba(12, 35, 75, 0.04);
+    --shadow-md: 0 4px 12px rgba(12, 35, 75, 0.08), 0 2px 4px rgba(12, 35, 75, 0.04);
+    --shadow-lg: 0 8px 24px rgba(12, 35, 75, 0.12), 0 2px 6px rgba(12, 35, 75, 0.06);
+
+    --radius: 10px;
+    --radius-sm: 6px;
+    --radius-lg: 14px;
+
+    --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* Header */
+/* ── Container ───────────────────────────────────── */
+.container {
+    min-height: 100vh;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    font-family: var(--font-body);
+    color: var(--ink);
+}
+
+/* ── Header ──────────────────────────────────────── */
 .header {
-    background: var(--color-primary);
-    padding: 0 40px;
-    height: 64px;
+    background: var(--navy);
+    padding: 0 32px;
+    height: 60px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .headerLeft {
     display: flex;
     align-items: center;
-    gap: 20px;
-}
-
-.backButton {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.backButton:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.3);
+    gap: 16px;
 }
 
 .logo {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
 }
 
 .logoMark {
-    width: 36px;
-    height: 36px;
-    background: var(--color-secondary);
-    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    background: var(--red);
+    border-radius: var(--radius-sm);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
-    font-size: 0.9rem;
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 0.8rem;
     color: white;
     letter-spacing: -0.5px;
 }
 
 .logoText {
-    font-size: 1.25rem;
-    font-weight: 600;
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    font-weight: 700;
     color: white;
     letter-spacing: -0.3px;
 }
@@ -77,21 +100,44 @@
     gap: 12px;
 }
 
+.backButton {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 7px 14px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.backButton:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.25);
+    color: white;
+}
+
 .statusIndicator {
     display: flex;
     align-items: center;
-    gap: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 6px 14px;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 5px 12px;
     border-radius: 20px;
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.9);
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.8);
 }
 
 .statusDot {
-    width: 8px;
-    height: 8px;
-    background: #10b981;
+    width: 7px;
+    height: 7px;
+    background: #34D399;
     border-radius: 50%;
     animation: pulse 2s infinite;
 }
@@ -104,22 +150,21 @@
     }
 
     50% {
-        opacity: 0.5;
+        opacity: 0.4;
     }
 }
 
-/* Main Chat Area */
+/* ── Main Chat Area ──────────────────────────────── */
 .main {
     flex: 1;
     display: flex;
     flex-direction: column;
-    max-width: 900px;
+    max-width: 860px;
     width: 100%;
     margin: 0 auto;
     padding: 0;
 }
 
-/* Chat Container */
 .chatContainer {
     flex: 1;
     display: flex;
@@ -127,28 +172,28 @@
     overflow: hidden;
 }
 
-/* Messages Area */
+/* ── Messages Area ───────────────────────────────── */
 .messagesArea {
     flex: 1;
     overflow-y: auto;
     padding: 24px 24px 16px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 20px;
 }
 
-/* Message Styles */
+/* ── Message Styles ──────────────────────────────── */
 .message {
     display: flex;
     gap: 12px;
-    max-width: 85%;
-    animation: fadeIn 0.3s ease;
+    max-width: 82%;
+    animation: fadeIn 0.25s ease;
 }
 
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(8px);
     }
 
     to {
@@ -167,25 +212,25 @@
 }
 
 .avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1rem;
+    font-size: 0.8rem;
+    font-family: var(--font-heading);
+    font-weight: 700;
     flex-shrink: 0;
 }
 
 .avatarAi {
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+    background: var(--navy);
     color: white;
-    font-size: 0.85rem;
-    font-weight: 600;
 }
 
 .avatarUser {
-    background: var(--color-secondary);
+    background: var(--red);
     color: white;
 }
 
@@ -197,55 +242,57 @@
 
 .messageBubble {
     padding: 14px 18px;
-    border-radius: 16px;
-    font-size: 0.95rem;
-    line-height: 1.5;
+    font-size: 0.9rem;
+    line-height: 1.6;
 }
 
 .messageBubbleAi {
-    background: white;
-    border: 1px solid var(--color-border);
-    border-radius: 16px 16px 16px 4px;
-    color: var(--color-text);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 2px 14px 14px 14px;
+    color: var(--ink);
+    box-shadow: var(--shadow-card);
 }
 
 .messageBubbleUser {
-    background: var(--color-primary);
+    background: var(--navy);
     color: white;
-    border-radius: 16px 16px 4px 16px;
+    border-radius: 14px 2px 14px 14px;
 }
 
 .messageTime {
-    font-size: 0.7rem;
-    color: var(--color-text-tertiary);
+    font-size: 0.65rem;
+    color: var(--ink-3);
     padding: 0 4px;
+    font-family: var(--font-body);
 }
 
 .messageUser .messageTime {
     text-align: right;
 }
 
-/* Typing Indicator */
+/* ── Typing Indicator ────────────────────────────── */
 .typingIndicator {
     display: flex;
     gap: 12px;
     align-self: flex-start;
-    max-width: 85%;
+    max-width: 82%;
 }
 
 .typingBubble {
-    background: white;
-    border: 1px solid var(--color-border);
+    background: var(--surface);
+    border: 1px solid var(--line);
     padding: 16px 20px;
-    border-radius: 16px 16px 16px 4px;
+    border-radius: 2px 14px 14px 14px;
     display: flex;
-    gap: 4px;
+    gap: 5px;
+    box-shadow: var(--shadow-card);
 }
 
 .typingDot {
-    width: 8px;
-    height: 8px;
-    background: var(--color-primary);
+    width: 7px;
+    height: 7px;
+    background: var(--navy);
     border-radius: 50%;
     animation: bounce 1.4s infinite ease-in-out;
 }
@@ -271,23 +318,24 @@
     }
 
     40% {
-        transform: translateY(-8px);
+        transform: translateY(-6px);
     }
 }
 
-/* Quick Prompts */
+/* ── Quick Prompts ───────────────────────────────── */
 .quickPrompts {
-    padding: 16px 24px;
-    border-top: 1px solid var(--color-border);
-    background: white;
+    padding: 18px 24px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
 }
 
 .quickPromptsLabel {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--color-text-tertiary);
+    font-family: var(--font-heading);
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--ink-3);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.8px;
     margin-bottom: 12px;
 }
 
@@ -298,100 +346,103 @@
 }
 
 .promptButton {
-    background: var(--color-background);
-    border: 1px solid var(--color-border);
-    color: var(--color-text);
-    padding: 10px 16px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    padding: 8px 16px;
     border-radius: 20px;
-    font-size: 0.85rem;
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
 .promptButton:hover {
-    background: var(--color-primary);
+    background: var(--navy);
     color: white;
-    border-color: var(--color-primary);
-    transform: translateY(-1px);
+    border-color: var(--navy);
 }
 
 .promptIcon {
-    font-size: 1rem;
+    font-size: 0.9rem;
 }
 
-/* Input Area */
+/* ── Input Area ──────────────────────────────────── */
 .inputArea {
-    padding: 16px 24px 24px;
-    background: white;
-    border-top: 1px solid var(--color-border);
+    padding: 16px 24px 20px;
+    background: var(--surface);
+    border-top: 1px solid var(--line);
 }
 
 .inputWrapper {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     align-items: flex-end;
 }
 
 .textInput {
     flex: 1;
-    border: 1px solid var(--color-border);
-    border-radius: 24px;
-    padding: 14px 20px;
-    font-size: 0.95rem;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 18px;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--ink);
     outline: none;
-    transition: all 0.2s ease;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
     resize: none;
-    font-family: inherit;
-    min-height: 48px;
+    min-height: 44px;
     max-height: 150px;
+    background: var(--bg);
 }
 
 .textInput:focus {
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(12, 35, 75, 0.1);
+    border-color: var(--navy);
+    box-shadow: 0 0 0 3px rgba(12, 35, 75, 0.08);
+    background: var(--surface);
 }
 
 .textInput::placeholder {
-    color: var(--color-text-tertiary);
+    color: var(--ink-3);
 }
 
 .sendButton {
-    width: 48px;
-    height: 48px;
-    background: var(--color-primary);
+    width: 44px;
+    height: 44px;
+    background: var(--navy);
     border: none;
-    border-radius: 50%;
+    border-radius: var(--radius);
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
     flex-shrink: 0;
 }
 
 .sendButton:hover:not(:disabled) {
-    background: var(--color-primary-hover);
-    transform: scale(1.05);
+    background: var(--navy-hover);
 }
 
 .sendButton:disabled {
-    background: var(--color-border);
+    background: var(--line);
     cursor: not-allowed;
 }
 
 .sendIcon {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
 }
 
-/* Welcome Card */
+/* ── Welcome Card ────────────────────────────────── */
 .welcomeCard {
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
-    border-radius: 16px;
+    background: var(--navy);
+    border-radius: var(--radius-lg);
     padding: 28px;
     margin: 24px;
     color: white;
@@ -399,61 +450,66 @@
 }
 
 .welcomeIcon {
-    font-size: 3rem;
-    margin-bottom: 16px;
+    font-size: 2.5rem;
+    margin-bottom: 14px;
 }
 
 .welcomeCard h2 {
-    font-size: 1.5rem;
+    font-family: var(--font-heading);
+    font-size: 1.35rem;
     font-weight: 700;
     margin: 0 0 8px 0;
+    letter-spacing: -0.3px;
 }
 
 .welcomeCard p {
-    font-size: 0.95rem;
-    opacity: 0.9;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.75);
     margin: 0;
-    line-height: 1.5;
+    line-height: 1.55;
 }
 
-/* Footer Hint */
+/* ── Footer Hint ─────────────────────────────────── */
 .footerHint {
     text-align: center;
     padding: 8px;
-    font-size: 0.75rem;
-    color: var(--color-text-tertiary);
+    font-size: 0.7rem;
+    color: var(--ink-3);
+    font-family: var(--font-body);
 }
 
-/* Loading State */
+/* ── Loading State ───────────────────────────────── */
 .loading {
     display: flex;
     align-items: center;
     justify-content: center;
     height: 100vh;
-    color: var(--color-primary);
+    color: var(--navy);
+    font-family: var(--font-heading);
     font-weight: 600;
+    font-size: 0.95rem;
 }
 
-/* Transcript Upload Banner */
+/* ── Transcript Upload Banner ────────────────────── */
 .transcriptBanner {
-    padding: 16px 24px;
-    background: linear-gradient(135deg, rgba(12, 35, 75, 0.05) 0%, rgba(171, 5, 32, 0.05) 100%);
-    border-bottom: 1px solid var(--color-border);
+    padding: 14px 24px;
+    background: var(--navy-light);
+    border-bottom: 1px solid var(--line);
 }
 
 .transcriptBannerContent {
     display: flex;
     align-items: center;
-    gap: 16px;
-    max-width: 900px;
+    gap: 14px;
+    max-width: 860px;
     margin: 0 auto;
 }
 
 .transcriptBannerIcon {
-    width: 48px;
-    height: 48px;
-    background: var(--color-primary);
-    border-radius: 12px;
+    width: 42px;
+    height: 42px;
+    background: var(--navy);
+    border-radius: var(--radius);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -469,58 +525,59 @@
 }
 
 .transcriptBannerText strong {
-    font-size: 0.95rem;
+    font-family: var(--font-heading);
+    font-size: 0.88rem;
     font-weight: 600;
-    color: var(--color-text);
+    color: var(--ink);
 }
 
 .transcriptBannerText span {
-    font-size: 0.85rem;
-    color: var(--color-text-tertiary);
+    font-size: 0.78rem;
+    color: var(--ink-2);
 }
 
 .transcriptBannerBtn {
-    padding: 10px 20px;
-    background: var(--color-primary);
+    padding: 8px 18px;
+    background: var(--navy);
     color: white;
     border: none;
-    border-radius: 8px;
-    font-size: 0.9rem;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background 0.15s ease;
     white-space: nowrap;
 }
 
 .transcriptBannerBtn:hover {
-    background: var(--color-primary-hover);
-    transform: translateY(-1px);
+    background: var(--navy-hover);
 }
 
-/* File Attachment Styles */
+/* ── File Attachment Styles ──────────────────────── */
 .attachButton {
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
     background: transparent;
-    border: 1px solid var(--color-border);
-    border-radius: 50%;
-    color: var(--color-text-tertiary);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    color: var(--ink-3);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
     flex-shrink: 0;
 }
 
 .attachButton:hover:not(:disabled) {
-    background: var(--color-background);
-    border-color: var(--color-primary);
-    color: var(--color-primary);
+    background: var(--bg);
+    border-color: var(--navy);
+    color: var(--navy);
 }
 
 .attachButton:disabled {
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: not-allowed;
 }
 
@@ -528,20 +585,21 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 16px;
-    background: rgba(12, 35, 75, 0.05);
-    border: 1px solid var(--color-border);
-    border-radius: 12px;
-    margin-bottom: 12px;
+    padding: 10px 14px;
+    background: var(--navy-light);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    margin-bottom: 10px;
 }
 
 .selectedFileInfo {
     display: flex;
     align-items: center;
-    gap: 10px;
-    color: var(--color-primary);
-    font-size: 0.9rem;
-    font-weight: 500;
+    gap: 8px;
+    color: var(--navy);
+    font-family: var(--font-heading);
+    font-size: 0.82rem;
+    font-weight: 600;
 }
 
 .selectedFileInfo svg {
@@ -549,31 +607,31 @@
 }
 
 .removeFileBtn {
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
     background: transparent;
     border: none;
-    border-radius: 50%;
-    color: var(--color-text-tertiary);
+    border-radius: var(--radius-sm);
+    color: var(--ink-3);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
 }
 
 .removeFileBtn:hover {
-    background: rgba(220, 38, 38, 0.1);
-    color: #DC2626;
+    background: var(--red-light);
+    color: var(--red);
 }
 
 .uploadSpinner {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-top-color: white;
     border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+    animation: spin 0.7s linear infinite;
 }
 
 @keyframes spin {
@@ -582,7 +640,7 @@
     }
 }
 
-/* Responsive */
+/* ── Responsive ──────────────────────────────────── */
 @media (max-width: 768px) {
     .header {
         padding: 0 16px;
@@ -601,7 +659,7 @@
     }
 
     .quickPrompts {
-        padding: 12px 16px;
+        padding: 14px 16px;
     }
 
     .promptsGrid {
@@ -613,12 +671,12 @@
     }
 
     .inputArea {
-        padding: 12px 16px 20px;
+        padding: 12px 16px 16px;
     }
 
     .welcomeCard {
         margin: 16px;
-        padding: 20px;
+        padding: 22px;
     }
 
     .transcriptBanner {

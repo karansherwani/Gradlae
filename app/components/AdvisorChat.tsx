@@ -130,8 +130,6 @@ export default function AdvisorChat({
         try {
             const formData = new FormData();
             formData.append('file', file);
-            const userId = localStorage.getItem('userId') || localStorage.getItem('userEmail') || '';
-            if (userId) formData.append('userId', userId);
 
             // Use the general-purpose advisor upload endpoint
             const res = await fetch('/api/advisor/upload', { method: 'POST', body: formData });

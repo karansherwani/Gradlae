@@ -1,30 +1,59 @@
-/* LANDING PAGE STYLES - Clean Professional UofA Theme */
+/* ===================================================
+   PACEMATCH LANDING PAGE — Premium University SaaS
+   =================================================== */
 
+/* ── Design Tokens ───────────────────────────────── */
 :root {
-  --uofa-red: var(--color-secondary);
-  --uofa-red-dark: var(--color-secondary-hover);
-  --uofa-blue: var(--color-primary);
-  --uofa-blue-light: var(--color-primary-hover);
-  --bg-light: var(--color-background);
-  --text-primary: var(--color-text);
-  --text-secondary: var(--color-text-secondary);
-  --border-color: var(--color-border);
+  --navy: #0C234B;
+  --navy-mid: #132D5E;
+  --navy-light: #1E3A6C;
+  --crimson: #AB0520;
+  --crimson-dark: #8B0015;
+  --crimson-light: #C41838;
+
+  --surface: #FFFFFF;
+  --bg-warm: #F7F8FA;
+  --bg-cool: #F0F2F6;
+
+  --ink: #1A1D23;
+  --ink-2: #4A4F5C;
+  --ink-3: #7C8291;
+  --ink-inverse: #FFFFFF;
+
+  --line: #E2E4EA;
+  --line-light: #ECEEF2;
+
+  --shadow-sm: 0 1px 3px rgba(12, 35, 75, 0.06), 0 1px 2px rgba(12, 35, 75, 0.04);
+  --shadow-md: 0 4px 12px rgba(12, 35, 75, 0.08), 0 2px 4px rgba(12, 35, 75, 0.04);
+  --shadow-lg: 0 12px 32px rgba(12, 35, 75, 0.12), 0 4px 8px rgba(12, 35, 75, 0.06);
+  --shadow-hero-btn: 0 8px 32px rgba(12, 35, 75, 0.3);
+
+  --radius: 10px;
+  --radius-sm: 6px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+
+  --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
+/* ── Container ───────────────────────────────────── */
 .container {
   width: 100%;
   min-height: 100vh;
-  background: var(--color-surface);
+  background: var(--surface);
+  font-family: var(--font-body);
+  color: var(--ink);
 }
 
-/* Header */
+/* ── Header ──────────────────────────────────────── */
 .topHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 48px;
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--border-color);
+  padding: 14px 48px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -39,344 +68,399 @@
 .logoMark {
   width: 32px;
   height: 32px;
-  background: var(--uofa-blue);
-  border-radius: 6px;
+  background: var(--navy);
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
+  font-family: var(--font-heading);
+  font-weight: 800;
   font-size: 0.75rem;
-  color: var(--color-text-inverse);
+  color: var(--ink-inverse);
 }
 
 .logoText {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: var(--uofa-blue);
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--navy);
+  letter-spacing: -0.3px;
 }
 
 .headerNav {
   display: flex;
-  gap: 36px;
+  gap: 32px;
 }
 
 .headerNav a {
-  color: var(--text-secondary);
+  color: var(--ink-2);
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 500;
-  transition: color 0.2s;
+  transition: color 0.15s;
 }
 
 .headerNav a:hover {
-  color: var(--uofa-blue);
+  color: var(--navy);
 }
 
 .headerCta {
-  background: var(--uofa-blue);
-  color: var(--color-text-inverse);
+  background: var(--navy);
+  color: var(--ink-inverse);
   border: none;
-  padding: 10px 24px;
-  border-radius: 6px;
+  padding: 9px 22px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-heading);
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.15s ease;
 }
 
 .headerCta:hover {
-  background: var(--uofa-blue-light);
+  background: var(--navy-light);
 }
 
-/* Hero */
+/* ═══════════════════════════════════════════════════
+   HERO — Premium gradient, noise texture, vignette
+   ═══════════════════════════════════════════════════ */
 .hero {
-  background: linear-gradient(135deg, var(--uofa-blue) 0%, var(--uofa-blue-light) 100%);
-  color: var(--color-text-inverse);
-  padding: 80px 48px 100px;
+  background: var(--navy);
+  color: var(--ink-inverse);
+  padding: 100px 48px 110px;
   text-align: center;
+  position: relative;
 }
 
 .heroContent {
-  max-width: 600px;
+  max-width: 620px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 .hero h1 {
-  font-size: 2.75rem;
-  margin-bottom: 20px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-  line-height: 1.15;
+  font-family: var(--font-heading);
+  font-size: 3rem;
+  font-weight: 800;
+  margin: 0 0 20px 0;
+  letter-spacing: -1px;
+  line-height: 1.1;
 }
 
 .heroSubtext {
-  font-size: 1.1rem;
-  margin-bottom: 32px;
-  opacity: 0.9;
+  font-size: 1.08rem;
+  margin: 0 0 36px 0;
+  color: rgba(255, 255, 255, 0.82);
   line-height: 1.6;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
+/* Primary CTA button — used across hero, advisor, final CTA */
 .ctaButton {
-  background: var(--color-surface);
-  color: var(--uofa-blue);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--surface);
+  color: var(--navy);
   border: none;
-  padding: 14px 36px;
-  font-size: 1rem;
-  font-weight: 600;
-  border-radius: 6px;
+  padding: 14px 34px;
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-hero-btn);
+  position: relative;
+}
+
+/* radial glow behind CTA on hover */
+.ctaButton::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 16px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
 }
 
 .ctaButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 40px rgba(12, 35, 75, 0.35);
+}
+
+.ctaButton:hover::before {
+  opacity: 1;
 }
 
 .freeText {
-  font-size: 0.85rem;
-  opacity: 0.8;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.58);
   margin-top: 20px;
 }
 
-/* How It Works */
+/* ── How It Works ────────────────────────────────── */
 .howItWorks {
-  padding: 80px 48px;
+  padding: 88px 48px;
   text-align: center;
-  background: var(--bg-light);
+  background: var(--bg-warm);
 }
 
 .sectionLabel {
   display: inline-block;
-  background: var(--color-surface);
-  border: 1px solid var(--border-color);
-  padding: 6px 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 5px 14px;
   border-radius: 20px;
-  font-size: 0.8rem;
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
   font-weight: 600;
-  color: var(--text-secondary);
+  color: var(--ink-3);
   margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
 }
 
 .howItWorks h2 {
+  font-family: var(--font-heading);
   font-size: 2rem;
-  color: var(--text-primary);
-  margin-bottom: 12px;
+  color: var(--ink);
+  margin: 0 0 12px 0;
   font-weight: 700;
+  letter-spacing: -0.5px;
 }
 
 .accentText {
-  color: var(--uofa-red);
+  color: var(--crimson);
 }
 
 .sectionSubtext {
-  font-size: 1rem;
-  color: var(--text-secondary);
-  max-width: 500px;
-  margin: 0 auto 50px;
-  line-height: 1.5;
+  font-size: 0.95rem;
+  color: var(--ink-2);
+  max-width: 480px;
+  margin: 0 auto 52px;
+  line-height: 1.55;
 }
 
 .stepsContainer {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
-  max-width: 1000px;
+  gap: 20px;
+  max-width: 960px;
   margin: 0 auto;
 }
 
 .stepItem {
   text-align: center;
-  padding: 24px 20px;
+  padding: 24px 18px;
 }
 
 .stepNumber {
-  width: 40px;
-  height: 40px;
-  background: var(--uofa-blue);
-  color: var(--color-text-inverse);
+  width: 38px;
+  height: 38px;
+  background: var(--navy);
+  color: var(--ink-inverse);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.85rem;
+  font-family: var(--font-heading);
+  font-size: 0.8rem;
   font-weight: 700;
-  margin: 0 auto 20px;
+  margin: 0 auto 18px;
 }
 
 .stepItem h3 {
-  font-size: 1rem;
-  color: var(--text-primary);
-  margin-bottom: 10px;
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  color: var(--ink);
+  margin: 0 0 8px 0;
   font-weight: 600;
 }
 
 .stepItem p {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
+  font-size: 0.82rem;
+  color: var(--ink-2);
   line-height: 1.5;
+  margin: 0;
 }
 
-/* Features */
+/* ── Features ────────────────────────────────────── */
 .featuresSection {
-  padding: 80px 48px;
+  padding: 88px 48px;
   text-align: center;
 }
 
 .featuresSection h2 {
+  font-family: var(--font-heading);
   font-size: 2rem;
-  color: var(--text-primary);
-  margin-bottom: 50px;
+  color: var(--ink);
+  margin: 0 0 48px 0;
   font-weight: 700;
+  letter-spacing: -0.5px;
 }
 
 .featuresGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
+  gap: 20px;
   max-width: 1000px;
   margin: 0 auto;
 }
 
 .featureCard {
-  background: var(--bg-light);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  padding: 28px 24px;
+  background: var(--bg-warm);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 28px 22px;
   text-align: center;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
 .featureCard:hover {
-  border-color: var(--uofa-blue);
-  box-shadow: 0 4px 12px rgba(12, 35, 75, 0.08);
+  border-color: var(--navy);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 .featureIcon {
-  width: 48px;
-  height: 48px;
-  background: var(--uofa-blue);
-  border-radius: 10px;
+  width: 46px;
+  height: 46px;
+  background: var(--navy);
+  border-radius: var(--radius);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-text-inverse);
+  color: var(--ink-inverse);
   margin: 0 auto 16px;
 }
 
 .featureCard h3 {
-  font-size: 1rem;
-  color: var(--text-primary);
-  margin-bottom: 8px;
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  color: var(--ink);
+  margin: 0 0 8px 0;
   font-weight: 600;
 }
 
 .featureCard p {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
+  font-size: 0.82rem;
+  color: var(--ink-2);
   line-height: 1.5;
   margin: 0;
 }
 
-/* Stats */
+/* ── Stats ───────────────────────────────────────── */
 .stats {
-  background: var(--uofa-blue);
-  padding: 50px 48px;
+  background: var(--navy);
+  padding: 48px;
 }
 
 .statsGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 32px;
+  gap: 28px;
   max-width: 900px;
   margin: 0 auto;
   text-align: center;
 }
 
 .statNumber {
-  font-size: 2.25rem;
-  font-weight: 700;
-  color: var(--color-text-inverse);
+  font-family: var(--font-heading);
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--ink-inverse);
   margin-bottom: 4px;
+  letter-spacing: -0.5px;
 }
 
 .statLabel {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.65);
 }
 
-/* AI Advisor Section */
+/* ═══════════════════════════════════════════════════
+   AI ADVISOR — Glassmorphism card, two-column layout
+   ═══════════════════════════════════════════════════ */
 .aiAdvisorSection {
-  padding: 80px 48px;
-  background: linear-gradient(135deg, var(--uofa-blue) 0%, #1a3a6e 50%, var(--uofa-blue-light) 100%);
+  background: var(--navy);
+  padding: 88px 48px;
   position: relative;
   overflow: hidden;
 }
 
-.aiAdvisorSection::before {
-  content: '';
-  position: absolute;
-  top: -100px;
-  right: -100px;
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
-  pointer-events: none;
-}
-
 .aiAdvisorWrapper {
-  max-width: 700px;
+  max-width: 1040px;
   margin: 0 auto;
-  text-align: center;
   position: relative;
   z-index: 1;
 }
 
 .aiAdvisorLabel {
-  display: inline-block;
-  background: var(--uofa-red);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--crimson);
   color: white;
-  padding: 6px 16px;
-  border-radius: 20px;
-  font-size: 0.75rem;
+  padding: 5px 14px;
+  border-radius: 4px;
+  font-family: var(--font-heading);
+  font-size: 0.65rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 12px rgba(171, 5, 32, 0.3);
+  margin-bottom: 24px;
+}
+
+/* Two-column layout */
+.aiAdvisorInner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+}
+
+/* ── Left column: copy ── */
+.aiAdvisorCopy {
+  text-align: left;
 }
 
 .aiAdvisorSection h2 {
-  font-size: 2.25rem;
+  font-family: var(--font-heading);
+  font-size: 2.2rem;
   color: white;
-  margin-bottom: 16px;
-  font-weight: 700;
+  margin: 0 0 14px 0;
+  font-weight: 800;
+  letter-spacing: -0.6px;
+  line-height: 1.15;
 }
 
 .aiAdvisorDesc {
-  font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.85);
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.76);
   line-height: 1.6;
-  margin-bottom: 32px;
+  margin: 0 0 28px 0;
 }
 
 .aiAdvisorFeatures {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px 32px;
-  margin-bottom: 36px;
-  text-align: left;
-  max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: 32px;
 }
 
 .aiAdvisorFeature {
   display: flex;
   align-items: center;
-  gap: 12px;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 0.95rem;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.9rem;
   font-weight: 500;
 }
 
@@ -384,209 +468,421 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 50%;
-  font-size: 0.75rem;
+  width: 20px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  font-size: 0.65rem;
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* CTA in advisor — solid white button */
+.aiCtaButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--surface);
+  color: var(--navy);
+  border: none;
+  padding: 13px 30px;
+  font-family: var(--font-heading);
+  font-size: 0.92rem;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+  position: relative;
+}
+
+.aiCtaButton::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 14px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.aiCtaButton:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.24);
+}
+
+.aiCtaButton:hover::before {
+  opacity: 1;
+}
+
+/* ── Right column: glassmorphism plan card ── */
+.aiAdvisorPreview {
+  /* Glassmorphism card */
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.previewHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.previewIconWrap {
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
   flex-shrink: 0;
 }
 
-@media (max-width: 768px) {
-  .aiAdvisorSection {
-    padding: 60px 20px;
-  }
-
-  .aiAdvisorSection h2 {
-    font-size: 1.75rem;
-  }
-
-  .aiAdvisorFeatures {
-    grid-template-columns: 1fr;
-  }
+.previewTitle {
+  font-family: var(--font-heading);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: white;
+  margin: 0;
 }
 
-/* Testimonials */
+.previewSubtitle {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 2px 0 0 0;
+}
+
+/* Accent tags / pills */
+.previewTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.previewTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-family: var(--font-heading);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.previewTagNavy {
+  background: rgba(12, 35, 75, 0.5);
+  border: 1px solid rgba(12, 35, 75, 0.3);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.previewTagRed {
+  background: rgba(171, 5, 32, 0.35);
+  border: 1px solid rgba(171, 5, 32, 0.25);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.previewTagGreen {
+  background: rgba(30, 107, 58, 0.35);
+  border: 1px solid rgba(30, 107, 58, 0.25);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Mock course rows */
+.previewCourses {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.previewCourseRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+}
+
+.courseInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.courseName {
+  font-family: var(--font-heading);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.courseCode {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.45);
+  margin-top: 1px;
+}
+
+.courseCredits {
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 3px 10px;
+  border-radius: 4px;
+}
+
+.previewFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.previewStat {
+  text-align: center;
+}
+
+.previewStatValue {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: white;
+}
+
+.previewStatLabel {
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ── Testimonials ────────────────────────────────── */
 .testimonials {
-  padding: 80px 48px;
-  background: var(--bg-light);
+  padding: 88px 48px;
+  background: var(--bg-warm);
 }
 
 .testimonials h2 {
+  font-family: var(--font-heading);
   font-size: 2rem;
   text-align: center;
-  margin-bottom: 50px;
-  color: var(--text-primary);
+  margin: 0 0 48px 0;
+  color: var(--ink);
   font-weight: 700;
+  letter-spacing: -0.5px;
 }
 
 .testimonialsGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  gap: 20px;
   max-width: 1000px;
   margin: 0 auto;
 }
 
 .testimonialCard {
-  background: var(--color-surface);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   padding: 28px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s ease;
+}
+
+.testimonialCard:hover {
+  box-shadow: var(--shadow-md);
 }
 
 .testimonialText {
-  font-size: 0.95rem;
-  color: var(--text-primary);
+  font-size: 0.92rem;
+  color: var(--ink);
   line-height: 1.6;
   margin: 0 0 20px 0;
   font-style: italic;
 }
 
 .testimonialAuthor {
-  border-top: 1px solid var(--border-color);
-  padding-top: 16px;
+  border-top: 1px solid var(--line-light);
+  padding-top: 14px;
 }
 
 .authorName {
+  font-family: var(--font-heading);
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--ink);
   margin-bottom: 2px;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
 }
 
 .authorRole {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
+  font-size: 0.78rem;
+  color: var(--ink-3);
 }
 
-/* Support */
+/* ── Support ─────────────────────────────────────── */
 .support {
-  padding: 60px 48px;
+  padding: 64px 48px;
 }
 
 .supportGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  gap: 20px;
   max-width: 900px;
   margin: 0 auto;
 }
 
 .supportCard {
-  background: var(--bg-light);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
+  background: var(--bg-warm);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   padding: 28px;
   text-align: center;
+  transition: box-shadow 0.2s ease;
+}
+
+.supportCard:hover {
+  box-shadow: var(--shadow-md);
 }
 
 .supportCard h3 {
-  font-size: 1.1rem;
-  margin-bottom: 8px;
-  color: var(--text-primary);
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  margin: 0 0 8px 0;
+  color: var(--ink);
   font-weight: 600;
 }
 
 .supportCard p {
-  color: var(--text-secondary);
-  margin-bottom: 20px;
-  font-size: 0.9rem;
+  color: var(--ink-2);
+  margin: 0 0 20px 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
 }
 
 .supportBtn {
-  background: var(--uofa-blue);
-  color: var(--color-text-inverse);
+  background: var(--navy);
+  color: var(--ink-inverse);
   border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
+  padding: 9px 20px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  font-weight: 500;
-  font-size: 0.85rem;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.82rem;
   text-decoration: none;
   display: inline-block;
-  transition: background 0.2s;
+  transition: background 0.15s ease;
 }
 
 .supportBtn:hover {
-  background: var(--uofa-blue-light);
+  background: var(--navy-light);
 }
 
-/* Final CTA */
+/* ═══════════════════════════════════════════════════
+   FINAL CTA — Same gradient language as hero
+   ═══════════════════════════════════════════════════ */
 .finalCTA {
-  background: linear-gradient(135deg, var(--uofa-blue) 0%, var(--uofa-red) 100%);
-  color: var(--color-text-inverse);
-  padding: 70px 48px;
+  background: var(--navy);
+  color: var(--ink-inverse);
+  padding: 80px 48px;
   text-align: center;
 }
 
 .finalCTA h2 {
+  font-family: var(--font-heading);
   font-size: 2rem;
-  margin-bottom: 12px;
+  margin: 0 0 12px 0;
   font-weight: 700;
+  letter-spacing: -0.5px;
 }
 
 .finalCTA p {
-  font-size: 1rem;
-  margin-bottom: 28px;
-  opacity: 0.9;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.72);
+  margin: 0 0 28px 0;
 }
 
-/* Footer */
+/* ── Footer ──────────────────────────────────────── */
 .footer {
-  background: var(--uofa-blue);
-  color: var(--color-text-inverse);
-  padding: 50px 48px 30px;
+  background: var(--navy);
+  color: var(--ink-inverse);
+  padding: 48px 48px 28px;
 }
 
 .footerContent {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
-  gap: 48px;
+  gap: 44px;
   max-width: 900px;
-  margin: 0 auto 30px;
+  margin: 0 auto 28px;
 }
 
 .footerSection h4 {
-  margin-bottom: 16px;
-  font-size: 1rem;
+  font-family: var(--font-heading);
+  margin: 0 0 14px 0;
+  font-size: 0.95rem;
   font-weight: 600;
 }
 
 .footerSection p {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  margin: 0;
 }
 
 .footerSection a {
   display: block;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.6);
   text-decoration: none;
-  margin-bottom: 10px;
-  font-size: 0.9rem;
-  transition: color 0.2s;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+  transition: color 0.15s;
 }
 
 .footerSection a:hover {
-  color: var(--color-text-inverse);
+  color: var(--ink-inverse);
 }
 
 .footerBottom {
   text-align: center;
-  padding-top: 30px;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.85rem;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.8rem;
 }
 
-/* Modal */
+/* ── Modal ───────────────────────────────────────── */
 .modal {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(12, 35, 75, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -595,14 +891,15 @@
 }
 
 .modalContent {
-  background: var(--color-surface);
-  border-radius: 12px;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
   padding: 36px;
   max-width: 420px;
   width: 100%;
   position: relative;
   max-height: 90vh;
   overflow-y: auto;
+  box-shadow: var(--shadow-lg);
 }
 
 .closeBtn {
@@ -611,65 +908,70 @@
   right: 16px;
   background: none;
   border: none;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   cursor: pointer;
-  color: var(--text-secondary);
+  color: var(--ink-3);
   line-height: 1;
+  transition: color 0.15s;
 }
 
 .closeBtn:hover {
-  color: var(--text-primary);
+  color: var(--ink);
 }
 
 .modalHeader {
   text-align: center;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 
 .modalLogo {
-  width: 48px;
-  height: 48px;
-  background: var(--uofa-blue);
-  border-radius: 10px;
+  width: 44px;
+  height: 44px;
+  background: var(--navy);
+  border-radius: var(--radius);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 1rem;
-  color: var(--color-text-inverse);
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: var(--ink-inverse);
   margin: 0 auto 12px;
 }
 
 .modalHeader h2 {
-  font-size: 1.25rem;
-  color: var(--uofa-blue);
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  color: var(--navy);
   margin: 0 0 4px 0;
+  font-weight: 700;
 }
 
 .modalTagline {
-  color: var(--text-secondary);
-  font-size: 0.85rem;
+  color: var(--ink-3);
+  font-size: 0.82rem;
   margin: 0;
 }
 
 .findUniTitle {
-  font-size: 1.1rem;
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--ink);
   text-align: center;
   margin: 0 0 4px 0;
 }
 
 .findUniDesc {
   text-align: center;
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-  margin: 0 0 20px 0;
+  color: var(--ink-3);
+  font-size: 0.82rem;
+  margin: 0 0 18px 0;
 }
 
 .searchWrapper {
   position: relative;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .searchIcon {
@@ -677,27 +979,30 @@
   left: 14px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--text-secondary);
+  color: var(--ink-3);
 }
 
 .searchInput {
   width: 100%;
-  padding: 12px 12px 12px 44px;
-  border: 1px solid var(--border-color);
+  padding: 11px 12px 11px 42px;
+  border: 1px solid var(--line);
   border-radius: 8px;
-  font-size: 0.95rem;
-  transition: border-color 0.2s;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  transition: border-color 0.15s;
+  background: var(--surface);
+  color: var(--ink);
 }
 
 .searchInput:focus {
   outline: none;
-  border-color: var(--uofa-blue);
+  border-color: var(--navy);
 }
 
 .universityList {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   max-height: 280px;
   overflow-y: auto;
 }
@@ -705,24 +1010,24 @@
 .universityItem {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 14px;
-  border: 1px solid var(--border-color);
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
   border-radius: 8px;
-  background: var(--color-surface);
+  background: var(--surface);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s;
   text-align: left;
   width: 100%;
 }
 
 .universityItem:hover {
-  border-color: var(--uofa-blue);
-  background: var(--bg-light);
+  border-color: var(--navy);
+  background: var(--bg-warm);
 }
 
 .uniIcon {
-  color: var(--uofa-blue);
+  color: var(--navy);
 }
 
 .uniInfo {
@@ -730,44 +1035,47 @@
 }
 
 .uniName {
+  font-family: var(--font-heading);
   font-weight: 600;
-  color: var(--text-primary);
-  font-size: 0.9rem;
+  color: var(--ink);
+  font-size: 0.88rem;
 }
 
 .uniDomain {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
+  font-size: 0.76rem;
+  color: var(--ink-3);
 }
 
 .noResults {
   text-align: center;
-  color: var(--text-secondary);
+  color: var(--ink-3);
   padding: 20px;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
 }
 
-/* Feedback Form */
+/* ── Feedback Form ───────────────────────────────── */
 .feedbackForm {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  margin-top: 20px;
+  gap: 12px;
+  margin-top: 18px;
 }
 
 .feedbackInput,
 .feedbackTextarea {
-  padding: 12px;
-  border: 1px solid var(--border-color);
+  padding: 11px 14px;
+  border: 1px solid var(--line);
   border-radius: 8px;
-  font-size: 0.95rem;
-  font-family: inherit;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--ink);
+  background: var(--surface);
 }
 
 .feedbackInput:focus,
 .feedbackTextarea:focus {
   outline: none;
-  border-color: var(--uofa-blue);
+  border-color: var(--navy);
 }
 
 .feedbackTextarea {
@@ -776,21 +1084,45 @@
 }
 
 .submitBtn {
-  background: var(--uofa-blue);
-  color: var(--color-text-inverse);
+  background: var(--navy);
+  color: var(--ink-inverse);
   border: none;
   padding: 12px;
   border-radius: 8px;
-  font-size: 0.95rem;
+  font-family: var(--font-heading);
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
+  transition: background 0.15s;
 }
 
 .submitBtn:hover {
-  background: var(--uofa-blue-light);
+  background: var(--navy-light);
 }
 
-/* Responsive */
+/* ── Responsive ──────────────────────────────────── */
+@media (max-width: 980px) {
+  .aiAdvisorInner {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .aiAdvisorCopy {
+    text-align: center;
+  }
+
+  .aiAdvisorFeatures {
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+  }
+
+  .aiCtaButton {
+    margin: 0 auto;
+  }
+}
+
 @media (max-width: 900px) {
 
   .stepsContainer,
@@ -818,18 +1150,30 @@
   }
 
   .hero {
-    padding: 60px 20px 80px;
+    padding: 72px 24px 88px;
   }
 
   .hero h1 {
-    font-size: 2rem;
+    font-size: 2.1rem;
+  }
+
+  .heroSubtext {
+    font-size: 0.95rem;
   }
 
   .howItWorks,
   .featuresSection,
   .testimonials,
   .support {
-    padding: 60px 20px;
+    padding: 60px 24px;
+  }
+
+  .aiAdvisorSection {
+    padding: 60px 24px;
+  }
+
+  .aiAdvisorSection h2 {
+    font-size: 1.65rem;
   }
 
   .stepsContainer,
@@ -838,9 +1182,31 @@
     max-width: 400px;
   }
 
+  .finalCTA {
+    padding: 64px 24px;
+  }
+
   .footerContent {
     grid-template-columns: 1fr;
-    gap: 28px;
+    gap: 24px;
     text-align: center;
+  }
+
+  .footer {
+    padding: 36px 24px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero h1 {
+    font-size: 1.8rem;
+  }
+
+  .aiAdvisorSection h2 {
+    font-size: 1.4rem;
+  }
+
+  .finalCTA h2 {
+    font-size: 1.6rem;
   }
 }

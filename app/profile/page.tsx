@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useAuth } from '../components/AuthProvider';
 import styles from '../styles/profile.module.css';
 
 interface UserProfile {
@@ -15,6 +16,7 @@ interface UserProfile {
 
 export default function ProfilePage() {
     const router = useRouter();
+    const { user, dbUser, accessToken, loading: authLoading } = useAuth();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -28,30 +30,28 @@ export default function ProfilePage() {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        // Check if user is logged in
-        const studentName = localStorage.getItem('studentName');
-        if (!studentName) {
-            router.push('/');
+        if (authLoading) return;
+        if (!user) {
+            router.push('/auth');
+            return;
+        }
+        loadProfile();
+    }, [authLoading, user, accessToken]);
+
+    const loadProfile = async () => {
+        if (!accessToken) {
+            setLoading(false);
             return;
         }
 
-        // Load profile from API
-        loadProfile();
-    }, [router]);
-
-    const loadProfile = async () => {
         try {
-            const userId = localStorage.getItem('userId') || localStorage.getItem('userEmail');
-            if (!userId) {
-                setLoading(false);
-                return;
-            }
-
-            const response = await fetch(`/api/user/profile?userId=${encodeURIComponent(userId)}`);
+            const response = await fetch('/api/user/profile', {
+                headers: { Authorization: `Bearer ${accessToken}` },
+            });
             if (response.ok) {
                 const data = await response.json();
                 setProfile({
-                    fullName: data.fullName || '',
+                    fullName: data.fullName || dbUser?.name || '',
                     dateOfBirth: data.dateOfBirth || '',
                     studentId: data.studentId || '',
                     address: data.address || '',
@@ -71,26 +71,21 @@ export default function ProfilePage() {
         setMessage(null);
 
         try {
-            const userId = localStorage.getItem('userId') || localStorage.getItem('userEmail');
-            if (!userId) {
-                throw new Error('User not found');
+            if (!accessToken) {
+                throw new Error('Not authenticated');
             }
 
             const response = await fetch('/api/user/profile', {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    userId,
-                    ...profile,
-                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+                body: JSON.stringify(profile),
             });
 
             if (response.ok) {
                 setMessage({ type: 'success', text: 'Profile updated successfully!' });
-                // Update localStorage with new name
-                if (profile.fullName) {
-                    localStorage.setItem('studentName', profile.fullName);
-                }
             } else {
                 const data = await response.json();
                 throw new Error(data.error || 'Failed to update profile');
@@ -102,7 +97,7 @@ export default function ProfilePage() {
         }
     };
 
-    if (loading) {
+    if (authLoading || loading) {
         return (
             <div className={styles.container}>
                 <div className={styles.loadingState}>

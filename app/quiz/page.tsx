@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../components/AuthProvider';
 import styles from '../styles/quiz.module.css';
 import { getBatchRecommendation } from '@/app/lib/courseData';
 
@@ -30,7 +31,8 @@ interface PreviousAttempt {
 
 export default function QuizPage() {
   const router = useRouter();
-  const [userEmail, setUserEmail] = useState('');
+  const { user, accessToken, loading: authLoading } = useAuth();
+  const userEmail = user?.email || '';
   const [loading, setLoading] = useState(false);
   const [quizData, setQuizData] = useState<QuizData | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -47,15 +49,12 @@ export default function QuizPage() {
   // Quiz phase: 'loading' | 'instructions' | 'quiz' | 'no-course'
   const [quizPhase, setQuizPhase] = useState<'loading' | 'instructions' | 'quiz' | 'no-course'>('loading');
 
-  // Get user email from localStorage on mount
+  // Redirect if not authenticated
   useEffect(() => {
-    const storedEmail = localStorage.getItem('userEmail');
-    if (!storedEmail) {
+    if (!authLoading && !user) {
       router.push('/auth');
-      return;
     }
-    setUserEmail(storedEmail);
-  }, [router]);
+  }, [authLoading, user, router]);
 
   // State for course data loaded from CSV
   const [courseCatalog, setCourseCatalog] = useState<Record<string, { name: string; credits: number; prereqs: string[] }>>({});
@@ -141,12 +140,15 @@ export default function QuizPage() {
       const questionHashes = quizData.questions.map(q => q.hash);
 
       // Submit to backend
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
+      else headers['x-user-email'] = userEmail;
+
       const response = await fetch('/api/submit-quiz', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-user-email': userEmail,
-        },
+        headers,
         body: JSON.stringify({
           courseNumber: quizData.courseNumber,
           courseName: quizData.courseName,
@@ -166,18 +168,6 @@ export default function QuizPage() {
       if (tabSwitchRef.current) {
         console.warn('Tab switch detected! Quiz automatically submitted.');
       }
-
-      // Store results with batch recommendation
-      localStorage.setItem('quizResults', JSON.stringify({
-        courseNumber: quizData.courseNumber,
-        courseName: quizData.courseName,
-        score,
-        total: quizData.questions.length,
-        percentage,
-        batch: batch.name,
-        batchDescription: batch.description,
-        timestamp: new Date().toISOString(),
-      }));
 
       // Clear the upgradeFor so user can take another quiz later
       localStorage.removeItem('upgradeFor');
@@ -211,12 +201,15 @@ export default function QuizPage() {
     setError('');
 
     try {
+      const quizHeaders: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (accessToken) quizHeaders['Authorization'] = `Bearer ${accessToken}`;
+      else quizHeaders['x-user-email'] = userEmail;
+
       const response = await fetch('/api/generate-quiz', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-user-email': userEmail,
-        },
+        headers: quizHeaders,
         body: JSON.stringify({
           courseNumber: preReqCourse.courseNumber,
           courseName: preReqCourse.courseName,

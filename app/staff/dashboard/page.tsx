@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../../components/AuthProvider';
 import styles from '../../styles/staff-dashboard.module.css';
 import ScheduleCalendar from './components/ScheduleCalendar';
 import AppointmentsSidebar from './components/AppointmentsSidebar';
@@ -12,25 +13,24 @@ type TabType = 'schedule' | 'appointments' | 'profile' | 'reviews';
 
 export default function StaffDashboard() {
   const router = useRouter();
+  const { user, dbUser, loading: authLoading, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>('schedule');
-  const [staffName, setStaffName] = useState('');
-  const [staffId, setStaffId] = useState('');
   const [upcomingCount, setUpcomingCount] = useState(0);
 
-  useEffect(() => {
-    // Check if user is logged in as staff
-    const userType = localStorage.getItem('userType');
-    const name = localStorage.getItem('studentName');
-    const id = localStorage.getItem('userId');
+  const staffName = dbUser?.name || user?.user_metadata?.full_name || 'Staff Member';
+  const staffId = dbUser?.id || '';
 
-    if (userType !== 'staff') {
+  useEffect(() => {
+    if (authLoading) return;
+    if (!user) {
       router.push('/auth');
       return;
     }
-
-    setStaffName(name || 'Staff Member');
-    setStaffId(id || '');
-  }, [router]);
+    // Check if user is staff (role check)
+    if (dbUser && dbUser.role !== 'instructor' && dbUser.role !== 'staff') {
+      router.push('/dashboard');
+    }
+  }, [authLoading, user, dbUser, router]);
 
   return (
     <div className={styles.container}>
@@ -44,16 +44,7 @@ export default function StaffDashboard() {
           <span className={styles.staffName}>👋 {staffName}</span>
           <button
             className={styles.logoutBtn}
-            onClick={() => {
-              const authKeys = [
-                'studentName', 'userEmail', 'userId', 'studentEmail',
-                'loginMethod', 'authToken', 'userType', 'staffRole',
-                'studentClasses', 'studentGrades', 'selectedUniversity',
-                'studentProfile', 'transcriptData'
-              ];
-              authKeys.forEach(key => localStorage.removeItem(key));
-              router.push('/auth');
-            }}
+            onClick={() => signOut()}
           >
             Logout
           </button>

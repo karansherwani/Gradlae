@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../components/AuthProvider';
 import styles from '../styles/progress.module.css';
 
 interface GradeComponent {
@@ -65,7 +66,8 @@ const DEFAULT_COMPONENTS: GradeComponent[] = [
 
 export default function ProgressPage() {
     const router = useRouter();
-    const [studentName, setStudentName] = useState('');
+    const { user, dbUser, accessToken, loading: authLoading } = useAuth();
+    const studentName = dbUser?.name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || '';
     const [courses, setCourses] = useState<Course[]>([]);
     const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
     const [newCourseName, setNewCourseName] = useState('');
@@ -82,23 +84,21 @@ export default function ProgressPage() {
     const [gpaCalculatorCourses, setGpaCalculatorCourses] = useState<GPACalculatorCourse[]>([]);
 
     useEffect(() => {
-        const name = localStorage.getItem('studentName');
-        if (!name) {
-            router.push('/');
+        if (authLoading) return;
+        if (!user) {
+            router.push('/auth');
             return;
         }
-        setStudentName(name);
-
-        // Load saved courses and transcript
         loadCourses();
         loadTranscript();
-    }, [router]);
+    }, [authLoading, user, accessToken]);
 
     const loadCourses = async () => {
-        const userId = localStorage.getItem('userId') || localStorage.getItem('userEmail');
-        if (userId) {
+        if (accessToken) {
             try {
-                const response = await fetch(`/api/user/courses?userId=${encodeURIComponent(userId)}`);
+                const response = await fetch('/api/user/courses', {
+                    headers: { Authorization: `Bearer ${accessToken}` },
+                });
                 const data = await response.json();
                 if (data.courses?.length > 0) {
                     setCourses(data.courses);
@@ -117,14 +117,15 @@ export default function ProgressPage() {
     };
 
     const loadTranscript = async () => {
-        const userId = localStorage.getItem('userId') || localStorage.getItem('userEmail');
-        if (!userId) {
+        if (!accessToken || !user?.email) {
             setLoadingTranscript(false);
             return;
         }
 
         try {
-            const response = await fetch(`/api/upload?userId=${encodeURIComponent(userId)}`);
+            const response = await fetch(`/api/upload?userId=${encodeURIComponent(user.email)}`, {
+                headers: { Authorization: `Bearer ${accessToken}` },
+            });
             const data = await response.json();
 
             if (data.hasTranscript && data.courses?.length > 0) {
@@ -206,14 +207,16 @@ export default function ProgressPage() {
         setCourses(updatedCourses);
         localStorage.setItem('savedCourses', JSON.stringify(updatedCourses));
 
-        // Also save to MongoDB
-        const userId = localStorage.getItem('userId') || localStorage.getItem('userEmail');
-        if (userId) {
+        // Also save to Supabase
+        if (accessToken) {
             try {
                 await fetch('/api/user/courses', {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId, courses: updatedCourses }),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                    body: JSON.stringify({ courses: updatedCourses }),
                 });
             } catch (error) {
                 console.error('Error saving courses to DB:', error);

@@ -4,6 +4,14 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './styles/landing.module.css';
 
+/* ─── SVG Icons ─── */
+const GradCapIcon = ({ size = 20 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+    <path d="M6 12v5c0 1.1 2.7 3 6 3s6-1.9 6-3v-5" />
+  </svg>
+);
+
 export default function LandingPage() {
   const router = useRouter();
   const [showUniSelect, setShowUniSelect] = useState(false);
@@ -144,7 +152,7 @@ export default function LandingPage() {
         </button>
       </header>
 
-      {/* HERO SECTION */}
+      {/* ══ HERO ══ */}
       <section className={styles.hero}>
         <div className={styles.heroContent}>
           <h1>YOUR PACE<br />YOUR STORY</h1>
@@ -218,36 +226,102 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* AI ADVISOR HIGHLIGHT */}
+      {/* ══ AI ADVISOR — Two-column with glassmorphism preview ══ */}
       <section className={styles.aiAdvisorSection}>
         <div className={styles.aiAdvisorWrapper}>
-          <div className={styles.aiAdvisorLabel}>MVP Feature</div>
-          <h2>AI-Powered <span className={styles.accentText}>Academic Planning</span></h2>
-          <p className={styles.aiAdvisorDesc}>
-            Our AI Academic Advisor analyzes your transcript, learning style, and goals to create
-            a personalized graduation plan. Graduate at your own pace with confidence.
-          </p>
-          <div className={styles.aiAdvisorFeatures}>
-            <div className={styles.aiAdvisorFeature}>
-              <span className={styles.aiCheckmark}>✓</span>
-              Personalized course recommendations
+          <div className={styles.aiAdvisorLabel}>✦ New Feature</div>
+
+          <div className={styles.aiAdvisorInner}>
+            {/* Left: Copy */}
+            <div className={styles.aiAdvisorCopy}>
+              <h2>AI Academic Advisor</h2>
+              <p className={styles.aiAdvisorDesc}>
+                Our AI analyzes your transcript, learning style, and goals to build a personalized graduation plan. Graduate at your own pace with confidence.
+              </p>
+              <div className={styles.aiAdvisorFeatures}>
+                <div className={styles.aiAdvisorFeature}>
+                  <span className={styles.aiCheckmark}>✓</span>
+                  Personalized course recommendations
+                </div>
+                <div className={styles.aiAdvisorFeature}>
+                  <span className={styles.aiCheckmark}>✓</span>
+                  Smart graduation timeline
+                </div>
+                <div className={styles.aiAdvisorFeature}>
+                  <span className={styles.aiCheckmark}>✓</span>
+                  Prerequisite analysis
+                </div>
+                <div className={styles.aiAdvisorFeature}>
+                  <span className={styles.aiCheckmark}>✓</span>
+                  Adaptive pace matching
+                </div>
+              </div>
+              <button className={styles.aiCtaButton} onClick={() => setShowUniSelect(true)}>
+                Try AI Advisor Free →
+              </button>
             </div>
-            <div className={styles.aiAdvisorFeature}>
-              <span className={styles.aiCheckmark}>✓</span>
-              Smart graduation timeline
-            </div>
-            <div className={styles.aiAdvisorFeature}>
-              <span className={styles.aiCheckmark}>✓</span>
-              Prerequisite analysis
-            </div>
-            <div className={styles.aiAdvisorFeature}>
-              <span className={styles.aiCheckmark}>✓</span>
-              Adaptive pace matching
+
+            {/* Right: Glassmorphism graduation plan mockup */}
+            <div className={styles.aiAdvisorPreview}>
+              <div className={styles.previewHeader}>
+                <div className={styles.previewIconWrap}>
+                  <GradCapIcon size={18} />
+                </div>
+                <div>
+                  <p className={styles.previewTitle}>My Graduation Plan</p>
+                  <p className={styles.previewSubtitle}>Fall 2026 — Recommended</p>
+                </div>
+              </div>
+
+              {/* Accent pills / tags */}
+              <div className={styles.previewTags}>
+                <span className={`${styles.previewTag} ${styles.previewTagNavy}`}>⚡ Recommended Pace</span>
+                <span className={`${styles.previewTag} ${styles.previewTagRed}`}>🎯 Target GPA: 3.5</span>
+                <span className={`${styles.previewTag} ${styles.previewTagGreen}`}>📋 Next 3 Courses</span>
+              </div>
+
+              {/* Mock course rows */}
+              <div className={styles.previewCourses}>
+                <div className={styles.previewCourseRow}>
+                  <div className={styles.courseInfo}>
+                    <span className={styles.courseName}>Data Structures</span>
+                    <span className={styles.courseCode}>CSC 210 · Fall 2026</span>
+                  </div>
+                  <span className={styles.courseCredits}>3 cr</span>
+                </div>
+                <div className={styles.previewCourseRow}>
+                  <div className={styles.courseInfo}>
+                    <span className={styles.courseName}>Discrete Mathematics</span>
+                    <span className={styles.courseCode}>MATH 243 · Fall 2026</span>
+                  </div>
+                  <span className={styles.courseCredits}>3 cr</span>
+                </div>
+                <div className={styles.previewCourseRow}>
+                  <div className={styles.courseInfo}>
+                    <span className={styles.courseName}>Technical Writing</span>
+                    <span className={styles.courseCode}>ENGL 308 · Fall 2026</span>
+                  </div>
+                  <span className={styles.courseCredits}>3 cr</span>
+                </div>
+              </div>
+
+              {/* Stats footer */}
+              <div className={styles.previewFooter}>
+                <div className={styles.previewStat}>
+                  <span className={styles.previewStatValue}>15</span>
+                  <span className={styles.previewStatLabel}>Credits</span>
+                </div>
+                <div className={styles.previewStat}>
+                  <span className={styles.previewStatValue}>3.52</span>
+                  <span className={styles.previewStatLabel}>Projected GPA</span>
+                </div>
+                <div className={styles.previewStat}>
+                  <span className={styles.previewStatValue}>Spring &apos;28</span>
+                  <span className={styles.previewStatLabel}>Grad Date</span>
+                </div>
+              </div>
             </div>
           </div>
-          <button className={styles.ctaButton} onClick={() => setShowUniSelect(true)}>
-            Try AI Advisor Free
-          </button>
         </div>
       </section>
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { signIn } from 'next-auth/react';
+import { supabase } from '../lib/supabaseClient';
 import styles from '../styles/auth.module.css';
 
 type AuthMethod = 'email' | 'netid' | 'staff' | null;
@@ -41,15 +41,16 @@ export default function AuthPage() {
     setShowConfirmPassword(true);
   };
 
-  // Google sign-in handler
+  // Google sign-in handler (Supabase OAuth)
   const handleGoogleSignIn = async () => {
     setLoading(true);
     try {
-      const result = await signIn('google', { redirect: false, callbackUrl: '/dashboard' });
-      if (result?.ok) {
-        window.location.href = '/dashboard';
-      } else {
-        setError('Google sign-in failed. Please try again.');
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: `${window.location.origin}/dashboard` },
+      });
+      if (oauthError) {
+        setError('Google sign-in failed: ' + oauthError.message);
       }
     } catch (err) {
       console.error('Google Sign-in Error:', err);
@@ -100,60 +101,60 @@ export default function AuthPage() {
       }
     }
 
+    // Build the email address for Supabase
+    let userEmail: string;
+    if (authMethod === 'email') {
+      userEmail = email.toLowerCase().trim();
+    } else if (authMethod === 'netid') {
+      userEmail = `${netId.toLowerCase().trim()}@${selectedUniversity || 'uofa'}.edu`;
+    } else if (authMethod === 'staff') {
+      userEmail = `${staffId.toLowerCase().trim()}@${selectedUniversity || 'uofa'}.edu`;
+    } else {
+      setError('Please select an authentication method');
+      setLoading(false);
+      return;
+    }
+
     try {
-      const response = await fetch('/api/auth/login', {
+      const endpoint = mode === 'signup' ? '/api/auth/signup' : '/api/auth/signin';
+      const fullName = authMethod === 'email'
+        ? email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1)
+        : authMethod === 'netid'
+          ? netId.charAt(0).toUpperCase() + netId.slice(1)
+          : `Prof. ${staffId.charAt(0).toUpperCase() + staffId.slice(1)}`;
+
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          university: selectedUniversity,
-          authMethod,
-          email: email || undefined,
-          netId: netId || undefined,
-          staffId: staffId || undefined,
+          email: userEmail,
           password,
-          isSignup: mode === 'signup',
+          name: fullName,
+          school: selectedUniversity || 'UArizona',
+          role: authMethod === 'staff' ? 'instructor' : 'student',
         }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
+      const data = await response.json();
 
-        // ✅ STORE USER EMAIL FOR QUIZ PAGE
-        const userEmail = email || `${netId}@${selectedUniversity}.edu` || `${staffId}@${selectedUniversity}.edu`;
-        localStorage.setItem('userEmail', userEmail);
-
-        localStorage.setItem('studentName', data.fullName || data.email || netId || staffId);
-        localStorage.setItem('userId', data.userId || '');
-        localStorage.setItem('studentEmail', data.email || userEmail);
-        localStorage.setItem('loginMethod', authMethod || 'email');
-        localStorage.setItem('authToken', data.token || '');
-        
-        // Store user type for staff
-        if (authMethod === 'staff') {
-          localStorage.setItem('userType', 'staff');
-          localStorage.setItem('staffRole', data.role || 'instructor');
-        } else {
-          localStorage.setItem('userType', 'student');
+      if (response.ok && data.success) {
+        // Set the Supabase session on the client — AuthProvider picks this up automatically
+        if (data.accessToken && data.refreshToken) {
+          await supabase.auth.setSession({
+            access_token: data.accessToken,
+            refresh_token: data.refreshToken,
+          });
         }
 
-        if (data.classes) {
-          localStorage.setItem('studentClasses', JSON.stringify(data.classes));
-        }
-        if (data.grades) {
-          localStorage.setItem('studentGrades', JSON.stringify(data.grades));
-        }
+        console.log('✓ Login successful via Supabase Auth');
 
-        console.log('✓ Login successful. Email stored:', userEmail);
-
-        // Small delay to ensure localStorage is saved
+        // Navigate to the appropriate dashboard
         setTimeout(() => {
-          // Redirect staff to staff dashboard if available, otherwise regular dashboard
           const dashboardRoute = authMethod === 'staff' ? '/staff/dashboard' : '/dashboard';
           window.location.href = dashboardRoute;
         }, 100);
       } else {
-        const errorData = await response.json();
-        setError(errorData.message || 'Authentication failed. Please try again.');
+        setError(data.message || 'Authentication failed. Please try again.');
       }
     } catch (err) {
       setError('Connection failed. Please try again or contact IT support.');

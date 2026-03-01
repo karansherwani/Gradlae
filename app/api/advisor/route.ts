@@ -1,13 +1,16 @@
 // app/api/advisor/route.ts
-// LLM-backed academic advisor – uses planner data + course catalog + transcript
+// LLM-backed academic advisor – pulls planner + transcript from Supabase,
+// falls back to static degreeRequirements.json if no DB planner exists.
 // API key is read ONLY from server-side environment variables.
 
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import { loadAllCourses, Course as CSVCourse } from '@/app/lib/loadCourses';
+import { supabaseAdmin } from '@/app/lib/supabaseServer';
+import { getUserFromRequest } from '@/app/lib/supabaseAuth';
 
-// ─── DATA LOADING ──────────────────────────────────────────────────────────
+// ─── TYPES ─────────────────────────────────────────────────────────────────
 
 interface PlannerData {
     plans: Array<{
@@ -40,15 +43,24 @@ interface PlannerData {
     }>;
 }
 
-function loadPlannerData(): PlannerData {
+interface TranscriptCourse {
+    course: string;
+    description: string;
+    grade: string;
+    credits: number;
+    term: string;
+    isRetake?: boolean;
+    bestGrade?: string;
+}
+
+// ─── STATIC DATA LOADING (fallback) ────────────────────────────────────────
+
+function loadStaticPlannerData(): PlannerData {
     const plannerPath = path.join(process.cwd(), 'data', 'degreeRequirements.json');
     const data = fs.readFileSync(plannerPath, 'utf-8');
     return JSON.parse(data);
 }
 
-/**
- * Build a compact planner context for the AI prompt
- */
 function buildPlannerContext(planner: PlannerData): string {
     const plan = planner.plans[0];
     if (!plan) return 'No degree plan data available.';
@@ -86,23 +98,16 @@ function buildPlannerContext(planner: PlannerData): string {
     return lines.join('\n');
 }
 
-/**
- * Build a compact course catalog sample for the prompt.
- * We sample strategically to stay within token limits.
- */
 function buildCourseSample(courses: CSVCourse[], maxCourses = 400): string {
-    // Group by subject
     const bySubject: Record<string, CSVCourse[]> = {};
     for (const c of courses) {
         if (!bySubject[c.subject]) bySubject[c.subject] = [];
         bySubject[c.subject].push(c);
     }
 
-    // Prioritize CS/ECE/MATH/ENGL/PHYS subjects and sample from others
     const priority = ['CSC', 'ECE', 'SFWE', 'MATH', 'ENGL', 'PHYS', 'CHEM', 'SIE'];
     const selected: CSVCourse[] = [];
 
-    // Add all courses from priority subjects (undergrad level, catalog number < 500)
     for (const subj of priority) {
         const subjectCourses = bySubject[subj] || [];
         for (const c of subjectCourses) {
@@ -113,7 +118,6 @@ function buildCourseSample(courses: CSVCourse[], maxCourses = 400): string {
         }
     }
 
-    // Fill remaining slots from other subjects
     const remaining = maxCourses - selected.length;
     if (remaining > 0) {
         const otherCourses = courses.filter(c => {
@@ -126,7 +130,6 @@ function buildCourseSample(courses: CSVCourse[], maxCourses = 400): string {
         }
     }
 
-    // Format compactly
     const lines: string[] = [];
     const grouped: Record<string, CSVCourse[]> = {};
     for (const c of selected) {
@@ -150,9 +153,55 @@ function buildCourseSample(courses: CSVCourse[], maxCourses = 400): string {
     return lines.join('\n');
 }
 
-/**
- * Build the system prompt – grounded in transcript, planner, and catalog data.
- */
+// ─── TRANSCRIPT CONTEXT (credit rules) ─────────────────────────────────────
+
+function buildTranscriptContextFromDB(courses: TranscriptCourse[], studentName: string): string {
+    // Filter out W grades
+    const passing = courses.filter(c => c.grade !== 'W' && c.grade !== 'IP');
+
+    // De-duplicate by course code
+    const seen = new Map<string, TranscriptCourse>();
+    for (const c of passing) {
+        const key = c.course.trim().toUpperCase();
+        if (!seen.has(key)) seen.set(key, c);
+    }
+    const uniqueCompleted = Array.from(seen.values());
+    const earnedCredits = uniqueCompleted.reduce((s, c) => s + c.credits, 0);
+    const inProgress = courses.filter(c => c.grade === 'IP');
+    const ipCredits = inProgress.reduce((s, c) => s + c.credits, 0);
+
+    const allTerms = [...new Set(courses.map(c => c.term))];
+    const semesterCount = allTerms.length;
+
+    let standing: string;
+    if (earnedCredits >= 90) standing = 'Senior';
+    else if (earnedCredits >= 60) standing = 'Junior';
+    else if (earnedCredits >= 30) standing = 'Sophomore';
+    else standing = 'Freshman';
+
+    let ctx = `Name: ${studentName}\n`;
+    ctx += `Completed Semesters: ${semesterCount}\n`;
+    ctx += `Academic Standing: ${standing} (based on ${earnedCredits} earned credits)\n`;
+    ctx += `Earned Credits: ${earnedCredits} (unique passed courses, excludes W and duplicate attempts)\n`;
+    if (ipCredits > 0) {
+        ctx += `In-Progress Credits: ${ipCredits} (not counted in earned total)\n`;
+    }
+    ctx += `\nCOMPLETED COURSES (${uniqueCompleted.length} unique):\n`;
+    for (const c of uniqueCompleted) {
+        ctx += `  ${c.course}: ${c.description} (Grade: ${c.grade}, ${c.credits} cr, ${c.term})\n`;
+    }
+    if (inProgress.length > 0) {
+        ctx += `\nIN-PROGRESS COURSES:\n`;
+        for (const c of inProgress) {
+            ctx += `  ${c.course}: ${c.description} (${c.credits} cr, ${c.term})\n`;
+        }
+    }
+
+    return ctx;
+}
+
+// ─── SYSTEM PROMPT ─────────────────────────────────────────────────────────
+
 function buildSystemPrompt(
     plannerContext: string,
     catalogSample: string,
@@ -222,7 +271,7 @@ Remember: Help students succeed and graduate on time!`;
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { messages, studentContext } = body;
+        const { messages, studentContext: clientContext } = body;
 
         if (!messages || !Array.isArray(messages)) {
             return NextResponse.json(
@@ -241,15 +290,66 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Load data
-        const plannerData = loadPlannerData();
-        const allCourses = loadAllCourses();
+        // ─── Try to load from Supabase for authenticated users ──────────
+        let studentContext: string | undefined = clientContext || undefined;
+        let dbPlannerContext: string | null = null;
 
-        // Build context
-        const plannerContext = buildPlannerContext(plannerData);
+        const user = await getUserFromRequest(request);
+        if (user) {
+            // Load transcript from Supabase
+            const { data: transcript } = await supabaseAdmin
+                .from('transcripts')
+                .select('parsed_json')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .single();
+
+            if (transcript?.parsed_json) {
+                const parsed = transcript.parsed_json as { courses: TranscriptCourse[]; studentInfo?: { name?: string } };
+                if (parsed.courses?.length > 0) {
+                    const name = parsed.studentInfo?.name || user.name || 'Student';
+                    studentContext = buildTranscriptContextFromDB(parsed.courses, name);
+                }
+            }
+
+            // Load planner from Supabase (if user has saved one)
+            const { data: planner } = await supabaseAdmin
+                .from('planners')
+                .select('planner_json')
+                .eq('user_id', user.id)
+                .order('updated_at', { ascending: false })
+                .limit(1)
+                .single();
+
+            if (planner?.planner_json) {
+                dbPlannerContext = buildPlannerContext(planner.planner_json as PlannerData);
+            }
+
+            // Log the session
+            const lastUserMsg = messages.filter((m: { role: string }) => m.role === 'user').pop();
+            if (lastUserMsg) {
+                // Fire-and-forget session logging
+                void (async () => {
+                    try {
+                        await supabaseAdmin
+                            .from('advisor_sessions')
+                            .insert({
+                                user_id: user.id,
+                                question: lastUserMsg.content?.substring(0, 2000) || '',
+                                answer: '',
+                            });
+                    } catch { /* ignore logging errors */ }
+                })();
+            }
+        }
+
+        // Build context – prefer DB planner, fall back to static file
+        const plannerContext = dbPlannerContext || buildPlannerContext(loadStaticPlannerData());
+        const allCourses = loadAllCourses();
         const catalogSample = buildCourseSample(allCourses);
 
-        const systemPrompt = buildSystemPrompt(plannerContext, catalogSample, studentContext || undefined);
+        const systemPrompt = buildSystemPrompt(plannerContext, catalogSample, studentContext);
 
         // Determine API endpoint
         const isRouteLLM = effectiveKey === process.env.ROUTELLM_API_KEY && !process.env.OPENAI_API_KEY;
@@ -278,7 +378,6 @@ export async function POST(request: NextRequest) {
         });
 
         if (!response.ok) {
-            const errText = await response.text();
             console.error('AI API error:', response.status);
 
             if (response.status === 401) {

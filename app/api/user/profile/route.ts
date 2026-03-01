@@ -1,96 +1,69 @@
+// app/api/user/profile/route.ts
+// Profile CRUD — uses Supabase users table (extended with profile columns).
+
 import { NextRequest, NextResponse } from 'next/server';
-import connectToDatabase from '@/app/lib/mongodb';
-import User from '@/app/models/User';
+import { supabaseAdmin } from '@/app/lib/supabaseServer';
+import { getUserFromRequest } from '@/app/lib/supabaseAuth';
 
 // GET - Retrieve user profile
 export async function GET(request: NextRequest) {
     try {
-        const searchParams = request.nextUrl.searchParams;
-        const userId = searchParams.get('userId');
-
-        if (!userId) {
-            return NextResponse.json(
-                { error: 'User ID is required' },
-                { status: 400 }
-            );
-        }
-
-        await connectToDatabase();
-
-        const user = await User.findOne({ email: userId.toLowerCase() });
-
+        const user = await getUserFromRequest(request);
         if (!user) {
-            // Return empty profile for new users
-            return NextResponse.json({
-                fullName: '',
-                dateOfBirth: '',
-                studentId: '',
-                address: '',
-                profilePicture: '',
-            });
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
+
+        const { data: row } = await supabaseAdmin
+            .from('users')
+            .select('name, date_of_birth, student_id, address, profile_picture')
+            .eq('id', user.id)
+            .single();
 
         return NextResponse.json({
-            fullName: user.profile?.fullName || '',
-            dateOfBirth: user.profile?.dateOfBirth || '',
-            studentId: user.profile?.studentId || '',
-            address: user.profile?.address || '',
-            profilePicture: user.profile?.profilePicture || '',
+            fullName: row?.name || '',
+            dateOfBirth: row?.date_of_birth || '',
+            studentId: row?.student_id || '',
+            address: row?.address || '',
+            profilePicture: row?.profile_picture || '',
         });
     } catch (error) {
         console.error('Profile GET error:', error);
-        return NextResponse.json(
-            { error: 'Failed to retrieve profile' },
-            { status: 500 }
-        );
+        return NextResponse.json({ error: 'Failed to retrieve profile' }, { status: 500 });
     }
 }
 
 // PUT - Update user profile
 export async function PUT(request: NextRequest) {
     try {
-        const body = await request.json();
-        const { userId, fullName, dateOfBirth, studentId, address, profilePicture } = body;
-
-        if (!userId) {
-            return NextResponse.json(
-                { error: 'User ID is required' },
-                { status: 400 }
-            );
+        const user = await getUserFromRequest(request);
+        if (!user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        await connectToDatabase();
+        const { fullName, dateOfBirth, studentId, address, profilePicture } = await request.json();
 
-        // Find user or create new one
-        const user = await User.findOneAndUpdate(
-            { email: userId.toLowerCase() },
-            {
-                $set: {
-                    'profile.fullName': fullName || '',
-                    'profile.dateOfBirth': dateOfBirth || '',
-                    'profile.studentId': studentId || '',
-                    'profile.address': address || '',
-                    'profile.profilePicture': profilePicture || '',
-                },
-            },
-            { upsert: true, new: true }
-        );
+        const { error: updateError } = await supabaseAdmin
+            .from('users')
+            .update({
+                name: fullName || '',
+                date_of_birth: dateOfBirth || '',
+                student_id: studentId || '',
+                address: address || '',
+                profile_picture: profilePicture || '',
+            })
+            .eq('id', user.id);
+
+        if (updateError) {
+            console.error('Profile update error:', updateError.message);
+            return NextResponse.json({ error: 'Failed to update profile' }, { status: 500 });
+        }
 
         return NextResponse.json({
             success: true,
-            profile: {
-                fullName: user.profile?.fullName || '',
-                dateOfBirth: user.profile?.dateOfBirth || '',
-                studentId: user.profile?.studentId || '',
-                address: user.profile?.address || '',
-                profilePicture: user.profile?.profilePicture || '',
-            },
+            profile: { fullName, dateOfBirth, studentId, address, profilePicture },
         });
     } catch (error) {
         console.error('Profile PUT error:', error);
-        return NextResponse.json(
-            { error: 'Failed to update profile' },
-            { status: 500 }
-        );
+        return NextResponse.json({ error: 'Failed to update profile' }, { status: 500 });
     }
 }

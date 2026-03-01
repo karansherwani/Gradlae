@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# security: never commit plaintext credential files
+app/data/users.json
+app/data/users.json.*

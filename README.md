@@ -1,37 +1,101 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PACEMAKER
+
+An AI-powered academic planning platform built with Next.js. Deployed at [pacematch.vercel.app](https://pacematch.vercel.app).
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Supabase Setup
 
-## Learn More
+PACEMAKER uses **Supabase** for authentication, data storage, and file storage.
 
-To learn more about Next.js, take a look at the following resources:
+### 1. Create a Supabase Project
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Go to [supabase.com](https://supabase.com) → create a project.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 2. Set Environment Variables
+
+Copy `.env.example` to `.env.local` and fill in:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+```
+
+Find these in: Supabase Dashboard → Project Settings → API.
+
+For Vercel deployment, add the same variables in **Vercel → Project Settings → Environment Variables**.
+
+### 3. Run the Database Migration
+
+Open Supabase Dashboard → **SQL Editor** → **New query**, then paste the contents of:
+
+```
+supabase/migration.sql
+```
+
+Click **Run**. This creates all tables, RLS policies, and storage buckets.
+
+### 4. Database Tables
+
+| Table | Purpose |
+|---|---|
+| `users` | User profiles (linked to Supabase Auth) |
+| `transcripts` | Parsed transcript data + raw file storage path |
+| `planners` | Degree plan JSON (semesters, courses, notes) |
+| `advisor_sessions` | AI advisor conversation logs |
+
+### 5. Row-Level Security (RLS)
+
+All tables have RLS enabled. Users can only read/write their own data. The `SUPABASE_SERVICE_ROLE_KEY` (used only server-side) bypasses RLS for trusted backend operations.
+
+### 6. Storage
+
+A private `transcripts` bucket stores uploaded PDF files, organized by user ID.
+
+---
+
+## Architecture
+
+```
+app/
+  lib/
+    supabaseClient.ts   ← browser client (anon key)
+    supabaseServer.ts   ← server client (service role key)
+    supabaseAuth.ts     ← server auth helper (JWT verification)
+  api/
+    auth/signup/         ← Supabase-based signup
+    auth/signin/         ← Supabase-based signin
+    transcript/upload/   ← PDF upload → Storage + parse → DB
+    planner/             ← CRUD for degree planner
+    advisor/             ← AI advisor (pulls from Supabase)
+    user/data/           ← Data summary + delete all
+  components/
+    AuthProvider.tsx     ← Client auth context & useAuth() hook
+  settings/              ← Account & data management page
+```
+
+---
+
+## Other Environment Variables
+
+| Variable | Required | Purpose |
+|---|---|---|
+| `ROUTELLM_API_KEY` | Yes | AI advisor LLM API key |
+| `STRIPE_SECRET_KEY` | Optional | Payments |
+| `NEXT_PUBLIC_STRIPE_PUBLIC_KEY` | Optional | Payments (client) |
+
+---
 
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# PACEMAKER
+Push to GitHub, link to Vercel, and add the env vars above. The app auto-deploys on push.

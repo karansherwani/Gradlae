@@ -122,9 +122,6 @@ const UserSchema = new Schema<IUser>(
     }
 );
 
-// Create indexes
-UserSchema.index({ email: 1 });
-
 // Prevent model recompilation in development
 const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
 
