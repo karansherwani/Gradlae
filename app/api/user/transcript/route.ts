@@ -1,5 +1,6 @@
 // app/api/user/transcript/route.ts
 // Fetch saved transcript from Supabase.
+// SECURITY: Only Bearer token auth is accepted. Legacy header auth removed.
 
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/app/lib/supabaseServer';
@@ -7,27 +8,10 @@ import { getUserFromRequest } from '@/app/lib/supabaseAuth';
 
 export async function GET(request: NextRequest) {
     try {
-        // Try Bearer auth
         const user = await getUserFromRequest(request);
 
         if (!user) {
-            // Fallback: header (legacy)
-            const userId = request.headers.get('x-user-id');
-            if (!userId) {
-                return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-            }
-
-            const { data: userRow } = await supabaseAdmin
-                .from('users')
-                .select('id')
-                .eq('email', userId.toLowerCase())
-                .single();
-
-            if (!userRow) {
-                return NextResponse.json({ courses: [] });
-            }
-
-            return getTranscriptCourses(userRow.id);
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         return getTranscriptCourses(user.id);

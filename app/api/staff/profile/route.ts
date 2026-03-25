@@ -1,8 +1,11 @@
 // CREATE THIS FILE: app/api/staff/profile/route.ts
+// SECURITY: POST requires authentication + role check.
 
 import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
+import { getUserFromRequest } from '@/app/lib/supabaseAuth';
+import { staffProfileSchema, validateBody } from '@/app/lib/validation';
 
 interface StaffProfile {
   staffId: string;
@@ -51,7 +54,7 @@ async function writeProfiles(profiles: StaffProfile[]) {
   await fs.writeFile(PROFILES_FILE, JSON.stringify(profiles, null, 2));
 }
 
-// GET - Fetch a staff member's profile
+// GET - Fetch a staff member's profile (public)
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -78,25 +81,36 @@ export async function GET(request: NextRequest) {
 }
 
 // POST - Create or update a staff profile
+// SECURITY: Requires authentication + staff/instructor role
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { staffId, ...profileData } = body;
-
-    if (!staffId) {
-      return NextResponse.json(
-        { message: 'Staff ID is required' },
-        { status: 400 }
-      );
+    // Auth check
+    const user = await getUserFromRequest(request);
+    if (!user) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
+
+    // Role check — only staff/instructors can create profiles
+    if (user.role !== 'instructor' && user.role !== 'staff') {
+      return NextResponse.json({ message: 'Forbidden: Staff role required' }, { status: 403 });
+    }
+
+    // Validate input
+    const body = await request.json();
+    const validation = validateBody(staffProfileSchema, body);
+    if (!validation.success) {
+      return NextResponse.json({ message: validation.error }, { status: 400 });
+    }
+
+    const { staffId, ...profileData } = validation.data;
 
     const allProfiles = await readProfiles();
     const existingIndex = allProfiles.findIndex(p => p.staffId === staffId);
 
-    const updatedProfile: StaffProfile = {
+    const updatedProfile = {
       staffId,
       ...profileData,
-    };
+    } as StaffProfile;
 
     if (existingIndex >= 0) {
       // Update existing profile

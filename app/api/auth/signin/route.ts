@@ -5,14 +5,29 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/app/lib/supabaseServer';
+import { signinSchema, validateBody } from '@/app/lib/validation';
 
 export async function POST(request: NextRequest) {
     try {
-        const { email, password } = await request.json();
-
-        if (!email || !password) {
-            return NextResponse.json({ message: 'Email and password are required' }, { status: 400 });
+        // Verify env vars are set (this is the #1 cause of Vercel failures)
+        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+            console.error('[signin/route] MISSING ENV VARS:', {
+                hasUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+                hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+                hasAnonKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+            });
+            return NextResponse.json(
+                { message: 'Server configuration error. Please contact support.' },
+                { status: 500 },
+            );
         }
+
+        const body = await request.json();
+        const validation = validateBody(signinSchema, body);
+        if (!validation.success) {
+            return NextResponse.json({ message: validation.error }, { status: 400 });
+        }
+        const { email, password } = validation.data;
 
         // Sign in via Supabase Auth — password is verified against the bcrypt hash
         const { data: sessionData, error } = await supabaseAdmin.auth.signInWithPassword({
@@ -28,7 +43,7 @@ export async function POST(request: NextRequest) {
             if (msg.includes('not confirmed') || msg.includes('email')) {
                 return NextResponse.json({ message: 'Please confirm your email address first' }, { status: 401 });
             }
-            console.error('Sign-in error:', error.message);
+            console.error('[signin/route] Sign-in error:', error.message);
             return NextResponse.json({ message: 'Sign-in failed: ' + error.message }, { status: 400 });
         }
 
@@ -65,7 +80,7 @@ export async function POST(request: NextRequest) {
             refreshToken: sessionData.session.refresh_token,
         });
     } catch (error) {
-        console.error('Signin error:', error);
+        console.error('[signin/route] Unhandled error:', error);
         const message = error instanceof Error ? error.message : 'Server error';
         return NextResponse.json(
             { message: 'Sign-in failed: ' + message },

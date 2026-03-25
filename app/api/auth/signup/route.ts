@@ -1,9 +1,11 @@
 // app/api/auth/signup/route.ts
 // Supabase-based signup – creates auth user + users-table row.
 // Passwords are ONLY handled by Supabase Auth (bcrypt-hashed internally).
+// SECURITY: Uniform error responses to prevent user enumeration.
 
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/app/lib/supabaseServer';
+import { signupSchema, validateBody } from '@/app/lib/validation';
 
 export async function POST(request: NextRequest) {
     try {
@@ -20,14 +22,12 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const { email, password, name, school, role } = await request.json();
-
-        if (!email || !password) {
-            return NextResponse.json({ message: 'Email and password are required' }, { status: 400 });
+        const body = await request.json();
+        const validation = validateBody(signupSchema, body);
+        if (!validation.success) {
+            return NextResponse.json({ message: validation.error }, { status: 400 });
         }
-        if (password.length < 6) {
-            return NextResponse.json({ message: 'Password must be at least 6 characters' }, { status: 400 });
-        }
+        const { email, password, name, school, role } = validation.data;
 
         // 1. Create Supabase auth user (password is bcrypt-hashed by Supabase internally)
         const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
@@ -38,16 +38,17 @@ export async function POST(request: NextRequest) {
         });
 
         if (authError) {
-            // Surface friendly error messages
             const msg = authError.message.toLowerCase();
+            // SECURITY: Use uniform response for duplicate accounts.
+            // Don't reveal whether the account already exists.
             if (msg.includes('already') || msg.includes('duplicate') || msg.includes('exists')) {
-                return NextResponse.json({ message: 'An account with this email already exists' }, { status: 409 });
-            }
-            if (msg.includes('password') && msg.includes('length')) {
-                return NextResponse.json({ message: 'Password must be at least 6 characters' }, { status: 400 });
+                return NextResponse.json({
+                    success: true,
+                    message: 'Account setup initiated. If a new account was created, you can now sign in.',
+                });
             }
             console.error('Supabase auth signup error:', authError.message);
-            return NextResponse.json({ message: 'Signup failed: ' + authError.message }, { status: 400 });
+            return NextResponse.json({ message: 'Signup failed. Please try again.' }, { status: 400 });
         }
 
         const authUser = authData.user;
@@ -96,8 +97,9 @@ export async function POST(request: NextRequest) {
     } catch (error) {
         console.error('Signup error:', error);
         const message = error instanceof Error ? error.message : 'Server error';
+        console.error('Signup error detail:', message);
         return NextResponse.json(
-            { message: 'Signup failed: ' + message },
+            { message: 'Signup failed. Please try again.' },
             { status: 500 },
         );
     }

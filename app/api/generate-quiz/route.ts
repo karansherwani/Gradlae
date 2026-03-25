@@ -2,48 +2,29 @@ import { NextRequest, NextResponse } from 'next/server';
 import { generateQuizForCourse } from '@/app/lib/quizGenerator';
 import { supabaseAdmin } from '@/app/lib/supabaseServer';
 import { getUserFromRequest } from '@/app/lib/supabaseAuth';
+import { generateQuizSchema, validateBody } from '@/app/lib/validation';
 
 export async function POST(request: NextRequest) {
     try {
-        const { courseNumber, courseName } = await request.json();
-
-        // Try Bearer auth first
+        // SECURITY: Only Bearer token auth accepted. Legacy header fallback removed.
         const user = await getUserFromRequest(request);
-        let userId: string;
-
-        if (user) {
-            userId = user.id;
-        } else {
-            // Fallback: x-user-email header (legacy)
-            const userEmail = request.headers.get('x-user-email');
-            if (!userEmail) {
-                return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-            }
-
-            const { data: userRow } = await supabaseAdmin
-                .from('users')
-                .select('id')
-                .eq('email', userEmail.toLowerCase())
-                .single();
-
-            if (!userRow) {
-                return NextResponse.json({ error: 'User not found' }, { status: 404 });
-            }
-            userId = userRow.id;
+        if (!user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        if (!courseNumber || !courseName) {
-            return NextResponse.json(
-                { error: 'Missing required fields: courseNumber, courseName' },
-                { status: 400 },
-            );
+        const body = await request.json();
+        const validation = validateBody(generateQuizSchema, body);
+        if (!validation.success) {
+            return NextResponse.json({ error: validation.error }, { status: 400 });
         }
+
+        const { courseNumber, courseName } = validation.data;
 
         // Check if user already attempted this quiz (using Supabase)
         const { data: attempt } = await supabaseAdmin
             .from('quiz_attempts')
             .select('id, score, total, percentage, created_at')
-            .eq('user_id', userId)
+            .eq('user_id', user.id)
             .eq('course_number', courseNumber)
             .limit(1)
             .single();
@@ -63,7 +44,7 @@ export async function POST(request: NextRequest) {
 
         // Generate unique quiz
         const quiz = await generateQuizForCourse(
-            userId,
+            user.id,
             courseNumber,
             courseName,
         );
@@ -76,24 +57,12 @@ export async function POST(request: NextRequest) {
         });
     } catch (error) {
         console.error('Quiz API error:', error);
-        let errorMessage = (error as Error).message;
-
-        if (errorMessage.includes('API key not valid')) {
-            errorMessage = 'System Configuration Error: Invalid API Key. Please check server logs.';
-        }
-
+        // SECURITY: Don't leak internal error details to client
         return NextResponse.json(
-            { error: 'Failed to generate quiz', details: errorMessage },
+            { error: 'Failed to generate quiz. Please try again.' },
             { status: 500 },
         );
     }
 }
 
-// GET method for debugging
-export async function GET() {
-    return NextResponse.json({
-        status: 'active',
-        message: 'Quiz generation API is running',
-        note: 'Use POST method with courseNumber, courseName',
-    });
-}
+// SECURITY: Debug GET endpoint removed to prevent information leakage.

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { getUserFromRequest } from '@/app/lib/supabaseAuth';
+import { checkoutSchema, validateBody } from '@/app/lib/validation';
 
 // Session pricing
 const PRICING = {
@@ -21,17 +23,21 @@ const PRICING = {
 };
 
 export async function POST(request: NextRequest) {
+    // SECURITY: Require authentication
+    const user = await getUserFromRequest(request);
+    if (!user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
     try {
         const body = await request.json();
-        const { sessionType, mentorName, timeSlot, userEmail } = body;
-
-        if (!sessionType || !mentorName) {
-            return NextResponse.json(
-                { error: 'Missing required fields' },
-                { status: 400 }
-            );
+        const validation = validateBody(checkoutSchema, body);
+        if (!validation.success) {
+            return NextResponse.json({ error: validation.error }, { status: 400 });
         }
+
+        const { sessionType, mentorName, timeSlot, userEmail } = validation.data;
 
         const pricing = PRICING[sessionType as keyof typeof PRICING];
         if (!pricing) {

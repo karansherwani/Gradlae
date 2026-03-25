@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { CourseGraph } from '@/app/lib/courseGraph';
 import { Course, StudentProfile, ChatMessage, DegreePlan } from '@/types';
+import { chatRequestSchema, validateBody, sanitizeAIInput } from '@/app/lib/validation';
 import fs from 'fs';
 import path from 'path';
 
@@ -347,21 +348,27 @@ Remember: Help students succeed and graduate on time!`;
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const {
-      messages,
-      studentProfile
-    }: {
-      messages: ChatMessage[];
-      studentProfile: StudentProfile;
-    } = body;
 
-    // Validate input
-    if (!messages || !studentProfile) {
+    // Validate input with Zod schema
+    const validation = validateBody(chatRequestSchema, body);
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: validation.error },
         { status: 400 }
       );
     }
+
+    const { messages: rawMessages, studentProfile: rawProfile } = validation.data;
+
+    // Cast validated data — Zod ensures shape; extra fields (id, timestamp) are client-only
+    const studentProfile = rawProfile as unknown as StudentProfile;
+
+    // Sanitize all user messages to mitigate prompt injection
+    const sanitizedMessages = rawMessages.map(m => ({
+      ...m,
+      content: m.role === 'user' ? sanitizeAIInput(m.content) : m.content,
+    })) as unknown as ChatMessage[];
+    const messages = sanitizedMessages;
 
     // Load data
     const courses = loadCourseData();

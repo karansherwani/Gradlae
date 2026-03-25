@@ -5,17 +5,31 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '../lib/supabaseClient';
 import styles from '../styles/auth.module.css';
 
-type AuthMethod = 'email' | 'netid' | 'staff' | null;
+type UserRole = 'student' | 'staff' | null;
 type Mode = 'signin' | 'signup' | 'reset';
+
+const universities = [
+  { id: 'uofa', name: 'University of Arizona', domain: 'arizona.edu' },
+  { id: 'asu', name: 'Arizona State University', domain: 'asu.edu' },
+  { id: 'nau', name: 'Northern Arizona University', domain: 'nau.edu' },
+  { id: 'uofc', name: 'University of Colorado Boulder', domain: 'colorado.edu' },
+  { id: 'ucsd', name: 'UC San Diego', domain: 'ucsd.edu' },
+  { id: 'stanford', name: 'Stanford University', domain: 'stanford.edu' },
+  { id: 'mit', name: 'MIT', domain: 'mit.edu' },
+  { id: 'berkeley', name: 'UC Berkeley', domain: 'berkeley.edu' },
+];
 
 export default function AuthPage() {
   const router = useRouter();
+
+  // Flow step: 'university' → 'role' → 'credentials'
+  const [flowStep, setFlowStep] = useState<'university' | 'role' | 'credentials'>('university');
   const [selectedUniversity, setSelectedUniversity] = useState<string>('');
-  const [authMethod, setAuthMethod] = useState<AuthMethod>(null);
+  const [uniSearch, setUniSearch] = useState('');
+  const [userRole, setUserRole] = useState<UserRole>(null);
+
   const [mode, setMode] = useState<Mode>('signin');
-  const [email, setEmail] = useState('');
   const [netId, setNetId] = useState('');
-  const [staffId, setStaffId] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
@@ -41,38 +55,25 @@ export default function AuthPage() {
     setShowConfirmPassword(true);
   };
 
-  // Google sign-in handler (Supabase OAuth)
-  const handleGoogleSignIn = async () => {
-    setLoading(true);
-    try {
-      const { error: oauthError } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: { redirectTo: `${window.location.origin}/dashboard` },
-      });
-      if (oauthError) {
-        setError('Google sign-in failed: ' + oauthError.message);
-      }
-    } catch (err) {
-      console.error('Google Sign-in Error:', err);
-      setError('Google sign-in failed.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Check if user was already directed from landing page with a university pre-selected
   useEffect(() => {
     const uni = localStorage.getItem('selectedUniversity');
-    if (!uni) {
-      router.push('/');
-      return;
+    if (uni) {
+      setSelectedUniversity(uni);
+      setFlowStep('role');
     }
-    setSelectedUniversity(uni);
-  }, [router]);
+  }, []);
+
+  const filteredUniversities = universities.filter(uni =>
+    uni.name.toLowerCase().includes(uniSearch.toLowerCase()) ||
+    uni.domain.toLowerCase().includes(uniSearch.toLowerCase())
+  );
 
   const getUniversityInfo = (id: string) => {
     const unis: Record<string, { name: string; primaryColor: string; secondaryColor: string }> = {
       uofa: { name: 'University of Arizona', primaryColor: '#C41E3A', secondaryColor: '#003366' },
       asu: { name: 'Arizona State University', primaryColor: '#8B0000', secondaryColor: '#FFB81C' },
+      nau: { name: 'Northern Arizona University', primaryColor: '#003466', secondaryColor: '#FFD200' },
       uofc: { name: 'University of Colorado Boulder', primaryColor: '#CFB53B', secondaryColor: '#1E3932' },
       ucsd: { name: 'UC San Diego', primaryColor: '#0066CC', secondaryColor: '#00629B' },
       stanford: { name: 'Stanford University', primaryColor: '#B1040E', secondaryColor: '#8C1515' },
@@ -81,6 +82,38 @@ export default function AuthPage() {
       berkeley: { name: 'UC Berkeley', primaryColor: '#003262', secondaryColor: '#FDB827' },
     };
     return unis[id] || { name: 'Your University', primaryColor: '#003366', secondaryColor: '#C41E3A' };
+  };
+
+  const handleUniversitySelect = (uniId: string) => {
+    setSelectedUniversity(uniId);
+    localStorage.setItem('selectedUniversity', uniId);
+    setFlowStep('role');
+    setError('');
+  };
+
+  const handleRoleSelect = (role: UserRole) => {
+    setUserRole(role);
+    setFlowStep('credentials');
+    setError('');
+  };
+
+  const handleBack = () => {
+    setError('');
+    if (flowStep === 'credentials') {
+      setFlowStep('role');
+      setNetId('');
+      setPassword('');
+      setConfirmPassword('');
+      setMode('signin');
+      setResetStep('request');
+      setResetMessage('');
+    } else if (flowStep === 'role') {
+      setFlowStep('university');
+      setSelectedUniversity('');
+      localStorage.removeItem('selectedUniversity');
+    } else {
+      router.push('/');
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -101,27 +134,14 @@ export default function AuthPage() {
       }
     }
 
-    // Build the email address for Supabase
-    let userEmail: string;
-    if (authMethod === 'email') {
-      userEmail = email.toLowerCase().trim();
-    } else if (authMethod === 'netid') {
-      userEmail = `${netId.toLowerCase().trim()}@${selectedUniversity || 'uofa'}.edu`;
-    } else if (authMethod === 'staff') {
-      userEmail = `${staffId.toLowerCase().trim()}@${selectedUniversity || 'uofa'}.edu`;
-    } else {
-      setError('Please select an authentication method');
-      setLoading(false);
-      return;
-    }
+    // Build the email address for Supabase using NetID
+    const userEmail = `${netId.toLowerCase().trim()}@${selectedUniversity || 'uofa'}.edu`;
+    const fullName = userRole === 'staff'
+      ? `Prof. ${netId.charAt(0).toUpperCase() + netId.slice(1)}`
+      : netId.charAt(0).toUpperCase() + netId.slice(1);
 
     try {
       const endpoint = mode === 'signup' ? '/api/auth/signup' : '/api/auth/signin';
-      const fullName = authMethod === 'email'
-        ? email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1)
-        : authMethod === 'netid'
-          ? netId.charAt(0).toUpperCase() + netId.slice(1)
-          : `Prof. ${staffId.charAt(0).toUpperCase() + staffId.slice(1)}`;
 
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -131,7 +151,7 @@ export default function AuthPage() {
           password,
           name: fullName,
           school: selectedUniversity || 'UArizona',
-          role: authMethod === 'staff' ? 'instructor' : 'student',
+          role: userRole === 'staff' ? 'instructor' : 'student',
         }),
       });
 
@@ -150,7 +170,7 @@ export default function AuthPage() {
 
         // Navigate to the appropriate dashboard
         setTimeout(() => {
-          const dashboardRoute = authMethod === 'staff' ? '/staff/dashboard' : '/dashboard';
+          const dashboardRoute = userRole === 'staff' ? '/staff/dashboard' : '/dashboard';
           window.location.href = dashboardRoute;
         }, 100);
       } else {
@@ -175,9 +195,7 @@ export default function AuthPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: email || undefined,
           netId: netId || undefined,
-          staffId: staffId || undefined,
           otp: resetStep === 'verify' ? otp : undefined,
           newPassword: resetStep === 'verify' ? password : undefined,
         }),
@@ -209,95 +227,129 @@ export default function AuthPage() {
     }
   };
 
-  if (!selectedUniversity) return null;
-
-  const uni = getUniversityInfo(selectedUniversity);
-  const cssVars = {
+  const uni = selectedUniversity ? getUniversityInfo(selectedUniversity) : null;
+  const cssVars = uni ? {
     '--primary-color': uni.primaryColor,
     '--secondary-color': uni.secondaryColor,
-  } as React.CSSProperties;
+  } as React.CSSProperties : {};
 
-  // Step 1: choose auth method
-  if (!authMethod) {
+  // ─── Step 1: Select University ───
+  if (flowStep === 'university') {
     return (
-      <div className={styles.container} style={cssVars}>
+      <div className={styles.container}>
         <header className={styles.header}>
-          <button
-            className={styles.backBtn}
-            onClick={() => {
-              localStorage.removeItem('selectedUniversity');
-              router.push('/');
-            }}
-          >
+          <button className={styles.backBtn} onClick={() => router.push('/')}>
             ← Back
           </button>
           <div>
             <div className={styles.logo}>🎓 PaceMatch</div>
-            <p className={styles.uniName}>{uni.name}</p>
           </div>
         </header>
 
         <main className={styles.main}>
           <div className={styles.authCard}>
-            <h1>Sign In or Create Account</h1>
-            <p>Choose how you&apos;d like to authenticate</p>
+            <h1>Select Your University</h1>
+            <p>Search and choose your institution to get started</p>
+
+            <div className={styles.formGroup}>
+              <input
+                type="text"
+                placeholder="🔍 Search universities..."
+                value={uniSearch}
+                onChange={(e) => setUniSearch(e.target.value)}
+                autoFocus
+              />
+            </div>
 
             <div className={styles.methodsGrid}>
-              <button className={styles.methodCard} onClick={() => setAuthMethod('email')}>
-                <div className={styles.methodIcon}>📧</div>
-                <h3>Email Login</h3>
-                <p>Sign in with your email address</p>
-                <span className={styles.arrow}>→</span>
-              </button>
-
-              <button className={styles.methodCard} onClick={() => setAuthMethod('netid')}>
-                <div className={styles.methodIcon}>🎓</div>
-                <h3>NetID / Student ID</h3>
-                <p>Sign in with your school credentials</p>
-                <span className={styles.arrow}>→</span>
-              </button>
-
-              <button className={styles.methodCard} onClick={() => setAuthMethod('staff')}>
-                <div className={styles.methodIcon}>👨‍🏫</div>
-                <h3>Staff Login</h3>
-                <p>For faculty and administrators</p>
-                <span className={styles.arrow}>→</span>
-              </button>
+              {filteredUniversities.map((u) => (
+                <button
+                  key={u.id}
+                  className={styles.methodCard}
+                  onClick={() => handleUniversitySelect(u.id)}
+                >
+                  <div className={styles.methodIcon}>🏛️</div>
+                  <div>
+                    <h3>{u.name}</h3>
+                    <p>{u.domain}</p>
+                  </div>
+                  <span className={styles.arrow}>→</span>
+                </button>
+              ))}
+              {filteredUniversities.length === 0 && (
+                <p style={{ color: 'var(--text-secondary)', textAlign: 'center', padding: '20px' }}>
+                  No universities found. Try a different search.
+                </p>
+              )}
             </div>
-
-            <div className={styles.divider}>
-              <span>or</span>
-            </div>
-
-            <button
-              className={styles.googleBtn}
-              onClick={handleGoogleSignIn}
-              disabled={loading}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-              </svg>
-              Continue with Google
-            </button>
           </div>
         </main>
       </div>
     );
   }
 
-  // Step 2-3: Sign In / Sign Up / Reset
+  // ─── Step 2: Select Role (Student / Staff) ───
+  if (flowStep === 'role') {
+    return (
+      <div className={styles.container} style={cssVars}>
+        <header className={styles.header}>
+          <button className={styles.backBtn} onClick={handleBack}>
+            ← Back
+          </button>
+          <div>
+            <div className={styles.logo}>🎓 PaceMatch</div>
+            {uni && <p className={styles.uniName}>{uni.name}</p>}
+          </div>
+        </header>
+
+        <main className={styles.main}>
+          <div className={styles.authCard}>
+            <h1>I am a...</h1>
+            <p>Select your role at {uni?.name}</p>
+
+            <div className={styles.methodsGrid}>
+              <button
+                className={styles.methodCard}
+                onClick={() => handleRoleSelect('student')}
+              >
+                <div className={styles.methodIcon}>🎓</div>
+                <div>
+                  <h3>Student</h3>
+                  <p>Undergraduate or graduate student</p>
+                </div>
+                <span className={styles.arrow}>→</span>
+              </button>
+
+              <button
+                className={styles.methodCard}
+                onClick={() => handleRoleSelect('staff')}
+              >
+                <div className={styles.methodIcon}>👨‍🏫</div>
+                <div>
+                  <h3>Staff / Faculty</h3>
+                  <p>Instructor, professor, or administrator</p>
+                </div>
+                <span className={styles.arrow}>→</span>
+              </button>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // ─── Step 3: NetID Login (Credentials) ───
+  const roleLabel = userRole === 'staff' ? 'Staff' : 'Student';
+
   return (
     <div className={styles.container} style={cssVars}>
       <header className={styles.header}>
-        <button className={styles.backBtn} onClick={() => setAuthMethod(null)}>
+        <button className={styles.backBtn} onClick={handleBack}>
           ← Back
         </button>
         <div>
           <div className={styles.logo}>🎓 PaceMatch</div>
-          <p className={styles.uniName}>{uni.name}</p>
+          {uni && <p className={styles.uniName}>{uni.name}</p>}
         </div>
       </header>
 
@@ -305,50 +357,32 @@ export default function AuthPage() {
         <div className={styles.authCard}>
           <h2>
             {mode === 'signin'
-              ? authMethod === 'email'
-                ? 'Email Sign In'
-                : authMethod === 'netid'
-                  ? 'NetID Sign In'
-                  : 'Staff Sign In'
+              ? `${roleLabel} Sign In`
               : mode === 'signup'
-                ? authMethod === 'email'
-                  ? 'Create Email Account'
-                  : authMethod === 'netid'
-                    ? 'Create NetID Account'
-                    : 'Create Staff Account'
+                ? `Create ${roleLabel} Account`
                 : 'Reset Password'}
           </h2>
           <p>
             {mode === 'signin'
-              ? 'Enter your credentials to continue'
+              ? 'Enter your NetID credentials to continue'
               : mode === 'signup'
-                ? 'Create your account to get started'
+                ? 'Create your account with your NetID'
                 : 'Follow the steps to recover access'}
           </p>
+
+          <div className={styles.securityNote}>
+            <strong>🔒 Secure Login</strong> — Sign in with your university NetID
+          </div>
 
           {mode === 'reset' ? (
             <form onSubmit={handleReset}>
               <div className={styles.formGroup}>
-                <label>
-                  {authMethod === 'email' ? 'Email Address' : authMethod === 'netid' ? 'NetID' : 'Staff ID'}
-                </label>
+                <label>NetID</label>
                 <input
                   type="text"
-                  value={authMethod === 'email' ? email : authMethod === 'netid' ? netId : staffId}
-                  onChange={(e) =>
-                    authMethod === 'email'
-                      ? setEmail(e.target.value)
-                      : authMethod === 'netid'
-                        ? setNetId(e.target.value)
-                        : setStaffId(e.target.value)
-                  }
-                  placeholder={
-                    authMethod === 'email'
-                      ? 'your.email@example.com'
-                      : authMethod === 'netid'
-                        ? 'e.g., jsmith'
-                        : 'e.g., staff123'
-                  }
+                  value={netId}
+                  onChange={(e) => setNetId(e.target.value)}
+                  placeholder="e.g., jsmith"
                   required
                   disabled={loading || resetStep === 'verify'}
                 />
@@ -411,52 +445,22 @@ export default function AuthPage() {
             </form>
           ) : (
             <form onSubmit={handleSubmit} name="login-form" autoComplete="on">
-              {authMethod === 'email' ? (
-                <div className={styles.formGroup}>
-                  <label htmlFor="email">Email Address</label>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="your.email@example.com"
-                    required
-                    disabled={loading}
-                    autoComplete="email"
-                  />
-                </div>
-              ) : authMethod === 'netid' ? (
-                <div className={styles.formGroup}>
-                  <label htmlFor="netId">NetID / Student ID</label>
-                  <input
-                    id="netId"
-                    name="username"
-                    type="text"
-                    value={netId}
-                    onChange={(e) => setNetId(e.target.value)}
-                    placeholder="e.g., jsmith"
-                    required
-                    disabled={loading}
-                    autoComplete="username"
-                  />
-                  <p className={styles.fieldHint}>Your unique identifier at {uni.name}</p>
-                </div>
-              ) : (
-                <div className={styles.formGroup}>
-                  <label htmlFor="staffId">Staff ID / Employee Number</label>
-                  <input
-                    id="staffId"
-                    type="text"
-                    value={staffId}
-                    onChange={(e) => setStaffId(e.target.value)}
-                    placeholder="e.g., staff123 or 00012345"
-                    required
-                    disabled={loading}
-                  />
-                  <p className={styles.fieldHint}>Your faculty or staff identifier at {uni.name}</p>
-                </div>
-              )}
+              <div className={styles.formGroup}>
+                <label htmlFor="netId">NetID</label>
+                <input
+                  id="netId"
+                  name="username"
+                  type="text"
+                  value={netId}
+                  onChange={(e) => setNetId(e.target.value)}
+                  placeholder="e.g., jsmith"
+                  required
+                  disabled={loading}
+                  autoComplete="username"
+                  autoFocus
+                />
+                <p className={styles.fieldHint}>Your unique identifier at {uni?.name}</p>
+              </div>
 
               <div className={styles.formGroup}>
                 <label htmlFor="password">Password</label>
@@ -526,7 +530,7 @@ export default function AuthPage() {
                 disabled={
                   loading ||
                   !password ||
-                  (!email && !netId && !staffId) ||
+                  !netId ||
                   (mode === 'signup' && !confirmPassword)
                 }
               >

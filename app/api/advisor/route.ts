@@ -9,6 +9,7 @@ import path from 'path';
 import { loadAllCourses, Course as CSVCourse } from '@/app/lib/loadCourses';
 import { supabaseAdmin } from '@/app/lib/supabaseServer';
 import { getUserFromRequest } from '@/app/lib/supabaseAuth';
+import { advisorRequestSchema, validateBody, sanitizeAIInput } from '@/app/lib/validation';
 
 // ─── TYPES ─────────────────────────────────────────────────────────────────
 
@@ -271,14 +272,23 @@ Remember: Help students succeed and graduate on time!`;
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { messages, studentContext: clientContext } = body;
 
-        if (!messages || !Array.isArray(messages)) {
+        // Validate input with Zod
+        const validation = validateBody(advisorRequestSchema, body);
+        if (!validation.success) {
             return NextResponse.json(
-                { error: 'Messages array is required' },
+                { error: validation.error },
                 { status: 400 }
             );
         }
+
+        const { messages: rawMessages, studentContext: clientContext } = validation.data;
+
+        // Sanitize user messages to mitigate prompt injection
+        const messages = rawMessages.map(m => ({
+            ...m,
+            content: m.role === 'user' ? sanitizeAIInput(m.content) : m.content,
+        }));
 
         // Use ONLY server-side environment variable – never from client
         const effectiveKey = process.env.OPENAI_API_KEY || process.env.ROUTELLM_API_KEY;

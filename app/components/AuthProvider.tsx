@@ -58,9 +58,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     }, []);
 
+    // Helper to clear stale auth state when refresh token is invalid
+    const clearStaleSession = useCallback(() => {
+        setSession(null);
+        setDbUser(null);
+        // Remove Supabase's internal storage keys that hold the stale token
+        if (typeof window !== 'undefined') {
+            Object.keys(localStorage).forEach(key => {
+                if (key.startsWith('sb-') && key.endsWith('-auth-token')) {
+                    localStorage.removeItem(key);
+                }
+            });
+        }
+    }, []);
+
     useEffect(() => {
         // Get initial session
-        supabase.auth.getSession().then(async ({ data: { session: s } }) => {
+        supabase.auth.getSession().then(async ({ data: { session: s }, error }) => {
+            if (error) {
+                console.warn('Session recovery failed (stale token cleared):', error.message);
+                clearStaleSession();
+                setLoading(false);
+                return;
+            }
             setSession(s);
             if (s?.access_token) {
                 await fetchDbUser(s.access_token);
@@ -69,7 +89,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
 
         // Listen for auth changes
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, s) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, s) => {
+            // Handle token refresh failures (stale/invalid refresh token)
+            if (event === 'TOKEN_REFRESHED' && !s) {
+                console.warn('Token refresh failed — clearing stale session');
+                clearStaleSession();
+                return;
+            }
+            if (event === 'SIGNED_OUT') {
+                setSession(null);
+                setDbUser(null);
+                return;
+            }
+
             setSession(s);
             if (s?.access_token) {
                 await fetchDbUser(s.access_token);
@@ -79,7 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
 
         return () => subscription.unsubscribe();
-    }, [fetchDbUser]);
+    }, [fetchDbUser, clearStaleSession]);
 
     const signOut = useCallback(async () => {
         await supabase.auth.signOut();

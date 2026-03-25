@@ -1,15 +1,19 @@
 // app/api/auth/reset/route.ts
 // Password reset — uses Supabase Auth's built-in password reset.
-// Sends a password reset email via Supabase; user clicks the link & sets new password.
-// No plaintext passwords are stored or compared.
+// SECURITY: Returns uniform responses to prevent user enumeration.
 
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/app/lib/supabaseServer';
+import { resetSchema, validateBody } from '@/app/lib/validation';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, netId, staffId, newPassword, otp } = body;
+    const validation = validateBody(resetSchema, body);
+    if (!validation.success) {
+      return NextResponse.json({ message: validation.error }, { status: 400 });
+    }
+    const { email, netId, staffId, newPassword, otp } = validation.data;
 
     // Build the identifier
     const identifier = email || (netId ? `${netId}@uofa.edu` : null) || (staffId ? `${staffId}@uofa.edu` : null);
@@ -33,15 +37,15 @@ export async function POST(request: NextRequest) {
 
       if (error) {
         console.error('Password reset email error:', error.message);
-        return NextResponse.json(
-          { message: 'Failed to send reset email. Please check your email address.' },
-          { status: 400 },
-        );
+        // SECURITY: Don't reveal whether the email exists.
+        // Fall through to the same generic response.
       }
 
+      // SECURITY: Always return the same response regardless of whether
+      // the email exists, to prevent user enumeration.
       return NextResponse.json({
         success: true,
-        message: 'Password reset email sent! Check your inbox.',
+        message: 'If that account exists, a password reset email has been sent.',
       });
     }
 
@@ -67,7 +71,12 @@ export async function POST(request: NextRequest) {
       );
 
       if (!authUser) {
-        return NextResponse.json({ message: 'User not found' }, { status: 404 });
+        // SECURITY: Don't reveal whether the user exists.
+        // Return the same success response as a valid reset.
+        return NextResponse.json({
+          success: true,
+          message: 'If the verification was valid, your password has been updated.',
+        });
       }
 
       // Update password via admin API (Supabase hashes it internally)
