@@ -70,14 +70,23 @@ export async function POST(request: NextRequest) {
         }
 
         // 3. Sign the user in via admin to get tokens
-        //    Use admin.generateLink or signInWithPassword from a separate anon client
-        //    The service-role client's signInWithPassword creates a session properly.
-        const { data: sessionData, error: signInError } = await supabaseAdmin.auth.signInWithPassword({
-            email: email.toLowerCase().trim(),
-            password,
-        });
+        let sessionData;
+        try {
+            const result = await supabaseAdmin.auth.signInWithPassword({
+                email: email.toLowerCase().trim(),
+                password,
+            });
 
-        if (signInError || !sessionData.session) {
+            if (result.error || !result.data.session) {
+                // User was created but auto-sign-in failed — let them sign in manually
+                return NextResponse.json({
+                    success: true,
+                    message: 'Account created successfully! Please sign in.',
+                    userId: authUser.id,
+                });
+            }
+            sessionData = result.data;
+        } catch {
             // User was created but auto-sign-in failed — let them sign in manually
             return NextResponse.json({
                 success: true,

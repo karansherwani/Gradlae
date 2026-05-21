@@ -84,12 +84,21 @@ export async function POST(request: NextRequest) {
       }
 
       // Auto sign-in
-      const { data: sessionData, error: signInError } = await supabaseAdmin.auth.signInWithPassword({
-        email: userEmail,
-        password,
-      });
-
-      if (signInError || !sessionData.session) {
+      let sessionData;
+      try {
+        const result = await supabaseAdmin.auth.signInWithPassword({
+          email: userEmail,
+          password,
+        });
+        if (result.error || !result.data.session) {
+          return NextResponse.json({
+            success: true,
+            message: 'Account created successfully! Please sign in.',
+            userId: authUser.id,
+          });
+        }
+        sessionData = result.data;
+      } catch {
         return NextResponse.json({
           success: true,
           message: 'Account created successfully! Please sign in.',
@@ -107,22 +116,32 @@ export async function POST(request: NextRequest) {
       });
     } else {
       // ── Sign In ──
-      const { data: sessionData, error } = await supabaseAdmin.auth.signInWithPassword({
-        email: userEmail,
-        password,
-      });
+      let sessionData;
+      try {
+        const result = await supabaseAdmin.auth.signInWithPassword({
+          email: userEmail,
+          password,
+        });
 
-      if (error) {
-        const msg = error.message.toLowerCase();
-        if (msg.includes('invalid') || msg.includes('credentials') || msg.includes('password')) {
-          return NextResponse.json({ message: 'Invalid email or password' }, { status: 401 });
+        if (result.error) {
+          const msg = result.error.message.toLowerCase();
+          if (msg.includes('invalid') || msg.includes('credentials') || msg.includes('password')) {
+            return NextResponse.json({ message: 'Invalid email or password' }, { status: 401 });
+          }
+          console.error('[login/route] Sign-in error:', result.error.message);
+          return NextResponse.json({ message: 'Sign-in failed. Please try again.' }, { status: 400 });
         }
-        console.error('[login/route] Sign-in error:', error.message);
-        return NextResponse.json({ message: 'Sign-in failed: ' + error.message }, { status: 400 });
-      }
 
-      if (!sessionData.session) {
-        return NextResponse.json({ message: 'Sign-in failed — no session created' }, { status: 401 });
+        if (!result.data.session) {
+          return NextResponse.json({ message: 'Sign-in failed — no session created' }, { status: 401 });
+        }
+        sessionData = result.data;
+      } catch (fetchErr) {
+        console.error('[login/route] Supabase fetch error:', fetchErr);
+        return NextResponse.json(
+          { message: 'Unable to reach authentication service. Please try again later.' },
+          { status: 502 },
+        );
       }
 
       // Fetch user row

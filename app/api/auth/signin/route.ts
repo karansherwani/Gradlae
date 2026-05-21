@@ -30,21 +30,34 @@ export async function POST(request: NextRequest) {
         const { email, password } = validation.data;
 
         // Sign in via Supabase Auth — password is verified against the bcrypt hash
-        const { data: sessionData, error } = await supabaseAdmin.auth.signInWithPassword({
-            email: email.toLowerCase().trim(),
-            password,
-        });
+        let sessionData;
+        try {
+            const result = await supabaseAdmin.auth.signInWithPassword({
+                email: email.toLowerCase().trim(),
+                password,
+            });
 
-        if (error) {
-            const msg = error.message.toLowerCase();
-            if (msg.includes('invalid') || msg.includes('credentials') || msg.includes('password')) {
-                return NextResponse.json({ message: 'Invalid email or password' }, { status: 401 });
+            if (result.error) {
+                const msg = result.error.message.toLowerCase();
+                if (msg.includes('invalid') || msg.includes('credentials') || msg.includes('password')) {
+                    return NextResponse.json({ message: 'Invalid email or password' }, { status: 401 });
+                }
+                if (msg.includes('not confirmed') || msg.includes('email')) {
+                    return NextResponse.json({ message: 'Please confirm your email address first' }, { status: 401 });
+                }
+                console.error('[signin/route] Sign-in error:', result.error.message);
+                return NextResponse.json({ message: 'Sign-in failed. Please try again.' }, { status: 400 });
             }
-            if (msg.includes('not confirmed') || msg.includes('email')) {
-                return NextResponse.json({ message: 'Please confirm your email address first' }, { status: 401 });
-            }
-            console.error('[signin/route] Sign-in error:', error.message);
-            return NextResponse.json({ message: 'Sign-in failed: ' + error.message }, { status: 400 });
+
+            sessionData = result.data;
+        } catch (fetchErr) {
+            console.error('[signin/route] Supabase fetch error:', fetchErr);
+            console.error('[signin/route] Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
+            console.error('[signin/route] Service key length:', process.env.SUPABASE_SERVICE_ROLE_KEY?.length);
+            return NextResponse.json(
+                { message: 'Unable to reach authentication service. Please try again later.' },
+                { status: 502 },
+            );
         }
 
         if (!sessionData.session) {

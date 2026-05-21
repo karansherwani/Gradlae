@@ -400,7 +400,7 @@ export default function AdvisorChat({
                     </button>
                 </div>
                 <p className={styles.footerHint}>
-                    Press Enter to send • 📎 Upload any PDF (transcript, planner, syllabus) • Powered by GPT-4o-mini
+                    Press Enter to send • 📎 Upload any PDF (transcript, planner, syllabus) • Powered by Gemini
                 </p>
             </div>
         </>

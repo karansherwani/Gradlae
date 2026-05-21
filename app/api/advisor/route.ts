@@ -1,11 +1,12 @@
 // app/api/advisor/route.ts
 // LLM-backed academic advisor – pulls planner + transcript from Supabase,
 // falls back to static degreeRequirements.json if no DB planner exists.
-// API key is read ONLY from server-side environment variables.
+// Uses Google Gemini (free tier) for AI responses.
 
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { loadAllCourses, Course as CSVCourse } from '@/app/lib/loadCourses';
 import { supabaseAdmin } from '@/app/lib/supabaseServer';
 import { getUserFromRequest } from '@/app/lib/supabaseAuth';
@@ -267,6 +268,51 @@ Remember: Help students succeed and graduate on time!`;
     return prompt;
 }
 
+// ─── ROUTELLM FALLBACK ────────────────────────────────────────────────────
+
+async function callRouteLLMFallback(
+    systemPrompt: string,
+    messages: Array<{ role: string; content: string }>,
+): Promise<string> {
+    const apiKey = process.env.ROUTELLM_API_KEY || process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+        throw new Error('No fallback AI API key configured');
+    }
+
+    const apiUrl = process.env.ROUTELLM_API_KEY
+        ? 'https://routellm.abacus.ai/v1/chat/completions'
+        : 'https://api.openai.com/v1/chat/completions';
+
+    const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+            model: process.env.ROUTELLM_API_KEY ? 'gpt-4o' : 'gpt-4o-mini',
+            messages: [
+                { role: 'system', content: systemPrompt },
+                ...messages.map(m => ({
+                    role: m.role === 'assistant' ? 'assistant' : 'user',
+                    content: m.content,
+                })),
+            ],
+            temperature: 0.7,
+            max_tokens: 4096,
+        }),
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        console.error('RouteLLM fallback error:', errorText);
+        throw new Error('Fallback AI service also failed');
+    }
+
+    const data = await response.json();
+    return data.choices[0].message.content;
+}
+
 // ─── API HANDLER ──────────────────────────────────────────────────────────
 
 export async function POST(request: NextRequest) {
@@ -289,16 +335,6 @@ export async function POST(request: NextRequest) {
             ...m,
             content: m.role === 'user' ? sanitizeAIInput(m.content) : m.content,
         }));
-
-        // Use ONLY server-side environment variable – never from client
-        const effectiveKey = process.env.OPENAI_API_KEY || process.env.ROUTELLM_API_KEY;
-
-        if (!effectiveKey) {
-            return NextResponse.json(
-                { error: 'The AI advisor is temporarily unavailable. Please try again later.' },
-                { status: 503 }
-            );
-        }
 
         // ─── Try to load from Supabase for authenticated users ──────────
         let studentContext: string | undefined = clientContext || undefined;
@@ -360,58 +396,78 @@ export async function POST(request: NextRequest) {
         const catalogSample = buildCourseSample(allCourses);
 
         const systemPrompt = buildSystemPrompt(plannerContext, catalogSample, studentContext);
+        const lastMessage = messages[messages.length - 1];
 
-        // Determine API endpoint
-        const isRouteLLM = effectiveKey === process.env.ROUTELLM_API_KEY && !process.env.OPENAI_API_KEY;
-        const apiUrl = isRouteLLM
-            ? 'https://routellm.abacus.ai/v1/chat/completions'
-            : 'https://api.openai.com/v1/chat/completions';
+        // ─── Try Gemini first, fall back to RouteLLM ─────────────────────
+        const geminiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY;
+        let aiMessage: string | null = null;
 
-        const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${effectiveKey}`,
-            },
-            body: JSON.stringify({
-                model: isRouteLLM ? 'gpt-4o' : 'gpt-4o-mini',
-                messages: [
-                    { role: 'system', content: systemPrompt },
-                    ...messages.map((m: { role: string; content: string }) => ({
-                        role: m.role,
-                        content: m.content,
-                    })),
-                ],
-                temperature: 0.7,
-                max_tokens: 4096,
-            }),
-        });
+        if (geminiKey) {
+            try {
+                const genAI = new GoogleGenerativeAI(geminiKey);
+                const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
-        if (!response.ok) {
-            console.error('AI API error:', response.status);
+                // Convert chat messages to Gemini format
+                const geminiHistory = messages
+                    .slice(0, -1)
+                    .filter((m: { role: string }) => m.role === 'user' || m.role === 'assistant')
+                    .map((m: { role: string; content: string }) => ({
+                        role: m.role === 'assistant' ? 'model' : 'user',
+                        parts: [{ text: m.content }],
+                    }));
 
-            if (response.status === 401) {
+                const chat = model.startChat({
+                    history: [
+                        { role: 'user', parts: [{ text: systemPrompt }] },
+                        { role: 'model', parts: [{ text: 'Understood. I am ready to help as an AI academic advisor for University of Arizona students. I will follow all the guidelines and constraints provided.' }] },
+                        ...geminiHistory,
+                    ],
+                    generationConfig: {
+                        temperature: 0.7,
+                        maxOutputTokens: 4096,
+                    },
+                });
+
+                const result = await chat.sendMessage(lastMessage.content);
+                const response = result.response;
+                aiMessage = response.text() || null;
+            } catch (geminiError) {
+                console.warn('Gemini API failed, falling back to RouteLLM:', (geminiError as Error).message);
+                // aiMessage stays null → will trigger fallback below
+            }
+        }
+
+        // ─── Fallback to RouteLLM if Gemini failed or key missing ────────
+        if (!aiMessage) {
+            try {
+                console.log('Using RouteLLM fallback for advisor...');
+                aiMessage = await callRouteLLMFallback(systemPrompt, messages);
+            } catch (fallbackError) {
+                console.error('Both Gemini and RouteLLM failed:', (fallbackError as Error).message);
                 return NextResponse.json(
-                    { error: 'AI service configuration error. Please contact support.' },
+                    { error: 'AI service is temporarily unavailable. Please try again later.' },
                     { status: 503 }
                 );
             }
-
-            return NextResponse.json(
-                { error: 'Failed to get AI response. Please try again.' },
-                { status: 502 }
-            );
         }
-
-        const data = await response.json();
-        const aiMessage = data.choices?.[0]?.message?.content || 'No response from AI.';
 
         return NextResponse.json({ message: aiMessage });
     } catch (error) {
         console.error('Advisor API error:', error);
+
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
+        if (errorMessage.includes('API key') || errorMessage.includes('401') || errorMessage.includes('403')) {
+            return NextResponse.json(
+                { error: 'AI service configuration error. Please contact support.' },
+                { status: 503 }
+            );
+        }
+
         return NextResponse.json(
-            { error: 'Internal server error' },
+            { error: 'Failed to get AI response. Please try again.' },
             { status: 500 }
         );
     }
 }
+
