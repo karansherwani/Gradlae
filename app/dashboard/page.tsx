@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../components/AuthProvider';
 import styles from '../styles/dashboard.module.css';
@@ -72,22 +72,19 @@ const ClockIcon = () => (
 export default function Dashboard() {
   const router = useRouter();
   const { user, dbUser, loading: authLoading, signOut } = useAuth();
-  const [displayName, setDisplayName] = useState('');
 
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
       router.push('/auth');
-      return;
     }
-    // Use DB user name, fall back to Supabase user metadata, then email
-    const name = dbUser?.name
-      || user.user_metadata?.full_name
-      || user.email?.split('@')[0]
-      || 'User';
-    const cleanName = name.startsWith('Student ') ? name.replace('Student ', '') : name;
-    setDisplayName(cleanName);
-  }, [authLoading, user, dbUser, router]);
+  }, [authLoading, user, router]);
+
+  const name = dbUser?.name
+    || user?.user_metadata?.full_name
+    || user?.email?.split('@')[0]
+    || 'User';
+  const displayName = name.startsWith('Student ') ? name.replace('Student ', '') : name;
 
   const handleLogout = async () => {
     await signOut();
@@ -143,7 +140,7 @@ export default function Dashboard() {
         <div className={styles.headerRight}>
           <div className={styles.userInfo} onClick={() => router.push('/profile')} style={{ cursor: 'pointer' }}>
             <div className={styles.userAvatar}>
-              {displayName ? displayName.split(' ').map(n => n.charAt(0).toUpperCase()).join('').slice(0, 2) : '?'}
+              {displayName ? displayName.split(' ').map((n: string) => n.charAt(0).toUpperCase()).join('').slice(0, 2) : '?'}
             </div>
             <span className={styles.userName}>{displayName || 'User'}</span>
           </div>
@@ -158,7 +155,7 @@ export default function Dashboard() {
         <section className={styles.welcomeSection}>
           <div className={styles.welcomeContent}>
             <p className={styles.welcomeLabel}>Student Dashboard</p>
-            <h1>Welcome back, {displayName} 👋</h1>
+            <h1>Welcome back, {displayName}</h1>
             <p className={styles.welcomeDesc}>
               Your academic success starts here. Plan your semester, track your grades, and find the pace that fits your life.
             </p>
@@ -208,7 +205,7 @@ export default function Dashboard() {
               <p className={styles.quickAccessEmptyTitle}>Start your journal</p>
               <p className={styles.quickAccessEmptyDesc}>Reflect on your week, set goals, and track what&apos;s working</p>
               <button className={styles.quickAccessCtaAlt} onClick={() => router.push('/journal')}>
-                Open Journal
+                Journal
               </button>
             </div>
           </div>
@@ -268,7 +265,7 @@ export default function Dashboard() {
           <div className={styles.batchGrid}>
             {/* Batch A */}
             <div className={styles.batchInfoCard}>
-              <span className={styles.batchBadge} style={{ background: '#0C234B' }}>Fast Track</span>
+              <span className={styles.batchBadge}>Fast Track</span>
               <h3>Batch A</h3>
               <span className={styles.batchDuration}><ClockIcon /> 7 Weeks</span>
               <p className={styles.batchDesc}>
@@ -278,7 +275,7 @@ export default function Dashboard() {
 
             {/* Batch B */}
             <div className={styles.batchInfoCard}>
-              <span className={styles.batchBadge} style={{ background: '#AB0520' }}>Standard Track</span>
+              <span className={styles.batchBadge}>Standard Track</span>
               <h3>Batch B</h3>
               <span className={styles.batchDuration}><ClockIcon /> Full Semester</span>
               <p className={styles.batchDesc}>
@@ -288,7 +285,7 @@ export default function Dashboard() {
 
             {/* Batch C */}
             <div className={styles.batchInfoCard}>
-              <span className={styles.batchBadge} style={{ background: '#0C234B' }}>Supported Track</span>
+              <span className={styles.batchBadge}>Supported Track</span>
               <h3>Batch C</h3>
               <span className={styles.batchDuration}><ClockIcon /> Full Semester + Tutoring</span>
               <p className={styles.batchDesc}>

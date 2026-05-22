@@ -1,18 +1,18 @@
 /* Staff Dashboard Styles */
 
 :root {
-    --uofa-blue: #0C234B;
-    --uofa-red: #AB0520;
-    --gray-50: #F9FAFB;
-    --gray-100: #F3F4F6;
-    --gray-200: #E5E7EB;
-    --gray-300: #D1D5DB;
-    --gray-400: #9CA3AF;
-    --gray-500: #6B7280;
-    --gray-600: #4B5563;
-    --gray-700: #374151;
-    --gray-800: #1F2937;
-    --gray-900: #111827;
+    --uofa-blue: var(--pm-blue);
+    --uofa-red: var(--pm-red);
+    --gray-50: var(--pm-bg);
+    --gray-100: var(--pm-bg);
+    --gray-200: var(--pm-line);
+    --gray-300: var(--pm-line);
+    --gray-400: var(--pm-gray);
+    --gray-500: var(--pm-gray);
+    --gray-600: var(--pm-gray);
+    --gray-700: var(--pm-gray);
+    --gray-800: var(--pm-black);
+    --gray-900: var(--pm-black);
   }
   
   /* Container & Layout */
@@ -22,7 +22,7 @@
   }
   
   .topHeader {
-    background: white;
+    background: var(--pm-bg);
     border-bottom: 1px solid var(--gray-200);
     padding: 1rem 2rem;
     display: flex;
@@ -41,7 +41,7 @@
   
   .logoMark {
     background: var(--uofa-blue);
-    color: white;
+    color: var(--pm-white);
     width: 40px;
     height: 40px;
     border-radius: 8px;
@@ -92,7 +92,7 @@
   /* Sidebar */
   .sidebar {
     width: 260px;
-    background: white;
+    background: var(--pm-bg);
     border-right: 1px solid var(--gray-200);
     padding: 2rem 0;
     display: flex;
@@ -143,7 +143,7 @@
     top: 50%;
     transform: translateY(-50%);
     background: var(--uofa-red);
-    color: white;
+    color: var(--pm-white);
     font-size: 0.75rem;
     font-weight: 700;
     padding: 2px 8px;
@@ -214,7 +214,7 @@
     gap: 8px;
     padding: 0.75rem 1.5rem;
     background: var(--uofa-blue);
-    color: white;
+    color: var(--pm-white);
     border: none;
     border-radius: 8px;
     font-weight: 600;
@@ -223,7 +223,7 @@
   }
   
   .createBtn:hover {
-    background: #0a1d3a;
+    background: var(--pm-blue-dark);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(12, 35, 75, 0.2);
   }
@@ -234,7 +234,7 @@
     align-items: center;
     margin-bottom: 1.5rem;
     padding: 1rem;
-    background: white;
+    background: var(--pm-bg);
     border-radius: 12px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
@@ -267,7 +267,7 @@
   }
   
   .dayColumn {
-    background: white;
+    background: var(--pm-bg);
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -321,7 +321,7 @@
   
   .slotAvailable {
     background: rgba(34, 197, 94, 0.05);
-    border-color: #22C55E;
+    border-color: var(--pm-olive);
   }
   
   .slotBooked {
@@ -369,8 +369,8 @@
   }
   
   .deleteBtn:hover {
-    background: #FEE2E2;
-    color: #DC2626;
+    background: var(--pm-red-soft);
+    color: var(--pm-red);
   }
   
   /* Stats Grid */
@@ -382,7 +382,7 @@
   }
   
   .statCard {
-    background: white;
+    background: var(--pm-bg);
     padding: 1.5rem;
     border-radius: 12px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -426,7 +426,7 @@
   }
   
   .modalContent {
-    background: white;
+    background: var(--pm-bg);
     border-radius: 16px;
     padding: 2rem;
     max-width: 500px;
@@ -523,11 +523,11 @@
   .confirmBtn {
     background: var(--uofa-blue);
     border: none;
-    color: white;
+    color: var(--pm-white);
   }
   
   .confirmBtn:hover {
-    background: #0a1d3a;
+    background: var(--pm-blue-dark);
   }
   
   /* Appointments */
@@ -574,7 +574,7 @@
   }
   
   .appointmentCard {
-    background: white;
+    background: var(--pm-bg);
     padding: 1.5rem;
     border-radius: 12px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -598,7 +598,7 @@
     height: 48px;
     border-radius: 50%;
     background: var(--uofa-blue);
-    color: white;
+    color: var(--pm-white);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -626,7 +626,7 @@
   
   .statusUpcoming {
     background: rgba(34, 197, 94, 0.1);
-    color: #16A34A;
+    color: var(--pm-olive);
   }
   
   .statusCompleted {
@@ -636,7 +636,7 @@
   
   .statusCancelled {
     background: rgba(239, 68, 68, 0.1);
-    color: #DC2626;
+    color: var(--pm-red);
   }
   
   .appointmentDetails {
@@ -673,7 +673,7 @@
     gap: 0.5rem;
     padding: 0.5rem 1rem;
     background: var(--uofa-blue);
-    color: white;
+    color: var(--pm-white);
     text-decoration: none;
     border-radius: 6px;
     font-weight: 500;
@@ -682,7 +682,7 @@
   }
   
   .joinBtn:hover {
-    background: #0a1d3a;
+    background: var(--pm-blue-dark);
   }
   
   .locationInfo {
@@ -744,7 +744,7 @@
   }
   
   .summaryCard {
-    background: white;
+    background: var(--pm-bg);
     padding: 1.5rem;
     border-radius: 12px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -805,11 +805,11 @@
   .saveBtn {
     background: var(--uofa-blue);
     border: none;
-    color: white;
+    color: var(--pm-white);
   }
   
   .saveBtn:hover {
-    background: #0a1d3a;
+    background: var(--pm-blue-dark);
   }
   
   .saveBtn:disabled {
@@ -827,12 +827,12 @@
   
   .successAlert {
     background: rgba(34, 197, 94, 0.1);
-    color: #16A34A;
+    color: var(--pm-olive);
   }
   
   .errorAlert {
     background: rgba(239, 68, 68, 0.1);
-    color: #DC2626;
+    color: var(--pm-red);
   }
   
   .profileGrid {
@@ -843,7 +843,7 @@
   }
   
   .profileCard {
-    background: white;
+    background: var(--pm-bg);
     padding: 1.5rem;
     border-radius: 12px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -868,7 +868,7 @@
     height: 80px;
     border-radius: 50%;
     background: var(--uofa-blue);
-    color: white;
+    color: var(--pm-white);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -939,7 +939,7 @@
   .addBtn {
     padding: 0.75rem 1rem;
     background: var(--uofa-blue);
-    color: white;
+    color: var(--pm-white);
     border: none;
     border-radius: 8px;
     font-weight: 600;
@@ -948,7 +948,7 @@
   }
   
   .addBtn:hover {
-    background: #0a1d3a;
+    background: var(--pm-blue-dark);
   }
   
   .emptyMessage {
@@ -1000,7 +1000,7 @@
   }
   
   .previewCard {
-    background: white;
+    background: var(--pm-bg);
     padding: 1.5rem;
     border-radius: 12px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -1031,7 +1031,7 @@
     height: 60px;
     border-radius: 50%;
     background: var(--uofa-blue);
-    color: white;
+    color: var(--pm-white);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1059,7 +1059,7 @@
   }
   
   .starIcon {
-    color: #FBBF24;
+    color: var(--pm-olive);
   }
   
   .reviews {
@@ -1125,7 +1125,7 @@
   .reviewsStats {
     display: flex;
     gap: 2rem;
-    background: white;
+    background: var(--pm-bg);
     padding: 2rem;
     border-radius: 12px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -1149,17 +1149,17 @@
   
   .starsLarge {
     font-size: 1.5rem;
-    color: #FBBF24;
+    color: var(--pm-olive);
     margin: 0.5rem 0;
   }
   
   .starsSmall {
     font-size: 1rem;
-    color: #FBBF24;
+    color: var(--pm-olive);
   }
   
   .starFilled {
-    color: #FBBF24;
+    color: var(--pm-olive);
   }
   
   .starEmpty {
@@ -1201,7 +1201,7 @@
   
   .ratingBarFill {
     height: 100%;
-    background: #FBBF24;
+    background: var(--pm-olive);
     transition: width 0.3s;
   }
   
@@ -1226,7 +1226,7 @@
   
   .filterBtn {
     padding: 0.5rem 1rem;
-    background: white;
+    background: var(--pm-bg);
     border: 1px solid var(--gray-200);
     border-radius: 6px;
     font-weight: 500;
@@ -1242,7 +1242,7 @@
   
   .filterBtnActive {
     background: var(--uofa-blue);
-    color: white;
+    color: var(--pm-white);
     border-color: var(--uofa-blue);
   }
   
@@ -1250,7 +1250,7 @@
     padding: 0.5rem 1rem;
     border: 1px solid var(--gray-200);
     border-radius: 6px;
-    background: white;
+    background: var(--pm-bg);
     color: var(--gray-700);
     font-weight: 500;
     cursor: pointer;
@@ -1263,7 +1263,7 @@
   }
   
   .reviewCard {
-    background: white;
+    background: var(--pm-bg);
     padding: 1.5rem;
     border-radius: 12px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -1287,7 +1287,7 @@
     height: 48px;
     border-radius: 50%;
     background: var(--uofa-blue);
-    color: white;
+    color: var(--pm-white);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1372,7 +1372,7 @@
   }
   
   .insightsCard {
-    background: white;
+    background: var(--pm-bg);
     padding: 1.5rem;
     border-radius: 12px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);

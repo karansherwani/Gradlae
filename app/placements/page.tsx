@@ -231,7 +231,7 @@ export default function PlacementsPage() {
       if (data.verification && !data.verification.verified) {
         setTranscriptVerified(false);
         setVerificationMessage(data.verification.message);
-        setUploadError(`⚠️ This transcript does not belong to you. ${data.verification.message} Please upload your own transcript.`);
+        setUploadError(`This transcript does not belong to you. ${data.verification.message} Please upload your own transcript.`);
         setSelectedFile(null);
         return; // Don't proceed - stay on upload page
       }
@@ -335,7 +335,7 @@ export default function PlacementsPage() {
           <a href="/mentoring">Mentoring</a>
         </nav>
         <button className={styles.headerCta} onClick={() => router.push('/dashboard')}>
-          ← Back
+          Back
         </button>
       </header>
 
@@ -376,7 +376,7 @@ export default function PlacementsPage() {
                   </div>
                 ) : (
                   <>
-                    <div className="text-4xl mb-4">📁</div>
+                    <div className="text-sm font-semibold tracking-wide text-muted-foreground mb-4">TRANSCRIPT FILE</div>
                     <p className="text-muted-foreground mb-4">Drag and drop your transcript here, or</p>
                     <Button onClick={triggerFileInput} variant="outline" size="lg">
                       Choose File
@@ -385,7 +385,7 @@ export default function PlacementsPage() {
                     {/* Selected File Display */}
                     {selectedFile && (
                       <div className="mt-4 p-3 bg-primary/5 border border-primary rounded-lg inline-flex items-center gap-2">
-                        <span className="font-medium">📄 {selectedFile.name}</span>
+                        <span className="font-medium">{selectedFile.name}</span>
                       </div>
                     )}
 
@@ -422,7 +422,7 @@ export default function PlacementsPage() {
           <div className={styles.resultsSection}>
             {/* Success Banner */}
             <div className={styles.successBanner}>
-              <span className={styles.successIcon}>✓</span>
+              <span className={styles.successIcon}>OK</span>
               <div>
                 <h3>Transcript Imported Successfully!</h3>
                 <p>Found {grades.length} courses across {[...new Set(grades.map(g => g.term))].length} semesters</p>
@@ -434,21 +434,8 @@ export default function PlacementsPage() {
                   setSelectedFile(null);
                   setUploadError(null);
                 }}
-                style={{
-                  marginLeft: 'auto',
-                  padding: '8px 16px',
-                  background: 'rgba(255,255,255,0.2)',
-                  border: '1px solid rgba(255,255,255,0.3)',
-                  borderRadius: '8px',
-                  color: 'white',
-                  cursor: 'pointer',
-                  fontSize: '0.9rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                }}
               >
-                📄 Update Transcript
+                Update Transcript
               </button>
             </div>
 
@@ -465,11 +452,10 @@ export default function PlacementsPage() {
               {/* Search Input */}
               <div className={styles.searchContainer}>
                 <div className={styles.searchWrapper}>
-                  <span className={styles.searchIconText}>🔍</span>
                   <input
                     type="text"
                     className={styles.searchInput}
-                    placeholder={coursesLoading ? 'Loading courses...' : `Search ${allCourses.length} courses (e.g., CSC 210, Chemistry)...`}
+                    placeholder={coursesLoading ? 'Loading courses...' : 'Search for courses...'}
                     value={searchQuery}
                     onChange={(e) => {
                       setSearchQuery(e.target.value);
@@ -518,7 +504,7 @@ export default function PlacementsPage() {
                             className={styles.removeBtn}
                             onClick={() => removePlannedCourse(course.courseCode)}
                           >
-                            ✕
+                            Remove
                           </button>
                         </div>
 
@@ -542,7 +528,7 @@ export default function PlacementsPage() {
                                   }}>
                                     {prereq.grade}
                                   </span>
-                                  {prereq.met ? '✓' : '✗'}
+                                  {prereq.met ? 'Met' : 'Missing'}
                                 </div>
                               </div>
                             ))}
@@ -567,7 +553,7 @@ export default function PlacementsPage() {
                                 router.push('/quiz');
                               }}
                             >
-                              📝 Take Quiz to Upgrade
+                              Take Quiz to Upgrade
                             </button>
                           )}
                         </div>
@@ -638,7 +624,7 @@ export default function PlacementsPage() {
                             {g.grade === 'IP' ? (
                               <span className={styles.inProgressBadge}>In Progress</span>
                             ) : g.grade === 'W' ? (
-                              <span className={styles.gradeBadge} style={{ background: '#9ca3af', color: 'white' }}>
+                              <span className={`${styles.gradeBadge} ${styles.gradeW}`}>
                                 W
                               </span>
                             ) : (
@@ -656,47 +642,11 @@ export default function PlacementsPage() {
 
 
             <div className={styles.actions}>
-              <button className={styles.enrollBtn} onClick={() => alert('✅ Enrolled successfully!')}>
+              <button className={styles.enrollBtn} onClick={() => alert('Enrolled successfully!')}>
               </button>
             </div>
 
-            {/* Upload New Transcript Section */}
-            <div style={{
-              marginTop: '40px',
-              padding: '24px',
-              background: 'linear-gradient(135deg, rgba(171, 5, 32, 0.05) 0%, rgba(0, 33, 71, 0.05) 100%)',
-              borderRadius: '12px',
-              border: '1px solid rgba(0, 33, 71, 0.1)',
-              textAlign: 'center'
-            }}>
-              <h3 style={{ margin: '0 0 8px 0', color: 'var(--uofa-blue, #002147)' }}>📄 Update Your Transcript</h3>
-              <p style={{ margin: '0 0 16px 0', color: '#6b7280', fontSize: '0.9rem' }}>
-                Have a new transcript? Upload it to keep your course history and GPA up to date.
-              </p>
-              <button
-                onClick={() => {
-                  setStep('upload');
-                  setSelectedFile(null);
-                  setUploadError(null);
-                }}
-                style={{
-                  padding: '12px 24px',
-                  background: 'var(--uofa-blue, #002147)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '1rem',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  transition: 'all 0.2s ease'
-                }}
-              >
-                📤 Upload New Transcript
-              </button>
-            </div>
+
           </div>
         )}
       </main>

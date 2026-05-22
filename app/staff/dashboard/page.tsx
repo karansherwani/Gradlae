@@ -41,7 +41,7 @@ export default function StaffDashboard() {
           <span className={styles.logoText}>PaceMatch Staff</span>
         </div>
         <div className={styles.headerRight}>
-          <span className={styles.staffName}>👋 {staffName}</span>
+          <span className={styles.staffName}>{staffName}</span>
           <button
             className={styles.logoutBtn}
             onClick={() => signOut()}

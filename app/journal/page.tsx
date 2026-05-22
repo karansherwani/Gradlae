@@ -189,7 +189,7 @@ export default function JournalPage() {
                     <div className={styles.saveStatus}>
                         {activeEntryId && (
                             <span className={saved ? styles.savedIndicator : styles.savingIndicator}>
-                                {saved ? '✓ Saved' : 'Saving...'}
+                                {saved ? 'Saved' : 'Saving...'}
                             </span>
                         )}
                     </div>

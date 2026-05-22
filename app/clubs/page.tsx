@@ -134,7 +134,7 @@ export default function ClubsPage() {
         try {
             // Handle multi-day events like "Fri, Jan 30, 2026 6:00 PM –"
             // Strip trailing time portions and dashes
-            let cleaned = dateStr.replace(/\d{1,2}:\d{2}\s*(AM|PM)?\s*[–\-]?\s*$/i, '').trim();
+            const cleaned = dateStr.replace(/\d{1,2}:\d{2}\s*(AM|PM)?\s*[–\-]?\s*$/i, '').trim();
 
             // Expected format after cleanup: "Tue, Jan 27, 2026"
             // Remove the day of week part
@@ -363,7 +363,7 @@ export default function ClubsPage() {
                                             {club.mission || 'Explore this organization to learn more about their activities and mission.'}
                                         </p>
                                         <div className={styles.clubMeta}>
-                                            <span>📋 {club.membership_type || 'Lifetime membership'}</span>
+                                            <span>Membership: {club.membership_type || 'Lifetime membership'}</span>
                                         </div>
                                         <div className={styles.clubActions}>
                                             {club.url && (
@@ -410,10 +410,10 @@ export default function ClubsPage() {
                                                 <h3>{event.name}</h3>
                                                 <p className={styles.organization}>By {event.organization}</p>
                                                 <div className={styles.eventMeta}>
-                                                    <span>🕐 {event.time}</span>
-                                                    <span>📍 {event.location || 'Location TBA'}</span>
+                                                    <span>Time: {event.time}</span>
+                                                    <span>Location: {event.location || 'Location TBA'}</span>
                                                     {event.attendees > 0 && (
-                                                        <span>👥 {event.attendees} going</span>
+                                                        <span>{event.attendees} attending</span>
                                                     )}
                                                 </div>
                                                 {event.tags && event.tags.length > 0 && (

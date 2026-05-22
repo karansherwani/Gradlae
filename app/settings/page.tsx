@@ -101,7 +101,7 @@ export default function SettingsPage() {
                     PACEMAKER
                 </div>
                 <button className={styles.backBtn} onClick={() => router.push('/dashboard')}>
-                    ← Back to Dashboard
+                    Back to Dashboard
                 </button>
             </header>
 
@@ -111,7 +111,7 @@ export default function SettingsPage() {
 
                 {/* Profile card */}
                 <div className={styles.card}>
-                    <div className={styles.cardTitle}>👤 Profile</div>
+                    <div className={styles.cardTitle}>Profile</div>
                     <div className={styles.dataRow}>
                         <span className={styles.dataLabel}>Email</span>
                         <span className={styles.dataValue}>{summary?.user.email || user?.email || '—'}</span>
@@ -128,12 +128,12 @@ export default function SettingsPage() {
 
                 {/* Data summary card */}
                 <div className={styles.card}>
-                    <div className={styles.cardTitle}>📊 Stored Data</div>
+                    <div className={styles.cardTitle}>Stored Data</div>
 
                     <div className={styles.dataRow}>
                         <span className={styles.dataLabel}>Transcript uploaded</span>
                         <span className={`${styles.badge} ${summary?.data.transcriptUploaded ? styles.badgeGreen : styles.badgeGray}`}>
-                            {summary?.data.transcriptUploaded ? '✓ Yes' : '✗ No'}
+                            {summary?.data.transcriptUploaded ? 'Yes' : 'No'}
                         </span>
                     </div>
                     {summary?.data.transcriptDate && (
@@ -148,7 +148,7 @@ export default function SettingsPage() {
                     <div className={styles.dataRow}>
                         <span className={styles.dataLabel}>Planner saved</span>
                         <span className={`${styles.badge} ${summary?.data.plannerSaved ? styles.badgeGreen : styles.badgeGray}`}>
-                            {summary?.data.plannerSaved ? '✓ Yes' : '✗ No'}
+                            {summary?.data.plannerSaved ? 'Yes' : 'No'}
                         </span>
                     </div>
                     {summary?.data.plannerLastUpdated && (
@@ -168,7 +168,7 @@ export default function SettingsPage() {
 
                 {/* Danger zone */}
                 <div className={`${styles.card} ${styles.dangerZone}`}>
-                    <div className={styles.cardTitle}>⚠️ Danger Zone</div>
+                    <div className={styles.cardTitle}>Danger Zone</div>
                     <p style={{ color: '#aaa', fontSize: '0.85rem', marginBottom: 16 }}>
                         This will permanently delete all your transcripts, planner data, and advisor session logs.
                         Your account will remain, but all associated data will be removed.

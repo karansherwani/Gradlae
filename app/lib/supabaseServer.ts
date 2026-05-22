@@ -1,6 +1,6 @@
 // lib/supabaseServer.ts
 // Server-side Supabase client – uses the SERVICE ROLE key.
-// ⚠️  NEVER import this file in client components or expose the key.
+// NEVER import this file in client components or expose the key.
 // Use only inside API routes, server actions, or server components.
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';

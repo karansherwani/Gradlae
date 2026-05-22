@@ -122,7 +122,7 @@ export default function ProfilePage() {
                     <a href="/progress">Calculate Grades</a>
                 </nav>
                 <Link href="/dashboard" className={styles.headerCta}>
-                    ← Back
+                    Back
                 </Link>
             </header>
 
@@ -153,9 +153,9 @@ export default function ProfilePage() {
                             ) : (
                                 profile.fullName
                                     ? profile.fullName.split(' ').map(n => n.charAt(0).toUpperCase()).join('').slice(0, 2)
-                                    : '👤'
+                                    : 'PR'
                             )}
-                            <div className={styles.avatarOverlay}>📷</div>
+                            <div className={styles.avatarOverlay}>Edit</div>
                         </div>
                         <input
                             type="file"
@@ -228,7 +228,7 @@ export default function ProfilePage() {
 
                         {message && (
                             <div className={`${styles.message} ${message.type === 'success' ? styles.success : styles.error}`}>
-                                {message.type === 'success' ? '✓' : '⚠'} {message.text}
+                                {message.type === 'success' ? 'Success:' : 'Notice:'} {message.text}
                             </div>
                         )}
 
@@ -243,7 +243,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div className={styles.infoCard}>
-                    <h3>🔒 Privacy Note</h3>
+                    <h3>Privacy Note</h3>
                     <p>
                         Your profile information is securely stored and only used to match your
                         identity with uploaded transcripts. We never share your personal data with

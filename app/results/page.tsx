@@ -6,19 +6,19 @@ import styles from '../styles/results.module.css';
 
 const SECTIONS = {
   'Fast Track': {
-    name: 'Fast Track ⚡',
+    name: 'Fast Track',
     duration: '7 Weeks',
     meetings: 'MWF 8:00-9:30 AM',
     professor: 'Dr. Sarah Chen',
   },
   'Standard Track': {
-    name: 'Standard Track 📚',
+    name: 'Standard Track',
     duration: 'Full Semester',
     meetings: 'MWF 1:00-2:30 PM',
     professor: 'Prof. John Smith',
   },
   'Supported Track': {
-    name: 'Supported Track 🎯',
+    name: 'Supported Track',
     duration: 'Full Semester + Tutoring',
     meetings: 'MWF 3:00-4:30 PM + Tutoring',
     professor: 'Dr. Maria Garcia',
@@ -37,15 +37,15 @@ function ResultsContent() {
   const [selected, setSelected] = useState(initialSelection);
 
   const handleEnroll = () => {
-    // @ts-ignore
-    alert(`✅ Enrolled in ${SECTIONS[selected]?.name || selected}!`);
+    const section = SECTIONS[selected as keyof typeof SECTIONS];
+    alert(`Enrolled in ${section?.name || selected}!`);
     router.push('/dashboard');
   };
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h2>Quiz Complete! ✓</h2>
+        <h2>Quiz Complete</h2>
         <p>Your Score: <strong>{score}%</strong></p>
       </div>
 

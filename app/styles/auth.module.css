@@ -1,144 +1,188 @@
-/* AUTH PAGE STYLES - Modern PaceMatch Design */
-
 :root {
-  --uofa-red: var(--color-secondary);
-  --uofa-blue: var(--color-primary);
-  --bg-light: #F8F9FB;
-  --text-primary: var(--color-text);
-  --text-secondary: var(--color-text-secondary);
-  --border-color: var(--color-border);
+  --uofa-red: var(--pm-red);
+  --uofa-red-dark: var(--pm-red-dark);
+  --uofa-red-soft: var(--pm-red-soft);
+  --uofa-blue: var(--pm-blue);
+  --uofa-blue-soft: var(--pm-blue-soft);
+  --auth-bg: var(--pm-bg);
+  --auth-surface: var(--pm-bg);
+  --auth-ink: var(--pm-black);
+  --auth-muted: var(--pm-gray);
+  --auth-line: var(--pm-line);
+  --auth-display: "Instrument Serif", Georgia, serif;
+  --auth-ui: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .container {
   min-height: 100vh;
-  background: var(--color-background);
   display: flex;
   flex-direction: column;
+  background: var(--pm-bg);
+  color: var(--auth-ink);
+  font-family: var(--auth-ui);
 }
 
 .header {
-  padding: 20px 32px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 18px;
+  padding: 18px clamp(20px, 5vw, 56px);
+  border-bottom: 1px solid var(--auth-line);
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .backBtn {
-  background: var(--color-surface);
-  border: 1px solid var(--border-color);
-  color: var(--color-primary);
-  padding: 8px 16px;
-  border-radius: 8px;
+  min-height: 42px;
+  border: 1px solid var(--uofa-blue);
+  border-radius: 999px;
+  background: var(--pm-bg);
+  color: var(--uofa-blue);
   cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 600;
-  transition: all 0.2s;
+  font: 800 0.9rem var(--auth-ui);
+  padding: 9px 18px;
+  transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
 }
 
 .backBtn:hover {
-  background: var(--color-primary);
-  color: var(--color-text-inverse);
-  border-color: var(--color-primary);
+  transform: translateY(-1px);
+  background: var(--uofa-blue);
+  color: var(--pm-white);
+  box-shadow: 0 12px 28px rgba(12, 35, 75, 0.14);
 }
 
 .logo {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--color-primary);
+  color: var(--uofa-blue);
+  font-size: 1.22rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 .uniName {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  margin: 0;
+  margin: 3px 0 0;
+  color: var(--auth-muted);
+  font-size: 0.86rem;
 }
 
 .main {
   flex: 1;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(320px, 520px) minmax(360px, 520px);
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  gap: clamp(28px, 6vw, 84px);
+  padding: clamp(34px, 6vw, 84px) clamp(20px, 5vw, 72px);
+}
+
+.main::before {
+  content: "Adaptive academic placement\A Get started with your student success workspace.";
+  white-space: pre-line;
+  min-height: 520px;
+  display: flex;
+  align-items: flex-end;
+  padding: 42px;
+  border: 1px solid var(--auth-line);
+  border-radius: 1.5rem;
+  background: var(--auth-surface);
+  color: var(--uofa-blue);
+  font-family: var(--auth-display);
+  font-size: clamp(2.4rem, 4.5vw, 4.8rem);
+  letter-spacing: -0.02em;
+  line-height: 0.98;
+  box-shadow: var(--pm-shadow-card);
 }
 
 .authCard {
-  background: var(--color-surface);
-  border-radius: 20px;
-  padding: 48px 40px;
-  max-width: 440px;
   width: 100%;
-  box-shadow: var(--shadow-xl);
-  border: 1px solid var(--border-color);
-  text-align: center;
+  max-width: 520px;
+  padding: clamp(30px, 4vw, 44px);
+  border: 1px solid var(--auth-line);
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--pm-shadow-card);
+  text-align: left;
 }
 
 .authCard h1,
 .authCard h2 {
-  color: var(--text-primary);
-  margin-bottom: 8px;
-  font-size: 1.6rem;
-  font-weight: 700;
-}
-
-.authCard>p {
-  color: var(--text-secondary);
-  margin-bottom: 32px;
-  font-size: 0.95rem;
-}
-
-.securityNote {
-  background: var(--color-background);
-  padding: 14px;
-  border-radius: 10px;
-  border-left: 3px solid var(--color-primary);
-  margin-bottom: 28px;
-  color: var(--text-secondary);
-  font-size: 0.85rem;
+  margin: 0;
+  color: var(--uofa-blue);
+  font-family: var(--auth-display);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 0.98;
   text-align: left;
 }
 
+.authCard > p {
+  margin: 16px 0 30px;
+  color: var(--auth-muted);
+  font-size: 1rem;
+  line-height: 1.65;
+  text-align: left;
+}
+
+.securityNote {
+  margin-bottom: 28px;
+  padding: 16px 18px;
+  border: 1px solid var(--auth-line);
+  border-left: 4px solid var(--uofa-red);
+  border-radius: 1rem;
+  background: var(--auth-surface);
+  color: var(--auth-muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
 .securityNote strong {
-  color: var(--color-primary);
+  color: var(--uofa-blue);
 }
 
 .formGroup {
-  margin-bottom: 20px;
+  margin-bottom: 22px;
   text-align: left;
 }
 
 .formGroup label {
   display: block;
-  margin-bottom: 8px;
-  font-weight: 600;
-  color: var(--text-primary);
+  margin-bottom: 9px;
+  color: var(--auth-ink);
   font-size: 0.9rem;
+  font-weight: 800;
 }
 
 .formGroup input {
   width: 100%;
-  padding: 14px 16px;
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  font-size: 1rem;
-  transition: all 0.2s;
-  background-color: var(--color-background);
-  color: var(--color-text);
+  min-height: 54px;
+  padding: 14px 18px;
+  border: 1px solid var(--auth-line);
+  border-radius: 999px;
+  background: var(--pm-bg);
+  color: var(--auth-ink);
+  font: 500 1rem var(--auth-ui);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
 }
 
 .formGroup input::placeholder {
-  color: var(--color-text-tertiary);
+  color: var(--pm-gray);
 }
 
 .formGroup input:focus {
   outline: none;
-  border-color: var(--color-primary);
-  background: var(--color-surface);
+  border-color: var(--uofa-red);
+  background: var(--pm-bg);
+  box-shadow: 0 0 0 4px rgba(171, 5, 32, 0.12);
 }
 
 .fieldHint {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  margin-top: 6px;
+  margin: 7px 0 0;
+  color: var(--auth-muted);
+  font-size: 0.82rem;
 }
 
 .passwordWrapper {
@@ -148,22 +192,27 @@
 }
 
 .passwordWrapper input {
-  padding-right: 48px;
+  padding-right: 54px;
 }
 
 .togglePassword {
   position: absolute;
-  right: 14px;
-  background: none;
-  border: none;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--auth-surface);
   cursor: pointer;
-  font-size: 1.1rem;
-  padding: 4px;
-  opacity: 0.6;
-  transition: opacity 0.2s;
+  font-size: 1rem;
+  opacity: 0.78;
+  transition: opacity 0.18s ease, background 0.18s ease;
 }
 
 .togglePassword:hover {
+  background: var(--uofa-red-soft);
   opacity: 1;
 }
 
@@ -174,118 +223,159 @@
 }
 
 .methodCard {
-  padding: 20px;
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  background: var(--color-surface);
-  cursor: pointer;
-  transition: all 0.2s;
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 16px;
+  padding: 18px;
+  border: 1px solid var(--auth-line);
+  border-radius: 1.25rem;
+  background: var(--pm-bg);
+  cursor: pointer;
   text-align: left;
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
 .methodCard:hover {
-  border-color: var(--color-primary);
-  background: var(--color-background);
+  transform: translateY(-2px);
+  border-color: var(--uofa-red);
+  box-shadow: var(--pm-shadow-card);
 }
 
 .methodIcon {
-  font-size: 1.8rem;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
   width: 48px;
   height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border-radius: 999px;
+  background: var(--pm-sage-light);
+  color: var(--pm-olive);
+}
+
+.methodIcon svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .methodCard h3 {
-  color: var(--text-primary);
-  margin: 0 0 4px 0;
-  font-size: 1rem;
-  font-weight: 600;
+  margin: 0 0 4px;
+  color: var(--uofa-blue);
+  font-family: var(--auth-display);
+  font-size: 1.45rem;
+  font-weight: 400;
+  letter-spacing: -0.02em;
 }
 
 .methodCard p {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
   margin: 0;
+  color: var(--auth-muted);
+  font-size: 0.88rem;
 }
 
 .arrow {
   margin-left: auto;
-  color: var(--text-secondary);
-  font-size: 1.2rem;
+  width: 9px;
+  height: 9px;
+  border-top: 2px solid var(--uofa-red);
+  border-right: 2px solid var(--uofa-red);
+  transform: rotate(45deg);
+}
+
+.submitBtn,
+.generateBtn,
+.googleBtn {
+  width: 100%;
+  min-height: 54px;
+  border-radius: 999px;
+  cursor: pointer;
+  font: 800 0.96rem var(--auth-ui);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, color 0.18s ease;
 }
 
 .submitBtn {
-  width: 100%;
-  padding: 14px;
+  margin-top: 10px;
+  border: 0;
   background: var(--uofa-blue);
-  color: white;
-  border: none;
-  border-radius: 10px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  margin-top: 12px;
+  color: var(--pm-white);
 }
 
 .submitBtn:hover:not(:disabled) {
-  background: var(--color-primary-hover);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  background: var(--pm-blue-dark);
+  box-shadow: var(--pm-shadow-card);
 }
 
 .submitBtn:disabled {
-  opacity: 0.5;
+  opacity: 0.52;
   cursor: not-allowed;
 }
 
-.error {
-  color: var(--color-error);
-  background: var(--color-error-bg);
-  padding: 12px 16px;
-  border-radius: 10px;
-  margin-bottom: 16px;
+.generateBtn {
+  margin-top: 10px;
+  border: 1px solid var(--pm-sage);
+  background: var(--pm-sage-light);
+  color: var(--pm-black);
+}
+
+.generateBtn:hover {
+  transform: translateY(-1px);
+  background: var(--pm-olive);
+  color: var(--pm-white);
+}
+
+.error,
+.success {
+  margin: 0 0 16px;
+  padding: 13px 16px;
+  border-radius: 1rem;
   font-size: 0.9rem;
-  text-align: left;
+  line-height: 1.45;
+}
+
+.error {
+  border: 1px solid var(--pm-red-soft);
+  background: var(--pm-red-soft);
+  color: var(--pm-red-dark);
 }
 
 .success {
-  color: var(--color-success);
-  background: var(--color-success-bg);
-  padding: 12px 16px;
-  border-radius: 10px;
-  margin-bottom: 16px;
-  font-size: 0.9rem;
+  border: 1px solid var(--pm-sage);
+  background: var(--pm-sage-light);
+  color: var(--pm-olive);
 }
 
 .helpText {
+  margin: 24px 0 0;
+  color: var(--auth-muted);
+  font-size: 0.92rem;
   text-align: center;
-  margin-top: 20px;
-  color: var(--text-secondary);
-  font-size: 0.9rem;
 }
 
-.helpText a {
-  color: var(--color-secondary);
+.helpText a,
+.toggleBtn {
+  color: var(--uofa-red);
+  font-weight: 800;
   text-decoration: none;
-  font-weight: 600;
 }
 
-.helpText a:hover {
+.helpText a:hover,
+.toggleBtn:hover {
   text-decoration: underline;
 }
 
 .toggleMode {
-  text-align: center;
-  margin-top: 24px;
-  color: var(--text-secondary);
-  font-size: 0.9rem;
+  margin-top: 28px;
   padding-top: 24px;
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid var(--auth-line);
+  color: var(--auth-muted);
+  font-size: 0.94rem;
+  text-align: center;
 }
 
 .toggleMode p {
@@ -293,86 +383,46 @@
 }
 
 .toggleBtn {
-  background: none;
-  border: none;
-  color: var(--color-secondary);
-  font-weight: 600;
+  border: 0;
+  background: transparent;
   cursor: pointer;
+  font-size: 0.94rem;
   padding: 0;
-  font-size: 0.9rem;
 }
 
-.toggleBtn:hover {
-  text-decoration: underline;
-}
-
-/* Responsive */
-@media (max-width: 600px) {
-  .header {
-    padding: 16px 20px;
-  }
-
-  .authCard {
-    padding: 32px 24px;
-    border-radius: 16px;
-  }
-
-  .authCard h1,
-  .authCard h2 {
-    font-size: 1.4rem;
-  }
-
-  .methodsGrid {
-    gap: 12px;
-  }
-
-  .methodCard {
-    padding: 16px;
-  }
-}
-
-/* Divider */
 .divider {
   display: flex;
   align-items: center;
   margin: 24px 0;
-  color: var(--text-secondary);
+  color: var(--auth-muted);
   font-size: 0.9rem;
 }
 
 .divider::before,
 .divider::after {
-  content: '';
+  content: "";
   flex: 1;
   height: 1px;
-  background: var(--border-color);
+  background: var(--auth-line);
 }
 
 .divider span {
   padding: 0 16px;
 }
 
-/* Google Sign-In Button */
 .googleBtn {
-  width: 100%;
-  padding: 14px 20px;
-  background: var(--color-surface);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  color: var(--text-primary);
-  transition: all 0.2s;
+  border: 1px solid var(--auth-line);
+  background: var(--pm-bg);
+  color: var(--auth-ink);
 }
 
 .googleBtn:hover:not(:disabled) {
-  background: var(--color-background);
-  border-color: var(--color-primary);
+  border-color: var(--uofa-blue);
+  background: var(--auth-surface);
 }
 
 .googleBtn:disabled {
@@ -380,22 +430,37 @@
   cursor: not-allowed;
 }
 
-/* Generate Password Button */
-.generateBtn {
-  margin-top: 8px;
-  padding: 8px 16px;
-  background: linear-gradient(135deg, #0C234B, #1E3A5F);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  width: 100%;
+@media (max-width: 980px) {
+  .main {
+    grid-template-columns: minmax(0, 560px);
+  }
+
+  .main::before {
+    display: none;
+  }
 }
 
-.generateBtn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(12, 35, 75, 0.3);
+@media (max-width: 600px) {
+  .header {
+    align-items: flex-start;
+    padding: 14px 18px;
+  }
+
+  .backBtn {
+    padding: 8px 14px;
+  }
+
+  .main {
+    align-items: start;
+    padding: 26px 16px 42px;
+  }
+
+  .authCard {
+    padding: 26px 20px;
+    border-radius: 1.25rem;
+  }
+
+  .methodCard {
+    padding: 15px;
+  }
 }

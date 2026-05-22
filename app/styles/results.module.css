@@ -18,7 +18,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 48px;
-  background: #ffffff;
+  background: var(--pm-bg);
   border-bottom: 1px solid #E5E7EB;
   position: sticky;
   top: 0;

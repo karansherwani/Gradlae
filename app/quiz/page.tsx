@@ -290,7 +290,7 @@ export default function QuizPage() {
           <a href="/progress">Calculate Grades</a>
         </nav>
         <button className={styles.headerCta} onClick={() => router.push('/placements')}>
-          ← Back
+          Back
         </button>
       </header>
 
@@ -330,7 +330,7 @@ export default function QuizPage() {
         <main className={styles.main}>
           <div className={styles.quizForm}>
             <div className={styles.noCourseMessage}>
-              <div className={styles.noCourseIcon}>📚</div>
+              <div className={styles.noCourseIcon}>Course</div>
               <h2>No Course Selected</h2>
               <p>Please select a course from the My Courses page to take the prerequisite assessment.</p>
               <button
@@ -363,7 +363,7 @@ export default function QuizPage() {
             {/* Previous Attempt Warning */}
             {previousAttempt && (
               <div className={styles.previousAttempt}>
-                <h3>✅ Already Completed</h3>
+                <h3>Already Completed</h3>
                 <p>
                   <strong>Score:</strong> {previousAttempt.score}/{previousAttempt.total} ({previousAttempt.percentage}%)
                 </p>
@@ -391,7 +391,7 @@ export default function QuizPage() {
 
                 {/* One Attempt Warning */}
                 <div className={styles.attemptWarning}>
-                  <div className={styles.warningIcon}>⚠️</div>
+                  <div className={styles.warningIcon}>!</div>
                   <div>
                     <h4>One Attempt Per Course</h4>
                     <p>You can only take this quiz once for each course. Make sure you&apos;re ready before starting.</p>
@@ -401,7 +401,7 @@ export default function QuizPage() {
                 {/* Academic Integrity Notice */}
                 <div className={styles.integrityNotice}>
                   <div className={styles.integrityHeader}>
-                    <div className={styles.integrityIcon}>👁️</div>
+                    <div className={styles.integrityIcon}>ID</div>
                     <h4>Academic Integrity Notice</h4>
                   </div>
                   <ul className={styles.integrityList}>
@@ -470,7 +470,7 @@ export default function QuizPage() {
             <h2>{quizData.courseNumber}</h2>
             <p>{quizData.courseName}</p>
             <p>Question {currentQuestion + 1} of {quizData.questions.length}</p>
-            <p className={styles.userInfo}>👤 {userEmail}</p>
+            <p className={styles.userInfo}>{userEmail}</p>
           </div>
           <div className={styles.progressBar}>
             <div className={styles.progress} style={{ width: `${progress}%` }} />
@@ -502,12 +502,12 @@ export default function QuizPage() {
                 />
                 <span className={styles.optionText}>{option}</span>
                 {showExplanation && idx === currentQ.correct && (
-                  <span className={styles.badge}>✓ Correct</span>
+                  <span className={styles.badge}>Correct</span>
                 )}
                 {showExplanation &&
                   idx !== currentQ.correct &&
                   selectedAnswers[currentQuestion] === idx && (
-                    <span className={styles.badge}>✗ Incorrect</span>
+                    <span className={styles.badge}>Incorrect</span>
                   )}
               </label>
             ))}
@@ -515,7 +515,7 @@ export default function QuizPage() {
 
           {showExplanation && (
             <div className={styles.explanation}>
-              <h4>💡 Explanation</h4>
+              <h4>Explanation</h4>
               <p>{currentQ.explanation}</p>
             </div>
           )}
@@ -534,17 +534,17 @@ export default function QuizPage() {
                 className={styles.nextBtn}
               >
                 {submitting
-                  ? '⏳ Submitting...'
+                  ? 'Submitting...'
                   : currentQuestion === quizData.questions.length - 1
-                    ? '✓ Submit & Get Recommendation'
-                    : 'Next Question →'}
+                    ? 'Submit and Get Recommendation'
+                    : 'Next Question'}
               </button>
             )}
           </div>
         </div>
 
         <div className={styles.warning}>
-          ⚠️ Switching tabs will auto-submit your quiz
+          Switching tabs will auto-submit your quiz
         </div>
       </main>
     </div>

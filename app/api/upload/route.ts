@@ -210,7 +210,7 @@ export async function POST(request: NextRequest) {
                 }
 
                 savedToDatabase = true;
-                console.log(`✅ Transcript saved to Supabase for user: ${user.email}`);
+                console.log(`Transcript saved to Supabase for user: ${user.email}`);
             }
         } else {
             verification = {

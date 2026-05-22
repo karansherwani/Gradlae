@@ -4,6 +4,29 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  --font-display: "Instrument Serif", Georgia, serif;
+  --font-ui: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --pm-black: #050505;
+  --pm-gray: #737373;
+  --pm-gray-soft: #e7e7e5;
+  --pm-white: #ffffff;
+  --pm-bg: #f5f3f0;
+  --pm-bg-warm: #faf9f7;
+  --pm-sage-light: #dde6f5;
+  --pm-sage-soft: #edf1f8;
+  --pm-sage: #8c9bb8;
+  --pm-olive: #0c234b;
+  --pm-blue: #0c234b;
+  --pm-blue-dark: #061832;
+  --pm-blue-soft: #e9eef6;
+  --pm-red: #ab0520;
+  --pm-red-dark: #8b0015;
+  --pm-red-soft: #f5e8ec;
+  --pm-line: #e0e3ea;
+  --pm-shadow-sm: 0 8px 24px rgba(12, 35, 75, 0.06);
+  --pm-shadow-card: 0 18px 54px rgba(12, 35, 75, 0.11);
+  --pm-shadow-lift: 0 28px 80px rgba(12, 35, 75, 0.16);
+
   /* Darker default text */
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -41,57 +64,57 @@
 
 :root {
   /* UofA Brand Colors */
-  --color-primary: #0C234B;
+  --color-primary: var(--pm-blue);
   /* Arizona Blue */
   --color-primary-rgb: 12, 35, 75;
-  --color-primary-hover: #1E3A6C;
+  --color-primary-hover: var(--pm-blue-dark);
 
-  --color-secondary: #AB0520;
+  --color-secondary: var(--pm-red);
   /* Arizona Red */
   --color-secondary-rgb: 171, 5, 32;
-  --color-secondary-hover: #8B0015;
+  --color-secondary-hover: var(--pm-red-dark);
 
   /* UI Colors */
-  --color-background: #FCFCF9;
-  --color-surface: #FFFFFF;
+  --color-background: var(--pm-bg-warm);
+  --color-surface: var(--pm-white);
 
   /* Text Colors - Darker and Higher Contrast */
-  --color-text: #000000;
+  --color-text: var(--pm-black);
   /* Pure Black */
-  --color-text-secondary: #1F1F1F;
+  --color-text-secondary: var(--pm-gray);
   /* Neutral Dark Gray */
-  --color-text-tertiary: #333333;
+  --color-text-tertiary: var(--pm-gray);
   /* Dark Gray */
-  --color-text-inverse: #FFFFFF;
+  --color-text-inverse: var(--pm-white);
 
   /* Border Colors */
-  --color-border: #E5E7EB;
+  --color-border: var(--pm-line);
   /* Gray 200 */
-  --color-border-hover: #D1D5DB;
+  --color-border-hover: var(--pm-line);
   /* Gray 300 */
 
   /* Functional Colors */
-  --color-success: #059669;
-  /* Emerald 600 */
-  --color-success-bg: #ECFDF5;
-  /* Emerald 50 */
-  --color-error: #DC2626;
-  /* Red 600 */
-  --color-error-bg: #FEF2F2;
+  --color-success: var(--pm-blue);
+  /* Arizona Blue */
+  --color-success-bg: var(--pm-blue-soft);
+  /* Blue 50 */
+  --color-error: var(--pm-red);
+  /* UA Red */
+  --color-error-bg: var(--pm-red-soft);
   /* Red 50 */
-  --color-warning: #D97706;
+  --color-warning: #c27803;
   /* Amber 600 */
-  --color-warning-bg: #FFFBEB;
+  --color-warning-bg: #fef3e0;
   /* Amber 50 */
-  --color-info: #2563EB;
+  --color-info: var(--pm-blue);
   /* Blue 600 */
-  --color-info-bg: #EFF6FF;
+  --color-info-bg: var(--pm-blue-soft);
   /* Blue 50 */
 
   /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: var(--pm-shadow-sm);
+  --shadow-md: var(--pm-shadow-card);
+  --shadow-lg: var(--pm-shadow-lift);
 
   /* Border Radius */
   --radius-sm: 0.375rem;
@@ -105,7 +128,19 @@ h2,
 h3,
 h4,
 h5,
-h6,
+h6 {
+  color: inherit;
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+h4,
+h5,
+h6 {
+  letter-spacing: -0.01em;
+}
+
 p,
 span,
 li,
@@ -194,5 +229,56 @@ a {
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-ui);
+    background: var(--pm-bg);
+    color: var(--pm-black);
   }
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: var(--font-ui);
+  letter-spacing: 0;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  border-radius: 9999px;
+}
+
+input,
+select {
+  border-radius: 9999px;
+}
+
+textarea {
+  border-radius: 1rem;
+}
+
+:where([class*="Card"], [class*="card"], [class*="Panel"], [class*="panel"], [class*="Modal"], [class*="modal"]) {
+  border-color: var(--pm-line);
+}
+
+:where([class*="Card"], [class*="card"], [class*="Panel"], [class*="panel"]) {
+  box-shadow: var(--pm-shadow-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+:where([class*="Card"], [class*="card"], [class*="Panel"], [class*="panel"]):hover {
+  transform: translateY(-8px);
+}
+
+:where([class*="Cta"], [class*="CTA"], [class*="Btn"], [class*="btn"], [class*="Button"], [class*="button"]) {
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+:where([class*="Icon"], [class*="icon"], [class*="Badge"], [class*="badge"]) {
+  flex-shrink: 0;
 }

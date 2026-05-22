@@ -179,7 +179,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: var(--pm-white);
     margin: 0 auto 16px;
 }
 
@@ -210,7 +210,7 @@
 }
 
 .optionFeatures span::before {
-    content: "✓ ";
+    content: "";
 }
 
 .optionAction {
@@ -251,7 +251,7 @@
 .browseBtn {
     display: inline-block;
     background: var(--color-primary);
-    color: white;
+    color: var(--pm-white);
     padding: 10px 24px;
     border-radius: var(--radius-sm);
     font-weight: 600;
@@ -283,7 +283,7 @@
 
 .retryBtn {
     background: var(--color-primary);
-    color: white;
+    color: var(--pm-white);
     border: none;
     padding: 10px 24px;
     border-radius: var(--radius-sm);
@@ -347,7 +347,7 @@
 
 .connectBtn {
     background: var(--color-primary);
-    color: white;
+    color: var(--pm-white);
     border: none;
     padding: 12px 32px;
     border-radius: var(--radius-sm);
@@ -392,8 +392,8 @@
 }
 
 .successBanner {
-    background: var(--color-success-bg);
-    border: 1px solid rgba(5, 150, 105, 0.2);
+    background: var(--pm-bg-warm);
+    border: 1px solid var(--pm-blue);
     border-radius: var(--radius-lg);
     padding: 20px 24px;
     display: flex;
@@ -405,12 +405,12 @@
 .successIcon {
     width: 48px;
     height: 48px;
-    background: rgba(5, 150, 105, 0.15);
+    background: var(--pm-blue-soft);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--color-success);
+    color: var(--pm-blue);
 }
 
 .successBanner h3 {
@@ -424,6 +424,26 @@
     color: var(--text-secondary);
     margin: 0;
     font-size: 0.9rem;
+}
+
+.updateTranscriptBtn {
+    margin-left: auto;
+    padding: 8px 16px;
+    background: var(--pm-blue);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--pm-white);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s;
+}
+
+.updateTranscriptBtn:hover {
+    background: var(--pm-blue-dark);
 }
 
 /* Plan Section */
@@ -450,7 +470,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: var(--pm-white);
 }
 
 .planHeader h3 {
@@ -494,7 +514,7 @@
 
 .searchInput {
     width: 100%;
-    padding: 12px 12px 12px 44px;
+    padding: 12px 16px;
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     font-size: 0.95rem;
@@ -720,7 +740,7 @@
 
 .quizBtn {
     background: var(--color-primary);
-    color: white;
+    color: var(--pm-white);
     border: none;
     padding: 10px 16px;
     border-radius: var(--radius-sm);
@@ -779,7 +799,7 @@
 }
 
 .semesterCard {
-    background: white;
+    background: var(--pm-bg);
     border: 1px solid var(--border-color);
     border-radius: 10px;
     margin-bottom: 16px;
@@ -804,7 +824,7 @@
 
 .currentBadge {
     background: rgba(59, 130, 246, 0.1);
-    color: #3B82F6;
+    color: var(--pm-blue);
     padding: 4px 10px;
     border-radius: 12px;
     font-size: 0.7rem;
@@ -813,7 +833,7 @@
 
 .plannedBadge {
     background: rgba(5, 150, 105, 0.1);
-    color: #059669;
+    color: var(--pm-olive);
     padding: 4px 10px;
     border-radius: 12px;
     font-size: 0.7rem;
@@ -936,15 +956,20 @@
     border-radius: 50%;
     font-size: 0.75rem;
     font-weight: 600;
-    background: rgba(5, 150, 105, 0.15);
-    color: #059669;
-    border: 2px solid #059669;
+    background: var(--pm-bg);
+    color: var(--pm-blue);
+    border: 2px solid #ffffff;
 }
 
 .gradeE {
     background: rgba(239, 68, 68, 0.15);
-    color: #EF4444;
-    border-color: #EF4444;
+    color: var(--pm-red);
+    border-color: var(--pm-red);
+}
+
+.gradeW {
+    background: var(--pm-bg);
+    color: var(--pm-gray);
 }
 
 /* In Progress Badge */
@@ -956,8 +981,8 @@
     font-size: 0.7rem;
     font-weight: 600;
     background: transparent;
-    color: #3B82F6;
-    border: 1px solid #3B82F6;
+    color: var(--pm-blue);
+    border: 1px solid var(--pm-blue);
 }
 
 /* Semester Header h3 override */
@@ -991,7 +1016,7 @@
     display: block;
     width: 100%;
     background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
-    color: white;
+    color: var(--pm-white);
     border: none;
     padding: 16px 32px;
     border-radius: var(--radius-md);

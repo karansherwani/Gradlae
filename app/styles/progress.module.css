@@ -14,7 +14,7 @@
 .container {
     width: 100%;
     min-height: 100vh;
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    background: var(--pm-bg);
 }
 
 /* Header - Matching Landing Page */
@@ -40,7 +40,7 @@
 .logoMark {
     width: 32px;
     height: 32px;
-    background: linear-gradient(135deg, #0C234B 0%, #1E3A6C 100%);
+    background: var(--pm-blue);
     border-radius: 6px;
     display: flex;
     align-items: center;
@@ -74,7 +74,7 @@
 }
 
 .headerCta {
-    background: linear-gradient(135deg, #0C234B 0%, #1E3A6C 100%);
+    background: var(--pm-blue);
     color: white;
     border: none;
     padding: 10px 24px;
@@ -93,8 +93,8 @@
 
 /* Hero Section */
 .hero {
-    background: linear-gradient(135deg, #0C234B 0%, #1E3A6C 50%, #0C234B 100%);
-    color: white;
+    background: var(--pm-blue) !important;
+    color: white !important;
     padding: 60px 48px 70px;
     text-align: center;
     position: relative;
@@ -108,8 +108,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: radial-gradient(circle at 30% 40%, rgba(171, 5, 32, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+    background: none;
     pointer-events: none;
 }
 
@@ -173,11 +172,12 @@
     width: 48px;
     height: 48px;
     border-radius: 12px;
-    background: linear-gradient(135deg, #0C234B 0%, #1E3A6C 100%);
+    background: var(--pm-blue) !important;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.25rem;
+    color: white !important;
 }
 
 .statInfo {
@@ -199,8 +199,8 @@
 }
 
 .welcomeCard {
-    background: linear-gradient(135deg, #0C234B 0%, #1E3A6C 100%);
-    color: white;
+    background: var(--pm-blue) !important;
+    color: white !important;
     padding: 30px;
     border-radius: 20px;
     margin-bottom: 30px;
@@ -217,7 +217,7 @@
     right: -50%;
     width: 100%;
     height: 200%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    background: none;
     pointer-events: none;
 }
 
@@ -257,12 +257,13 @@
     width: 48px;
     height: 48px;
     border-radius: 12px;
-    background: linear-gradient(135deg, #AB0520 0%, #d62839 100%);
+    background: var(--pm-red) !important;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.5rem;
     flex-shrink: 0;
+    color: white !important;
 }
 
 .sectionHeader h2 {
@@ -511,7 +512,7 @@
 }
 
 .gpaResultPrimary {
-    background: linear-gradient(135deg, #0C234B 0%, #1E3A6C 100%);
+    background: var(--pm-blue);
     border: none;
     box-shadow: 0 4px 20px rgba(12, 35, 75, 0.25);
 }
@@ -780,7 +781,7 @@
 
 .selectedCourse {
     border-color: #AB0520;
-    background: linear-gradient(135deg, rgba(171, 5, 32, 0.08) 0%, rgba(12, 35, 75, 0.08) 100%);
+    background: rgba(171, 5, 32, 0.08);
     transform: translateY(-3px);
     box-shadow: 0 6px 20px rgba(171, 5, 32, 0.15);
 }
@@ -808,7 +809,7 @@
 
 .addCourseBtn {
     padding: 14px 28px;
-    background: linear-gradient(135deg, #0C234B 0%, #1E3A6C 100%);
+    background: var(--pm-blue);
     color: white;
     border: none;
     border-radius: 10px;
@@ -847,7 +848,7 @@
 
 .saveBtn {
     padding: 14px 24px;
-    background: linear-gradient(135deg, #AB0520 0%, #d62839 100%);
+    background: var(--pm-red);
     color: white;
     border: none;
     border-radius: 10px;
@@ -1027,7 +1028,7 @@
 .currentGrade {
     text-align: center;
     padding: 32px;
-    background: linear-gradient(135deg, rgba(12, 35, 75, 0.05) 0%, rgba(171, 5, 32, 0.05) 100%);
+    background: var(--pm-bg-warm);
     border-radius: 16px;
     margin-bottom: 24px;
 }
@@ -1040,7 +1041,7 @@
     width: 150px;
     height: 150px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #0C234B 0%, #AB0520 100%);
+    background: var(--pm-blue);
     margin: 0 auto 16px;
     color: white;
     box-shadow: 0 8px 30px rgba(12, 35, 75, 0.3);

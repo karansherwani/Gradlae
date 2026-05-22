@@ -138,7 +138,7 @@ export default function StaffProfile({ staffId, staffName }: { staffId: string; 
 
       {saveStatus === 'saved' && (
         <div className={styles.successAlert}>
-          ✓ Profile updated successfully!
+          Profile updated successfully.
         </div>
       )}
 
@@ -281,8 +281,7 @@ export default function StaffProfile({ staffId, staffName }: { staffId: string; 
             <div className={styles.previewInfo}>
               <h4 className={styles.previewName}>{profile.name}</h4>
               <div className={styles.previewRating}>
-                <span className={styles.starIcon}>★</span>
-                <span>5.0</span>
+                <span>Rating 5.0</span>
                 <span className={styles.reviews}>(0 reviews)</span>
               </div>
             </div>

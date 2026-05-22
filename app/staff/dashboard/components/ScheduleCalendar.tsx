@@ -31,7 +31,7 @@ export default function ScheduleCalendar({ staffId, staffName }: { staffId: stri
       const response = await fetch(`/api/staff/timeslots?staffId=${staffId}`);
       if (response.ok) {
         const data = await response.json();
-        console.log('📅 Loaded time slots:', data.slots);
+        console.log('Loaded time slots:', data.slots);
         setTimeSlots(data.slots || []);
       }
     } catch (error) {
@@ -66,7 +66,7 @@ export default function ScheduleCalendar({ staffId, staffName }: { staffId: stri
       });
 
       if (response.ok) {
-        console.log('✅ Slot created successfully');
+        console.log('Slot created successfully');
         setShowCreateModal(false);
         await loadTimeSlots(); // Reload to show new slot
         setSelectedDate('');

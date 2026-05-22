@@ -22,7 +22,7 @@ const universities = [
 export default function AuthPage() {
   const router = useRouter();
 
-  // Flow step: 'university' → 'role' → 'credentials'
+  // Flow step: university to role to credentials
   const [flowStep, setFlowStep] = useState<'university' | 'role' | 'credentials'>('university');
   const [selectedUniversity, setSelectedUniversity] = useState<string>('');
   const [uniSearch, setUniSearch] = useState('');
@@ -166,7 +166,7 @@ export default function AuthPage() {
           });
         }
 
-        console.log('✓ Login successful via Supabase Auth');
+        console.log('Login successful via Supabase Auth');
 
         // Navigate to the appropriate dashboard
         setTimeout(() => {
@@ -239,10 +239,10 @@ export default function AuthPage() {
       <div className={styles.container}>
         <header className={styles.header}>
           <button className={styles.backBtn} onClick={() => router.push('/')}>
-            ← Back
+            Back
           </button>
           <div>
-            <div className={styles.logo}>🎓 PaceMatch</div>
+            <div className={styles.logo}>PaceMatch</div>
           </div>
         </header>
 
@@ -254,7 +254,7 @@ export default function AuthPage() {
             <div className={styles.formGroup}>
               <input
                 type="text"
-                placeholder="🔍 Search universities..."
+                placeholder="Search universities..."
                 value={uniSearch}
                 onChange={(e) => setUniSearch(e.target.value)}
                 autoFocus
@@ -268,12 +268,19 @@ export default function AuthPage() {
                   className={styles.methodCard}
                   onClick={() => handleUniversitySelect(u.id)}
                 >
-                  <div className={styles.methodIcon}>🏛️</div>
+                  <div className={styles.methodIcon} aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M3 21h18" />
+                      <path d="M5 21V8l7-5 7 5v13" />
+                      <path d="M9 21v-6h6v6" />
+                      <path d="M9 10h.01M12 10h.01M15 10h.01" />
+                    </svg>
+                  </div>
                   <div>
                     <h3>{u.name}</h3>
                     <p>{u.domain}</p>
                   </div>
-                  <span className={styles.arrow}>→</span>
+                  <span className={styles.arrow} aria-hidden="true"></span>
                 </button>
               ))}
               {filteredUniversities.length === 0 && (
@@ -294,10 +301,10 @@ export default function AuthPage() {
       <div className={styles.container} style={cssVars}>
         <header className={styles.header}>
           <button className={styles.backBtn} onClick={handleBack}>
-            ← Back
+            Back
           </button>
           <div>
-            <div className={styles.logo}>🎓 PaceMatch</div>
+            <div className={styles.logo}>PaceMatch</div>
             {uni && <p className={styles.uniName}>{uni.name}</p>}
           </div>
         </header>
@@ -312,24 +319,35 @@ export default function AuthPage() {
                 className={styles.methodCard}
                 onClick={() => handleRoleSelect('student')}
               >
-                <div className={styles.methodIcon}>🎓</div>
+                <div className={styles.methodIcon} aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M22 10 12 5 2 10l10 5 10-5Z" />
+                    <path d="M6 12v4c0 1.5 2.7 3 6 3s6-1.5 6-3v-4" />
+                  </svg>
+                </div>
                 <div>
                   <h3>Student</h3>
                   <p>Undergraduate or graduate student</p>
                 </div>
-                <span className={styles.arrow}>→</span>
+                <span className={styles.arrow} aria-hidden="true"></span>
               </button>
 
               <button
                 className={styles.methodCard}
                 onClick={() => handleRoleSelect('staff')}
               >
-                <div className={styles.methodIcon}>👨‍🏫</div>
+                <div className={styles.methodIcon} aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M4 20V7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v13" />
+                    <path d="M8 20v-6h8v6" />
+                    <path d="M8 9h8" />
+                  </svg>
+                </div>
                 <div>
                   <h3>Staff / Faculty</h3>
                   <p>Instructor, professor, or administrator</p>
                 </div>
-                <span className={styles.arrow}>→</span>
+                <span className={styles.arrow} aria-hidden="true"></span>
               </button>
             </div>
           </div>
@@ -345,10 +363,10 @@ export default function AuthPage() {
     <div className={styles.container} style={cssVars}>
       <header className={styles.header}>
         <button className={styles.backBtn} onClick={handleBack}>
-          ← Back
+          Back
         </button>
         <div>
-          <div className={styles.logo}>🎓 PaceMatch</div>
+          <div className={styles.logo}>PaceMatch</div>
           {uni && <p className={styles.uniName}>{uni.name}</p>}
         </div>
       </header>
@@ -371,7 +389,7 @@ export default function AuthPage() {
           </p>
 
           <div className={styles.securityNote}>
-            <strong>🔒 Secure Login</strong> — Sign in with your university NetID
+            <strong>Secure Login</strong> - Sign in with your university NetID
           </div>
 
           {mode === 'reset' ? (
@@ -482,7 +500,7 @@ export default function AuthPage() {
                     onClick={() => setShowPassword(!showPassword)}
                     tabIndex={-1}
                   >
-                    {showPassword ? '🙈' : '👁️'}
+                    {showPassword ? 'Hide' : 'Show'}
                   </button>
                 </div>
                 {mode === 'signup' && (
@@ -491,7 +509,7 @@ export default function AuthPage() {
                     className={styles.generateBtn}
                     onClick={generatePassword}
                   >
-                    🎲 Generate Strong Password
+                    Generate Strong Password
                   </button>
                 )}
               </div>
@@ -516,7 +534,7 @@ export default function AuthPage() {
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       tabIndex={-1}
                     >
-                      {showConfirmPassword ? '🙈' : '👁️'}
+                      {showConfirmPassword ? 'Hide' : 'Show'}
                     </button>
                   </div>
                 </div>

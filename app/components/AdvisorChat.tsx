@@ -286,7 +286,7 @@ export default function AdvisorChat({
                     fontSize: '0.85rem',
                     marginBottom: '12px',
                 }}>
-                    ⚠️ {error}
+                    Notice: {error}
                 </div>
             )}
 
@@ -344,7 +344,7 @@ export default function AdvisorChat({
                         onClick={() => setUploadedFileName(null)}
                         title="Remove file"
                     >
-                        ✕
+                        Remove
                     </button>
                 </div>
             )}
@@ -400,7 +400,7 @@ export default function AdvisorChat({
                     </button>
                 </div>
                 <p className={styles.footerHint}>
-                    Press Enter to send • 📎 Upload any PDF (transcript, planner, syllabus) • Powered by Gemini
+                    Press Enter to send. Upload any PDF transcript, planner, or syllabus. Powered by Gemini.
                 </p>
             </div>
         </>

@@ -316,8 +316,7 @@ export default function MentoringPage() {
                                         <div className={styles.mentorInfo}>
                                             <h3 className={styles.mentorName}>{mentor.name}</h3>
                                             <div className={styles.rating}>
-                                                <span className={styles.starIcon}>★</span>
-                                                <span>{mentor.rating}</span>
+                                                <span>Rating {mentor.rating}</span>
                                                 <span className={styles.reviews}>({mentor.reviewCount})</span>
                                             </div>
                                         </div>
@@ -367,8 +366,7 @@ export default function MentoringPage() {
                                 <div className={styles.mentorInfo}>
                                     <h3 className={styles.mentorName} style={{ fontSize: '1.75rem' }}>{selectedMentor.name}</h3>
                                     <div className={styles.rating} style={{ fontSize: '1.1rem', marginBottom: '12px' }}>
-                                        <span className={styles.starIcon}>★</span>
-                                        <span>{selectedMentor.rating}</span>
+                                        <span>Rating {selectedMentor.rating}</span>
                                         <span className={styles.reviews}>({selectedMentor.reviewCount} reviews)</span>
                                     </div>
                                     <p className={styles.bio} style={{ fontSize: '1rem', color: '#111827' }}>{selectedMentor.major}</p>
@@ -477,7 +475,6 @@ export default function MentoringPage() {
 
                             <div className={styles.reviewsSection}>
                                 <h2 className={styles.sectionTitle} style={{ fontSize: '1.25rem' }}>
-                                    <span style={{ color: '#FBBF24' }}>★</span>
                                     Student Reviews
                                 </h2>
                                 {selectedMentor.reviews.map(review => (
@@ -485,9 +482,7 @@ export default function MentoringPage() {
                                         <div className={styles.reviewHeader}>
                                             <span className={styles.reviewerName}>{review.user}</span>
                                             <div className={styles.reviewStars}>
-                                                {[...Array(5)].map((_, i) => (
-                                                    <span key={i}>{i < Math.floor(review.rating) ? '★' : '☆'}</span>
-                                                ))}
+                                                <span>{review.rating}/5</span>
                                             </div>
                                         </div>
                                         <p className={styles.reviewText}>{review.text}</p>
@@ -503,7 +498,7 @@ export default function MentoringPage() {
             {showSuccessModal && bookedSlot && selectedMentor && (
                 <div className={styles.modalOverlay}>
                     <div className={styles.modalContent}>
-                        <div className={styles.successIcon} style={{ background: 'rgba(12, 35, 75, 0.1)', color: 'var(--uofa-blue)' }}>✓</div>
+                        <div className={styles.successIcon} style={{ background: 'rgba(12, 35, 75, 0.1)', color: 'var(--uofa-blue)' }}>OK</div>
                         <h2>Session Booked!</h2>
                         <p style={{ color: '#111827' }}>
                             You have successfully booked an <strong>{meetingType}</strong> session with <strong>{selectedMentor.name}</strong> on

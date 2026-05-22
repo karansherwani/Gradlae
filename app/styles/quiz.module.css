@@ -2,20 +2,20 @@
 
 /* UofA Colors - Explicit definitions for consistency */
 :root {
-  --uofa-blue: #0C234B;
-  --uofa-blue-light: #1E3A6C;
-  --uofa-red: #AB0520;
-  --bg-light: #FCFCF9;
-  --text-primary: #000000;
-  --text-secondary: #374151;
-  --text-muted: #6B7280;
-  --border-color: #E5E7EB;
-  --success: #059669;
-  --success-bg: #ECFDF5;
-  --error: #DC2626;
-  --error-bg: #FEF2F2;
-  --warning: #D97706;
-  --warning-bg: #FFFBEB;
+  --uofa-blue: var(--pm-blue);
+  --uofa-blue-light: var(--pm-blue-dark);
+  --uofa-red: var(--pm-red);
+  --bg-light: var(--pm-bg-warm);
+  --text-primary: var(--pm-black);
+  --text-secondary: var(--pm-gray);
+  --text-muted: var(--pm-gray);
+  --border-color: var(--pm-line);
+  --success: var(--pm-olive);
+  --success-bg: var(--pm-sage-light);
+  --error: var(--pm-red);
+  --error-bg: var(--pm-red-soft);
+  --warning: var(--pm-olive);
+  --warning-bg: var(--pm-sage-light);
 }
 
 /* Container */
@@ -31,7 +31,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 48px;
-  background: #ffffff;
+  background: var(--pm-bg);
   border-bottom: 1px solid var(--border-color);
   position: sticky;
   top: 0;
@@ -54,7 +54,7 @@
   justify-content: center;
   font-weight: 700;
   font-size: 0.75rem;
-  color: white;
+  color: var(--pm-white);
 }
 
 .logoText {
@@ -82,7 +82,7 @@
 
 .headerCta {
   background: var(--uofa-blue);
-  color: white;
+  color: var(--pm-white);
   border: none;
   padding: 10px 24px;
   border-radius: 6px;
@@ -99,7 +99,7 @@
 /* Hero Section */
 .hero {
   background: linear-gradient(135deg, var(--uofa-blue) 0%, var(--uofa-blue-light) 100%);
-  color: white;
+  color: var(--pm-white);
   padding: 60px 48px 80px;
   text-align: center;
 }
@@ -114,7 +114,7 @@
   margin-bottom: 16px;
   font-weight: 700;
   letter-spacing: -0.5px;
-  color: white;
+  color: var(--pm-white);
 }
 
 .heroSubtext {
@@ -122,7 +122,7 @@
   opacity: 0.9;
   line-height: 1.6;
   margin: 0;
-  color: white;
+  color: var(--pm-white);
 }
 
 /* Main Content */
@@ -133,7 +133,7 @@
 }
 
 .quizForm {
-  background: white;
+  background: var(--pm-bg);
   padding: 2.5rem;
   border-radius: 16px;
   border: 1px solid var(--border-color);
@@ -163,7 +163,7 @@
   padding: 0.875rem;
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  background: white;
+  background: var(--pm-bg);
   color: var(--text-primary);
   font-size: 1rem;
   transition: border-color 0.2s;
@@ -180,7 +180,7 @@
   width: 100%;
   padding: 1rem;
   background: var(--uofa-blue);
-  color: white;
+  color: var(--pm-white);
   border: none;
   border-radius: 8px;
   font-size: 1.1rem;
@@ -229,7 +229,7 @@
 
 .progressBar {
   height: 8px;
-  background: #E5E7EB;
+  background: var(--pm-line);
   border-radius: 10px;
   overflow: hidden;
   margin-top: 1rem;
@@ -242,7 +242,7 @@
 }
 
 .questionCard {
-  background: white;
+  background: var(--pm-bg);
   padding: 2.5rem;
   border-radius: 16px;
   border: 1px solid var(--border-color);
@@ -274,7 +274,7 @@
   cursor: pointer;
   transition: all 0.2s;
   position: relative;
-  background: white;
+  background: var(--pm-bg);
 }
 
 .option:hover {
@@ -329,12 +329,12 @@
 
 .option.correct .badge {
   background: var(--success);
-  color: white;
+  color: var(--pm-white);
 }
 
 .option.incorrect .badge {
   background: var(--error);
-  color: white;
+  color: var(--pm-white);
 }
 
 .explanation {
@@ -376,17 +376,17 @@
 }
 
 .explainBtn {
-  background: #F3F4F6;
+  background: var(--pm-bg);
   color: var(--text-primary);
 }
 
 .explainBtn:hover {
-  background: #E5E7EB;
+  background: var(--pm-line);
 }
 
 .nextBtn {
   background: var(--uofa-blue);
-  color: white;
+  color: var(--pm-white);
 }
 
 .nextBtn:hover {
@@ -627,7 +627,7 @@
 .integrityNotice {
   background: linear-gradient(135deg, rgba(251, 191, 36, 0.08) 0%, rgba(245, 158, 11, 0.03) 100%);
   border: 1px solid rgba(251, 191, 36, 0.3);
-  border-left: 4px solid #F59E0B;
+  border-left: 4px solid var(--pm-olive);
   border-radius: 12px;
   padding: 1.25rem;
   margin-bottom: 2rem;
@@ -682,7 +682,7 @@
   content: '•';
   position: absolute;
   left: 0.5rem;
-  color: #F59E0B;
+  color: var(--pm-olive);
   font-weight: bold;
 }
 
@@ -695,7 +695,7 @@
   width: 100%;
   padding: 1.125rem;
   background: var(--uofa-blue);
-  color: white;
+  color: var(--pm-white);
   border: none;
   border-radius: 10px;
   font-size: 1.1rem;
@@ -724,7 +724,7 @@
   width: 18px;
   height: 18px;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
+  border-top-color: var(--pm-white);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }

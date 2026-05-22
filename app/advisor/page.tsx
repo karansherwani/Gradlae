@@ -129,13 +129,13 @@ export default function AdvisorPage() {
                         `Hello ${cleanName}! I'm your AI Academic Advisor, powered by real course data from the University of Arizona.\n\n` +
                         `From your transcript: you're a ${standing} (semester ${semesterCount}) with ${uniqueCompleted.length} completed courses and ${earnedCredits} earned credits.` +
                         (inProgress.length > 0 ? `\nCurrently enrolled in: ${inProgress.map(c => c.course).join(', ')}` : '') +
-                        `\n\nI can help you with:\n• Planning your next semester\n• Understanding prerequisites\n• Course recommendations based on your transcript\n• Creating a personalized graduation timeline\n\nWhat would you like to explore today?`
+                        `\n\nI can help you with:\n- Planning your next semester\n- Understanding prerequisites\n- Course recommendations based on your transcript\n- Creating a personalized graduation timeline\n\nWhat would you like to explore today?`
                     );
                 } else {
                     setHasTranscript(false);
                     setWelcomeMessage(
                         `Hello ${cleanName}! I'm your AI Academic Advisor, powered by real course data from the University of Arizona.\n\n` +
-                        `I don't have your transcript yet. You can upload it right here using the 📎 button below, or on the My Courses page.\n\n` +
+                        `I don't have your transcript yet. You can upload it here using the attachment button below, or on the My Courses page.\n\n` +
                         `With your transcript I can give you personalized advice about remaining requirements, credit counts, and graduation planning.\n\n` +
                         `Feel free to ask general questions about courses and prerequisites in the meantime!`
                     );
@@ -145,7 +145,7 @@ export default function AdvisorPage() {
                 setHasTranscript(false);
                 setWelcomeMessage(
                     `Hello ${cleanName}! I'm your AI Academic Advisor.\n\n` +
-                    `Upload your transcript with the 📎 button below for personalized advice, or ask me general questions about courses and planning!`
+                    `Upload your transcript with the attachment button below for personalized advice, or ask me general questions about courses and planning!`
                 );
             }
 
@@ -153,7 +153,7 @@ export default function AdvisorPage() {
         };
 
         initializeAdvisor();
-    }, [authLoading, user, accessToken]);
+    }, [authLoading, user, accessToken, cleanName, router]);
 
     // Called when AdvisorChat parses a new transcript
     const handleTranscriptParsed = (ctx: string) => {
@@ -172,7 +172,7 @@ export default function AdvisorPage() {
                 <div className={styles.headerLeft}>
                     <div className={styles.logo}>
                         <div className={styles.logoMark}>PM</div>
-                        <span className={styles.logoText}>AI Advisor</span>
+                        <span className={styles.logoText}>PaceMatch</span>
                     </div>
                 </div>
                 <div className={styles.headerRight}>
@@ -187,6 +187,20 @@ export default function AdvisorPage() {
 
             {/* Main Chat Area */}
             <main className={styles.main}>
+                <section className={styles.advisorHero}>
+                    <div>
+                        <p className={styles.heroLabel}>AI Academic Advisor</p>
+                        <h1>Plan your next move with course-aware guidance.</h1>
+                        <p>
+                            Ask about prerequisites, remaining credits, transcript details, or graduation timelines using the same PaceMatch data that powers your dashboard.
+                        </p>
+                    </div>
+                    <div className={styles.heroStats}>
+                        <span>Transcript-aware</span>
+                        <span>UofA course data</span>
+                        <span>PDF uploads</span>
+                    </div>
+                </section>
                 <div className={styles.chatContainer}>
                     {/* Transcript Upload Banner – shown when no transcript */}
                     {hasTranscript === false && (
@@ -202,7 +216,7 @@ export default function AdvisorPage() {
                                 </div>
                                 <div className={styles.transcriptBannerText}>
                                     <strong>Upload Your Transcript</strong>
-                                    <span>Use the 📎 button below or upload on the My Courses page for personalized advice</span>
+                                    <span>Use the attachment button below or upload on the My Courses page for personalized advice</span>
                                 </div>
                                 <button
                                     className={styles.transcriptBannerBtn}

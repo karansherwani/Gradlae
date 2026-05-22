@@ -371,11 +371,11 @@ export default function ProgressPage() {
     };
 
     const getStatusText = (needed: number): string => {
-        if (needed <= 0) return 'Already secured! 🎉';
-        if (needed > 100) return 'Keep pushing! 💪';
-        if (needed <= 60) return 'Very doable! ✓';
-        if (needed <= 80) return 'You can do it! ✨';
-        return 'You got this! 🚀';
+        if (needed <= 0) return 'Already secured';
+        if (needed > 100) return 'Additional support recommended';
+        if (needed <= 60) return 'Very doable';
+        if (needed <= 80) return 'Within reach';
+        return 'Stay focused';
     };
 
     // Get current semester from transcript
@@ -396,7 +396,7 @@ export default function ProgressPage() {
                     <a href="/mentoring">Mentoring</a>
                 </nav>
                 <button className={styles.headerCta} onClick={() => router.push('/dashboard')}>
-                    ← Back
+                    Back
                 </button>
             </header>
 
@@ -414,28 +414,28 @@ export default function ProgressPage() {
                 {/* Stats Cards */}
                 <div className={styles.statsGrid}>
                     <div className={styles.statCard}>
-                        <div className={styles.statIcon}>📊</div>
+                        <div className={styles.statIcon}>GPA</div>
                         <div className={styles.statInfo}>
                             <span className={styles.statValue}>{previousGPA || '—'}</span>
                             <span className={styles.statLabel}>Current GPA</span>
                         </div>
                     </div>
                     <div className={styles.statCard}>
-                        <div className={styles.statIcon}>📚</div>
+                        <div className={styles.statIcon}>CRS</div>
                         <div className={styles.statInfo}>
                             <span className={styles.statValue}>{currentSemesterCourses.length || gpaCalculatorCourses.length}</span>
                             <span className={styles.statLabel}>Current Courses</span>
                         </div>
                     </div>
                     <div className={styles.statCard}>
-                        <div className={styles.statIcon}>🎯</div>
+                        <div className={styles.statIcon}>CR</div>
                         <div className={styles.statInfo}>
                             <span className={styles.statValue}>{totalCurrentCredits}</span>
                             <span className={styles.statLabel}>Credits This Term</span>
                         </div>
                     </div>
                     <div className={styles.statCard}>
-                        <div className={styles.statIcon}>📈</div>
+                        <div className={styles.statIcon}>PRJ</div>
                         <div className={styles.statInfo}>
                             <span className={styles.statValue}>{calculateCumulativeGPA()}</span>
                             <span className={styles.statLabel}>Projected GPA</span>
@@ -444,14 +444,14 @@ export default function ProgressPage() {
                 </div>
 
                 <div className={styles.welcomeCard}>
-                    <h1>Hi {studentName}! 👋</h1>
+                    <h1>Hi {studentName}</h1>
                     <p>Track your grades, calculate what you need on finals, and project your GPA</p>
                 </div>
 
                 {/* GPA Calculator Section */}
                 <section className={styles.gpaCalculatorSection}>
                     <div className={styles.sectionHeader}>
-                        <div className={styles.sectionIcon}>📊</div>
+                        <div className={styles.sectionIcon}>GPA</div>
                         <div>
                             <h2>Cumulative GPA Calculator</h2>
                             <p>Calculate your projected cumulative GPA based on expected grades</p>
@@ -587,13 +587,9 @@ export default function ProgressPage() {
                 </section>
 
                 {/* Course List Section */}
+                {courses.length > 0 && (
                 <section className={styles.inputSection}>
                     <h2>Your Saved Courses</h2>
-                    {courses.length === 0 ? (
-                        <div className={styles.emptyState}>
-                            <p>No courses added yet. Add a course above to get started!</p>
-                        </div>
-                    ) : (
                         <div className={styles.coursesList}>
                             {courses.map((course) => {
                                 const courseComponents = course.components;
@@ -699,8 +695,8 @@ export default function ProgressPage() {
                                 );
                             })}
                         </div>
-                    )}
                 </section>
+                )}
 
                 {/* Grade Calculator for Selected Course */}
                 {selectedCourse && (
@@ -831,13 +827,7 @@ export default function ProgressPage() {
                     </>
                 )}
 
-                {!selectedCourse && courses.length === 0 && (
-                    <section className={styles.inputSection}>
-                        <div className={styles.emptyState}>
-                            <p>No courses added yet. Click &quot;+ Add Course&quot; to get started!</p>
-                        </div>
-                    </section>
-                )}
+
             </main>
         </div>
     );

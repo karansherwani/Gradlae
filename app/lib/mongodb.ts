@@ -33,10 +33,10 @@ export async function connectToDatabase() {
         cached.promise = mongoose.connect(uri, {
             bufferCommands: false,
         }).then((mongoose) => {
-            console.log('✅ Connected to MongoDB');
+            console.log('Connected to MongoDB');
             return mongoose;
         }).catch((error) => {
-            console.error('❌ MongoDB connection error:', error);
+            console.error('MongoDB connection error:', error);
             throw error;
         });
     }

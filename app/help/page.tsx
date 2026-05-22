@@ -81,13 +81,13 @@ export default function HelpCenterPage() {
 
                     <div className={styles.helpOptions}>
                         <div className={styles.helpCard}>
-                            <div style={{ fontSize: '2.5rem', marginBottom: '15px' }}>📞</div>
+                            <div style={{ fontSize: '0.8rem', fontWeight: 800, letterSpacing: '0.12em', marginBottom: '15px', color: 'var(--uofa-blue)' }}>PHONE</div>
                             <h3 style={{ color: 'var(--uofa-blue)' }}>24/7 Phone</h3>
                             <p>Immediate support for urgent issues.</p>
                             <a href="tel:+18005550199" className={styles.actionBtn} style={{ background: 'var(--uofa-blue)', color: 'white', padding: '8px 16px', borderRadius: '20px', display: 'inline-block' }}>Call Now</a>
                         </div>
                         <div className={styles.helpCard}>
-                            <div style={{ fontSize: '2.5rem', marginBottom: '15px' }}>✉️</div>
+                            <div style={{ fontSize: '0.8rem', fontWeight: 800, letterSpacing: '0.12em', marginBottom: '15px', color: 'var(--uofa-blue)' }}>EMAIL</div>
                             <h3 style={{ color: 'var(--uofa-blue)' }}>Email Us</h3>
                             <p>For general inquiries and feedback.</p>
                             <a href="mailto:support@pacematch.com" className={styles.actionBtn} style={{ background: 'var(--uofa-blue)', color: 'white', padding: '8px 16px', borderRadius: '20px', display: 'inline-block' }}>Send Email</a>

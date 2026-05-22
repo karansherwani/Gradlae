@@ -26,7 +26,7 @@ export default function FeedbackPage() {
                 <div className={styles.contentCard}>
                     {submitted ? (
                         <div style={{ textAlign: 'center', padding: '40px 0' }}>
-                            <div style={{ fontSize: '4rem', marginBottom: '20px' }}>✅</div>
+                            <div style={{ fontSize: '0.8rem', fontWeight: 800, letterSpacing: '0.14em', marginBottom: '20px', color: 'var(--uofa-red)' }}>SUBMITTED</div>
                             <h1>Thank You!</h1>
                             <p className={styles.subtitle}>Your feedback has been submitted successfully. We appreciate your input!</p>
                             <button className={styles.submitBtn} onClick={() => router.push('/')}>

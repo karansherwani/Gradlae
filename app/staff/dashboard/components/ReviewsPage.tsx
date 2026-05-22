@@ -64,11 +64,7 @@ export default function ReviewsPage({ staffId }: { staffId: string }) {
   const renderStars = (rating: number, size: 'small' | 'large' = 'small') => {
     return (
       <div className={size === 'large' ? styles.starsLarge : styles.starsSmall}>
-        {[...Array(5)].map((_, i) => (
-          <span key={i} className={i < rating ? styles.starFilled : styles.starEmpty}>
-            ★
-          </span>
-        ))}
+        <span>{rating}/5</span>
       </div>
     );
   };
@@ -99,7 +95,7 @@ export default function ReviewsPage({ staffId }: { staffId: string }) {
             
             return (
               <div key={star} className={styles.ratingBar}>
-                <span className={styles.ratingBarLabel}>{star} ★</span>
+                <span className={styles.ratingBarLabel}>{star} stars</span>
                 <div className={styles.ratingBarTrack}>
                   <div 
                     className={styles.ratingBarFill} 
@@ -128,7 +124,7 @@ export default function ReviewsPage({ staffId }: { staffId: string }) {
               className={`${styles.filterBtn} ${filter === String(star) ? styles.filterBtnActive : ''}`}
               onClick={() => setFilter(String(star) as any)}
             >
-              {star} ★
+              {star} stars
             </button>
           ))}
         </div>
