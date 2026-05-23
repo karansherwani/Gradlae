@@ -31,7 +31,7 @@
   gap: 18px;
   padding: 18px clamp(20px, 5vw, 56px);
   border-bottom: 1px solid var(--auth-line);
-  background: var(--pm-bg);
+  background: var(--pm-bg-warm);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }

@@ -303,8 +303,8 @@ textarea {
 
 /* Page Header Global Background Styling */
 header {
-  background-color: var(--pm-bg) !important;
-  background: var(--pm-bg) !important;
+  background-color: var(--pm-bg-warm) !important;
+  background: var(--pm-bg-warm) !important;
 }
 
 /* Remove all container borders and shadows for Advisor Graduation Timeline & Panels */
