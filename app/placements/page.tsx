@@ -8,6 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import styles from '../styles/placements.module.css';
 import { fetchCourses, setCourses, getCourses, Course, getPrerequisites } from '../lib/courseData';
 import { getRecommendedBatch, PrerequisiteInfo } from '../lib/batchLogic';
+import { extractPdfTextInBrowser } from '../lib/browserPdfText';
+import { parseTranscriptText } from '../lib/transcriptTextParser';
 
 type Step = 'upload' | 'results';
 
@@ -207,40 +209,34 @@ export default function PlacementsPage() {
 
     setUploading(true);
     setUploadError(null);
-    // Call the upload API
-    try {
-      const formData = new FormData();
-      formData.append('file', selectedFile);
 
-      const headers: Record<string, string> = {};
-      if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
-
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        headers,
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Upload failed');
+    const readJsonResponse = async (response: Response) => {
+      const contentType = response.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        return response.json();
       }
 
-      // Check verification status FIRST - reject if not verified
+      const text = await response.text();
+      const shortText = text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 180);
+      throw new Error(
+        response.status === 413
+          ? 'This PDF is too large for the deployed upload endpoint. Try a smaller PDF export.'
+          : shortText || `Upload failed with status ${response.status}`
+      );
+    };
+
+    const applyUploadData = (data: any) => {
       if (data.verification && !data.verification.verified) {
         setTranscriptVerified(false);
         setVerificationMessage(data.verification.message);
         setUploadError(`This transcript does not belong to you. ${data.verification.message} Please upload your own transcript.`);
         setSelectedFile(null);
-        return; // Don't proceed - stay on upload page
+        return false;
       }
 
-      // Verification passed - proceed with parsing
       setTranscriptVerified(true);
       setVerificationMessage(null);
 
-      // Transform API response to grades format
       const courseGrades: CourseGrade[] = data.courses?.map((c: { course: string; description: string; grade: string; credits: number; term: string; isRetake?: boolean; originalGrade?: string; originalTerm?: string; allGrades?: string[]; bestGrade?: string; bestGradeTerm?: string }) => ({
         course: c.course,
         description: c.description || '',
@@ -257,6 +253,55 @@ export default function PlacementsPage() {
 
       setGrades(courseGrades);
       setStep('results');
+      return true;
+    };
+
+    try {
+      if (selectedFile.type === 'application/pdf' || selectedFile.name.toLowerCase().endsWith('.pdf')) {
+        try {
+          const text = await extractPdfTextInBrowser(selectedFile);
+          const transcript = parseTranscriptText(text);
+
+          if (transcript.courses.length > 0) {
+            const saveResponse = await fetch('/api/upload/parsed', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+              },
+              body: JSON.stringify({ transcript }),
+            });
+            const saveData = await readJsonResponse(saveResponse);
+            if (!saveResponse.ok) {
+              throw new Error(saveData.error || 'Failed to save parsed transcript');
+            }
+            applyUploadData(saveData);
+            return;
+          }
+        } catch (browserParseError) {
+          console.warn('Browser transcript parsing failed, falling back to server upload:', browserParseError);
+        }
+      }
+
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+
+      const headers: Record<string, string> = {};
+      if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        headers,
+        body: formData,
+      });
+
+      const data = await readJsonResponse(response);
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Upload failed');
+      }
+
+      applyUploadData(data);
     } catch (error) {
       console.error('Upload error:', error);
       setUploadError((error as Error).message || 'Failed to upload transcript');

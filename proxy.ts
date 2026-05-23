@@ -1,5 +1,5 @@
-// middleware.ts
-// Security middleware — adds security headers, rate limiting, and CSRF protection.
+// proxy.ts
+// Security proxy — adds security headers, rate limiting, and CSRF protection.
 // This is the first line of defense for the entire application.
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -13,7 +13,6 @@ const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 const RATE_LIMITS: Record<string, { maxRequests: number; windowMs: number }> = {
     auth: { maxRequests: 10, windowMs: 15 * 60 * 1000 },    // 10 req / 15 min
     ai: { maxRequests: 30, windowMs: 60 * 1000 },            // 30 req / min
-    upload: { maxRequests: 5, windowMs: 60 * 1000 },          // 5 req / min
     api: { maxRequests: 100, windowMs: 60 * 1000 },           // 100 req / min
 };
 
@@ -29,6 +28,12 @@ function checkRateLimit(ip: string, category: string): boolean {
     const key = `${ip}:${category}`;
     const now = Date.now();
 
+    for (const [entryKey, entry] of rateLimitMap) {
+        if (now > entry.resetTime) {
+            rateLimitMap.delete(entryKey);
+        }
+    }
+
     const entry = rateLimitMap.get(key);
     if (!entry || now > entry.resetTime) {
         rateLimitMap.set(key, { count: 1, resetTime: now + config.windowMs });
@@ -42,16 +47,6 @@ function checkRateLimit(ip: string, category: string): boolean {
     entry.count++;
     return true;
 }
-
-// Clean up stale entries every 5 minutes
-setInterval(() => {
-    const now = Date.now();
-    for (const [key, entry] of rateLimitMap) {
-        if (now > entry.resetTime) {
-            rateLimitMap.delete(key);
-        }
-    }
-}, 5 * 60 * 1000);
 
 // ─── SECURITY HEADERS ──────────────────────────────────────────────────────
 
@@ -91,12 +86,12 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
     return response;
 }
 
-// ─── MIDDLEWARE ─────────────────────────────────────────────────────────────
+// ─── PROXY ─────────────────────────────────────────────────────────────────
 
 export function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
-    // Skip middleware for static files and _next internals
+    // Skip proxy for static files and _next internals
     if (
         pathname.startsWith('/_next') ||
         pathname.startsWith('/favicon') ||
@@ -106,7 +101,7 @@ export function proxy(request: NextRequest) {
     }
 
     // ─── Rate Limiting ───
-    if (pathname.startsWith('/api/')) {
+    if (pathname.startsWith('/api/') && !pathname.startsWith('/api/upload')) {
         const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
             || request.headers.get('x-real-ip')
             || 'unknown';
