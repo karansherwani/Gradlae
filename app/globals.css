@@ -10,7 +10,7 @@
   --pm-gray: #737373;
   --pm-gray-soft: #e7e7e5;
   --pm-white: #ffffff;
-  --pm-bg: #f5f3f0;
+  --pm-bg: #f6f3eb;
   --pm-bg-warm: #faf9f7;
   --pm-sage-light: #dde6f5;
   --pm-sage-soft: #edf1f8;
@@ -303,8 +303,8 @@ textarea {
 
 /* Page Header Global Background Styling */
 header {
-  background-color: rgb(245, 243, 240) !important;
-  background: rgb(245, 243, 240) !important;
+  background-color: var(--pm-bg) !important;
+  background: var(--pm-bg) !important;
 }
 
 /* Remove all container borders and shadows for Advisor Graduation Timeline & Panels */

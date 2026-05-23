@@ -93,7 +93,7 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
 
 // ─── MIDDLEWARE ─────────────────────────────────────────────────────────────
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
     // Skip middleware for static files and _next internals
