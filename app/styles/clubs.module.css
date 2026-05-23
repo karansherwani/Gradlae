@@ -14,7 +14,7 @@
 .container {
     width: 100%;
     min-height: 100vh;
-    background: var(--color-surface);
+    background: var(--pm-bg);
 }
 
 /* Header - Matching Landing Page */

@@ -5,7 +5,7 @@
   --uofa-blue: var(--pm-blue);
   --uofa-blue-soft: var(--pm-blue-soft);
   --auth-bg: var(--pm-bg);
-  --auth-surface: var(--pm-bg);
+  --auth-surface: var(--pm-bg-warm);
   --auth-ink: var(--pm-black);
   --auth-muted: var(--pm-gray);
   --auth-line: var(--pm-line);
@@ -141,7 +141,7 @@
   margin-bottom: 28px;
   padding: 16px 18px;
   border: 1px solid var(--auth-line);
-  border-left: 4px solid var(--uofa-red);
+  border-left: 4px solid var(--uofa-blue);
   border-radius: 1rem;
   background: var(--auth-surface);
   color: var(--auth-muted);
@@ -172,7 +172,7 @@
   padding: 14px 18px;
   border: 1px solid var(--auth-line);
   border-radius: 999px;
-  background: var(--pm-bg);
+  background: var(--auth-surface);
   color: var(--auth-ink);
   font: 500 1rem var(--auth-ui);
   transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
@@ -184,9 +184,9 @@
 
 .formGroup input:focus {
   outline: none;
-  border-color: var(--uofa-red);
-  background: var(--pm-bg);
-  box-shadow: 0 0 0 4px rgba(171, 5, 32, 0.12);
+  border-color: var(--uofa-blue);
+  background: var(--auth-surface);
+  box-shadow: 0 0 0 4px rgba(12, 35, 75, 0.1);
 }
 
 .fieldHint {
