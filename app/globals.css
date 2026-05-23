@@ -261,6 +261,24 @@ textarea {
   border-radius: 1rem;
 }
 
+.brandLogo {
+  display: block;
+  width: 148px !important;
+  max-width: 148px !important;
+  height: auto !important;
+  max-height: 42px !important;
+  object-fit: contain;
+}
+
+.brandLogoSmall {
+  display: block;
+  width: 116px !important;
+  max-width: 116px !important;
+  height: auto !important;
+  max-height: 34px !important;
+  object-fit: contain;
+}
+
 :where([class*="Card"], [class*="card"], [class*="Panel"], [class*="panel"], [class*="Modal"], [class*="modal"]) {
   border-color: var(--pm-line);
 }

@@ -1,5 +1,5 @@
 // app/api/courses/route.ts
-// Reads courses from the full CSV file (~18K courses) and returns filtered results
+// Reads courses from the canonical courses.csv file and returns filtered results
 
 import { NextRequest, NextResponse } from 'next/server';
 import { loadAllCourses, Course } from '@/app/lib/loadCourses';
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
             });
         }
 
-        // No query — return a capped subset (avoid sending 18K rows to the client)
+        // No query: return a capped subset to avoid sending the full catalog to the client.
         return NextResponse.json({
             courses: allCourses.slice(0, MAX_UNFILTERED),
             total: allCourses.length,

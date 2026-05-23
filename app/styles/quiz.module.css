@@ -98,7 +98,7 @@
 
 /* Hero Section */
 .hero {
-  background: linear-gradient(135deg, var(--uofa-blue) 0%, var(--uofa-blue-light) 100%);
+  background: var(--uofa-blue);
   color: var(--pm-white);
   padding: 60px 48px 80px;
   text-align: center;
@@ -237,7 +237,7 @@
 
 .progress {
   height: 100%;
-  background: linear-gradient(90deg, var(--uofa-blue) 0%, var(--uofa-blue-light) 100%);
+  background: var(--uofa-blue);
   transition: width 0.3s ease;
 }
 
@@ -625,7 +625,7 @@
 
 /* Academic Integrity Notice */
 .integrityNotice {
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.08) 0%, rgba(245, 158, 11, 0.03) 100%);
+  background: var(--color-warning-bg);
   border: 1px solid rgba(251, 191, 36, 0.3);
   border-left: 4px solid var(--pm-olive);
   border-radius: 12px;

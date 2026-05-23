@@ -7,26 +7,26 @@
 }
 
 .header {
-    background: linear-gradient(135deg, var(--pm-blue) 0%, var(--pm-blue-dark) 100%);
+    background: var(--pm-bg);
     padding: 0 40px;
     height: 64px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    border-bottom: 1px solid var(--pm-line);
 }
 
 .logo {
     font-size: 1.3rem;
     font-weight: 700;
-    color: var(--pm-white);
+    color: var(--pm-blue);
     cursor: pointer;
 }
 
 .backBtn {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--pm-bg);
+    background: transparent;
+    border: 1px solid var(--pm-blue);
+    color: var(--pm-blue);
     padding: 8px 16px;
     border-radius: 8px;
     cursor: pointer;
@@ -35,7 +35,8 @@
 }
 
 .backBtn:hover {
-    background: rgba(255, 255, 255, 0.12);
+    background: var(--pm-blue);
+    color: var(--pm-white);
 }
 
 .main {

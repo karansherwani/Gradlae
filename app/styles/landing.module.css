@@ -15,10 +15,7 @@
 
 .container {
   min-height: 100vh;
-  background:
-    radial-gradient(circle at 12% 16%, rgba(171, 5, 32, 0.04), transparent 28%),
-    radial-gradient(circle at 86% 18%, rgba(12, 35, 75, 0.055), transparent 26%),
-    linear-gradient(180deg, var(--pm-white) 0%, var(--pm-bg) 100%);
+  background: var(--pm-bg);
   color: var(--color-ink);
   font-family: var(--font-ui);
 }
@@ -32,8 +29,9 @@
   align-items: center;
   gap: 24px;
   padding: 16px clamp(20px, 5vw, 72px);
-  background: rgba(255, 255, 255, 0.86);
+  background: var(--pm-bg);
   border-bottom: 1px solid var(--pm-line);
+  font-family: Georgia, serif;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
@@ -51,6 +49,11 @@
 
 .headerLogo {
   gap: 10px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  padding: 0;
 }
 
 .logoMark {
@@ -78,6 +81,7 @@
 }
 
 .headerNav a,
+.headerNav button,
 .headerGhost,
 .secondaryHeroLink,
 .footerSection a {
@@ -93,6 +97,7 @@
 }
 
 .headerNav a:hover,
+.headerNav button:hover,
 .headerGhost:hover,
 .secondaryHeroLink:hover,
 .footerSection a:hover {
@@ -136,9 +141,7 @@
   padding: 86px clamp(20px, 5vw, 72px) 36px;
   text-align: center;
   overflow: hidden;
-  background:
-    radial-gradient(circle at 50% 44%, rgba(12, 35, 75, 0.055), transparent 32%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, var(--pm-bg) 100%);
+  background: var(--pm-bg);
 }
 
 .heroContent {
@@ -204,13 +207,16 @@
 .secondaryHeroLink {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   min-height: 48px;
   padding: 0 22px;
-  border: 1px solid var(--pm-sage);
+  border: 0;
   border-radius: 9999px;
-  background: var(--pm-sage-light);
-  color: var(--pm-black);
-  font-weight: 800;
+  background: var(--uofa-blue);
+  color: var(--pm-white);
+  font-size: 0.95rem;
+  font-weight: 700;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
 }
 
 .heroProof {
@@ -374,7 +380,7 @@
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--uofa-red), var(--pm-red));
+  background: var(--uofa-red);
   animation: growBar 1.2s ease both;
 }
 
@@ -604,7 +610,7 @@
   left: 12%;
   right: 12%;
   height: 2px;
-  background: linear-gradient(90deg, var(--uofa-red), var(--uofa-blue));
+  background: var(--uofa-red);
 }
 
 .stepItem {
@@ -687,9 +693,7 @@
 .finalCTA {
   padding: 92px clamp(20px, 5vw, 72px);
   text-align: center;
-  background:
-    radial-gradient(circle at 50% 100%, rgba(12, 35, 75, 0.06), transparent 34%),
-    linear-gradient(180deg, var(--pm-white) 0%, var(--pm-blue-soft) 100%);
+  background: var(--pm-bg);
 }
 
 .finalCTA p {

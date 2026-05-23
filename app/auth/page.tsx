@@ -42,6 +42,11 @@ export default function AuthPage() {
   const [resetStep, setResetStep] = useState<'request' | 'verify'>('request');
   const [resetMessage, setResetMessage] = useState('');
 
+  const handleLogoClick = async () => {
+    const { data } = await supabase.auth.getSession();
+    router.push(data.session ? '/dashboard' : '/');
+  };
+
   // Password generator function
   const generatePassword = () => {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%';
@@ -242,7 +247,7 @@ export default function AuthPage() {
             Back
           </button>
           <div>
-            <div className={styles.logo}>PaceMatch</div>
+            <img src="/gradlae-logo.png" alt="Gradlae" className={styles.authLogo} onClick={handleLogoClick} />
           </div>
         </header>
 
@@ -304,7 +309,7 @@ export default function AuthPage() {
             Back
           </button>
           <div>
-            <div className={styles.logo}>PaceMatch</div>
+            <img src="/gradlae-logo.png" alt="Gradlae" className={styles.authLogo} onClick={handleLogoClick} />
             {uni && <p className={styles.uniName}>{uni.name}</p>}
           </div>
         </header>
@@ -366,7 +371,7 @@ export default function AuthPage() {
           Back
         </button>
         <div>
-          <div className={styles.logo}>PaceMatch</div>
+          <img src="/gradlae-logo.png" alt="Gradlae" className={styles.authLogo} onClick={handleLogoClick} />
           {uni && <p className={styles.uniName}>{uni.name}</p>}
         </div>
       </header>

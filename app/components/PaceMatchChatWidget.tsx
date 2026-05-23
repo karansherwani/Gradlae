@@ -22,7 +22,7 @@ export default function PaceMatchChatWidget() {
   return (
     <div className={styles.widget}>
       {open && (
-        <section className={styles.panel} aria-label="PaceMatch chat options">
+        <section className={styles.panel} aria-label="Gradlae chat options">
           <div className={styles.badge}>
             <CompassIcon />
           </div>
@@ -43,7 +43,7 @@ export default function PaceMatchChatWidget() {
 
           <div className={styles.notice}>
             <p>
-              By using this chat service, you agree to chat monitoring and data processing in accordance with the PaceMatch privacy policy.
+              By using this chat service, you agree to chat monitoring and data processing in accordance with the Gradlae privacy policy.
             </p>
             <strong>Spam protection enabled</strong>
           </div>
@@ -53,7 +53,7 @@ export default function PaceMatchChatWidget() {
       <button
         className={styles.launcher}
         onClick={() => setOpen((value) => !value)}
-        aria-label={open ? 'Close PaceMatch chat' : 'Open PaceMatch chat'}
+        aria-label={open ? 'Close Gradlae chat' : 'Open Gradlae chat'}
       >
         <ChatIcon />
       </button>

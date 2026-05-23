@@ -3,7 +3,7 @@ import "./globals.css";
 import Provider from "./components/Provider";
 
 export const metadata: Metadata = {
-  title: "PaceMatch – University of Arizona",
+  title: "Gradlae – University of Arizona",
   description: "Your personalized academic success platform at the University of Arizona",
 };
 

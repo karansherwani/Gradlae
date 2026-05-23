@@ -2,7 +2,7 @@
 
 .container {
     min-height: 100vh;
-    background: linear-gradient(135deg, var(--pm-bg) 0%, var(--pm-blue-soft) 100%);
+    background: var(--pm-bg);
 }
 
 /* Header - consistent with other pages */
@@ -11,8 +11,8 @@
     justify-content: space-between;
     align-items: center;
     padding: 16px 48px;
-    background: var(--pm-blue);
-    border-bottom: 3px solid var(--pm-red);
+    background: var(--pm-bg);
+    border-bottom: 1px solid var(--pm-line);
 }
 
 .headerLogo {
@@ -24,7 +24,7 @@
 .logoMark {
     width: 40px;
     height: 40px;
-    background: linear-gradient(135deg, var(--pm-red), var(--pm-red));
+    background: var(--pm-red);
     border-radius: 10px;
     display: flex;
     align-items: center;
@@ -37,7 +37,7 @@
 .logoText {
     font-size: 1.25rem;
     font-weight: 700;
-    color: var(--pm-white);
+    color: var(--pm-blue);
 }
 
 .headerNav {
@@ -46,7 +46,7 @@
 }
 
 .headerNav a {
-    color: rgba(255, 255, 255, 0.85);
+    color: var(--pm-gray);
     text-decoration: none;
     font-weight: 500;
     font-size: 0.95rem;
@@ -54,14 +54,14 @@
 }
 
 .headerNav a:hover {
-    color: var(--pm-white);
+    color: var(--pm-blue);
 }
 
 .headerCta {
     padding: 10px 24px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: var(--pm-white);
+    background: transparent;
+    border: 1px solid var(--pm-blue);
+    color: var(--pm-blue);
     border-radius: 8px;
     font-weight: 600;
     text-decoration: none;
@@ -69,12 +69,13 @@
 }
 
 .headerCta:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--pm-blue);
+    color: var(--pm-white);
 }
 
 /* Hero Section */
 .hero {
-    background: linear-gradient(135deg, var(--pm-blue) 0%, var(--pm-blue-dark) 100%);
+    background: var(--pm-blue);
     padding: 60px 48px;
     text-align: center;
 }
@@ -116,7 +117,7 @@
 .avatar {
     width: 100px;
     height: 100px;
-    background: linear-gradient(135deg, var(--pm-blue), var(--pm-blue-dark));
+    background: var(--pm-blue);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -212,7 +213,7 @@
 
 .saveBtn {
     padding: 16px 32px;
-    background: linear-gradient(135deg, var(--pm-blue), var(--pm-blue-dark));
+    background: var(--pm-blue);
     color: var(--pm-white);
     border: none;
     border-radius: 10px;

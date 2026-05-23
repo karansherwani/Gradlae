@@ -19,6 +19,7 @@ export async function GET(request: NextRequest) {
                 email: user.email,
                 name: user.name,
                 school: user.school,
+                role: user.role,
             },
         });
     } catch (error) {

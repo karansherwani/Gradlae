@@ -3,7 +3,7 @@
 import fs from 'fs';
 import { parse } from 'csv-parse/sync';
 
-const csvContent = fs.readFileSync('courses-report.2026-01-15.csv', 'utf-8');
+const csvContent = fs.readFileSync('courses.csv', 'utf-8');
 const records = parse(csvContent, {
   columns: true,
   skip_empty_lines: true,
@@ -44,4 +44,3 @@ columns.forEach(col => {
     console.log(`    Sample value: "${records[0][col]}"`);
   }
 });
-

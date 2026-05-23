@@ -23,7 +23,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 16px 48px;
-    background: var(--color-surface);
+    background: var(--pm-bg);
     border-bottom: 1px solid var(--border-color);
     position: sticky;
     top: 0;
@@ -92,7 +92,7 @@
 
 /* Hero Section */
 .hero {
-    background: linear-gradient(135deg, var(--uofa-blue) 0%, var(--uofa-blue-light) 100%);
+    background: var(--uofa-blue);
     color: var(--color-text-inverse);
     padding: 60px 48px 70px;
     text-align: center;
@@ -367,7 +367,7 @@
 }
 
 .detailCard {
-    background: linear-gradient(to right, var(--color-background), var(--color-border));
+    background: var(--color-background);
     padding: 32px;
     border-radius: 16px;
     display: flex;

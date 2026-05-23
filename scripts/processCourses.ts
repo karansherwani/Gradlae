@@ -112,7 +112,7 @@ async function processCourses() {
   console.log(`✅ Loaded ${Object.keys(manualPrereqs).length} manual prerequisite mappings\n`);
 
   // Read CSV file
-  const csvContent = fs.readFileSync('courses-report.2026-01-15.csv', 'utf-8');
+  const csvContent = fs.readFileSync('courses.csv', 'utf-8');
   
   // Parse CSV
   const records = parse(csvContent, {
@@ -163,19 +163,7 @@ async function processCourses() {
     return course;
   });
 
-  // Create data directory if it doesn't exist
-  if (!fs.existsSync('data')) {
-    fs.mkdirSync('data');
-  }
-
-  // Write to JSON file
-  fs.writeFileSync(
-    'data/courses.json',
-    JSON.stringify(courses, null, 2)
-  );
-
-  console.log('✅ Courses processed successfully!');
-  console.log(`📁 Output: data/courses.json`);
+  console.log('✅ Courses processed successfully from courses.csv!');
   console.log(`📊 Total courses: ${courses.length}\n`);
 
   // Generate statistics

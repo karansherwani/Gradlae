@@ -17,18 +17,18 @@
 }
 
 .header {
-    background: var(--uofa-blue);
+    background: var(--pm-bg);
     padding: 24px 32px;
-    color: var(--color-text-inverse);
+    color: var(--pm-blue);
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .backBtn {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: var(--color-text-inverse);
+    background: transparent;
+    border: 1px solid var(--pm-blue);
+    color: var(--pm-blue);
     padding: 8px 16px;
     border-radius: 6px;
     cursor: pointer;
@@ -37,7 +37,8 @@
 }
 
 .backBtn:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--pm-blue);
+    color: var(--pm-white);
 }
 
 .main {

@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../components/AuthProvider';
 import styles from '../styles/support.module.css';
 
 export default function FeedbackPage() {
     const router = useRouter();
+    const { user } = useAuth();
     const [submitted, setSubmitted] = useState(false);
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -16,7 +18,7 @@ export default function FeedbackPage() {
     return (
         <div className={styles.container}>
             <header className={styles.header}>
-                <div className={styles.logo}>PaceMatch</div>
+                <img src="/gradlae-logo.png" alt="Gradlae" className="brandLogo" onClick={() => router.push(user ? '/dashboard' : '/')} style={{ cursor: 'pointer' }} />
                 <button className={styles.backBtn} onClick={() => router.push('/')}>
                     Back to Home
                 </button>
@@ -36,7 +38,7 @@ export default function FeedbackPage() {
                     ) : (
                         <>
                             <h1>Feedback</h1>
-                            <p className={styles.subtitle}>Help us improve PaceMatch by sharing your thoughts and suggestions.</p>
+                            <p className={styles.subtitle}>Help us improve Gradlae by sharing your thoughts and suggestions.</p>
 
                             <form onSubmit={handleSubmit} className={styles.feedbackForm}>
                                 <div className={styles.formGroup}>

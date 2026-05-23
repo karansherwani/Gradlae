@@ -22,6 +22,13 @@ const QUICK_PROMPTS = [
     { text: 'How many credits do I still need?' },
 ];
 
+function getGreeting() {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
+}
+
 // ─── Credit helpers (same logic as in AdvisorChat) ──────────────────────
 function computeCorrectedCredits(courses: TranscriptCourse[]) {
     const passing = courses.filter(c => c.grade !== 'W' && c.grade !== 'IP');
@@ -87,6 +94,7 @@ export default function AdvisorPage() {
 
     const studentName = dbUser?.name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || '';
     const cleanName = studentName.startsWith('Student ') ? studentName.replace('Student ', '') : studentName;
+    const displayName = cleanName || 'there';
 
     useEffect(() => {
         if (authLoading) return;
@@ -167,32 +175,41 @@ export default function AdvisorPage() {
 
     return (
         <div className={styles.container}>
-            {/* Header */}
             <header className={styles.header}>
-                <div className={styles.headerLeft}>
-                    <div className={styles.logo}>
-                        <div className={styles.logoMark}>PM</div>
-                        <span className={styles.logoText}>PaceMatch</span>
-                    </div>
+                <div className={styles.logo} onClick={() => router.push('/dashboard')} style={{ cursor: 'pointer' }}>
+                    <img src="/gradlae-logo.png" alt="Gradlae" className="brandLogo" />
                 </div>
-                <div className={styles.headerRight}>
-                    <button className={styles.backButton} onClick={() => router.push('/dashboard')}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M19 12H5M12 19l-7-7 7-7" />
-                        </svg>
-                        Dashboard
-                    </button>
+
+                <div className={styles.sidebarSection}>
+                    <p className={styles.sidebarLabel}>Past Conversations</p>
+                    <nav className={styles.sideNav} aria-label="Past conversations">
+                        <button className={`${styles.sideNavItem} ${styles.sideNavItemActive}`}>Today&apos;s academic plan</button>
+                        <button className={styles.sideNavItem}>Credits remaining</button>
+                        <button className={styles.sideNavItem}>Prerequisite check</button>
+                        <button className={styles.sideNavItem}>Graduation timeline</button>
+                    </nav>
+                </div>
+
+                <div className={styles.sidebarFooter}>
+                    <span>{displayName.charAt(0).toUpperCase()}</span>
+                    <strong>{displayName}</strong>
                 </div>
             </header>
 
-            {/* Main Chat Area */}
             <main className={styles.main}>
+                <button className={styles.topBackButton} onClick={() => router.push('/dashboard')}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7" />
+                    </svg>
+                    Dashboard
+                </button>
+
                 <section className={styles.advisorHero}>
                     <div>
                         <p className={styles.heroLabel}>AI Academic Advisor</p>
-                        <h1>Plan your next move with course-aware guidance.</h1>
+                        <h1>{getGreeting()}, {displayName}</h1>
                         <p>
-                            Ask about prerequisites, remaining credits, transcript details, or graduation timelines using the same PaceMatch data that powers your dashboard.
+                            Ask about prerequisites, remaining credits, transcript details, or graduation timelines using the same Gradlae data that powers your dashboard.
                         </p>
                     </div>
                     <div className={styles.heroStats}>
@@ -202,7 +219,6 @@ export default function AdvisorPage() {
                     </div>
                 </section>
                 <div className={styles.chatContainer}>
-                    {/* Transcript Upload Banner – shown when no transcript */}
                     {hasTranscript === false && (
                         <div className={styles.transcriptBanner}>
                             <div className={styles.transcriptBannerContent}>
@@ -228,50 +244,30 @@ export default function AdvisorPage() {
                         </div>
                     )}
 
-                    {/* Quick Prompts - shown initially */}
-                    {welcomeMessage && (
-                        <div style={{ marginBottom: '8px' }}>
-                            <div className={styles.quickPrompts}>
-                                <div className={styles.quickPromptsLabel}>Suggested Questions</div>
-                                <div className={styles.promptsGrid}>
-                                    {QUICK_PROMPTS.map((prompt, index) => (
-                                        <button
-                                            key={index}
-                                            className={styles.promptButton}
-                                            onClick={() => {
-                                                const textarea = document.querySelector(`.${styles.textInput}`) as HTMLTextAreaElement;
-                                                if (textarea) {
-                                                    const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-                                                        window.HTMLTextAreaElement.prototype, 'value'
-                                                    )?.set;
-                                                    nativeInputValueSetter?.call(textarea, prompt.text);
-                                                    textarea.dispatchEvent(new Event('input', { bubbles: true }));
-                                                    textarea.dispatchEvent(new Event('change', { bubbles: true }));
-                                                    textarea.focus();
-                                                    setTimeout(() => {
-                                                        textarea.dispatchEvent(new KeyboardEvent('keypress', {
-                                                            key: 'Enter',
-                                                            bubbles: true,
-                                                        }));
-                                                    }, 100);
-                                                }
-                                            }}
-                                        >
-                                            {prompt.text}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Advisor Chat Component */}
                     <AdvisorChat
                         studentName={cleanName}
                         welcomeMessage={welcomeMessage}
                         studentContext={studentContext}
                         onTranscriptParsed={handleTranscriptParsed}
                     />
+
+                    {welcomeMessage && (
+                        <div className={styles.quickPrompts}>
+                            <div className={styles.promptsGrid}>
+                                {QUICK_PROMPTS.map((prompt, index) => (
+                                    <button
+                                        key={index}
+                                        className={styles.promptButton}
+                                        onClick={() => {
+                                            window.dispatchEvent(new CustomEvent('advisor-prompt', { detail: prompt.text }));
+                                        }}
+                                    >
+                                        {prompt.text}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </main>
         </div>

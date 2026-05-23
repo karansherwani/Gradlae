@@ -1,15 +1,17 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../components/AuthProvider';
 import styles from '../styles/support.module.css';
 
 export default function PrivacyPage() {
     const router = useRouter();
+    const { user } = useAuth();
 
     return (
         <div className={styles.container}>
             <header className={styles.header}>
-                <div className={styles.logo}>PaceMatch</div>
+                <img src="/gradlae-logo.png" alt="Gradlae" className="brandLogo" onClick={() => router.push(user ? '/dashboard' : '/')} style={{ cursor: 'pointer' }} />
                 <button className={styles.backBtn} onClick={() => router.push('/')}>
                     Back to Home
                 </button>
@@ -23,7 +25,7 @@ export default function PrivacyPage() {
                     <div className={styles.privacyContent}>
                         <h2>1. Introduction</h2>
                         <p>
-                            Welcome to PaceMatch. We are committed to protecting your personal information and your right to privacy. If you have any questions or concerns about our policy, or our practices with regards to your personal information, please contact us.
+                            Welcome to Gradlae. We are committed to protecting your personal information and your right to privacy. If you have any questions or concerns about our policy, or our practices with regards to your personal information, please contact us.
                         </p>
 
                         <h2>2. Information We Collect</h2>
@@ -48,7 +50,7 @@ export default function PrivacyPage() {
 
                         <h2>6. Contact Us</h2>
                         <p>
-                            If you have questions or comments about this policy, you may email us at privacy@pacematch.edu.
+                            If you have questions or comments about this policy, you may email us at privacy@merse.edu.
                         </p>
                     </div>
                 </div>

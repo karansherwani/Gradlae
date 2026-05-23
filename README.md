@@ -1,6 +1,6 @@
 # PACEMAKER
 
-An AI-powered academic planning platform built with Next.js. Deployed at [pacematch.vercel.app](https://pacematch.vercel.app).
+An AI-powered academic planning platform built with Next.js. Deployed at Gradlae.
 
 ## Getting Started
 

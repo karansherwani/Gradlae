@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '../components/AuthProvider';
 import styles from '../styles/mentoring.module.css';
 
@@ -135,6 +136,7 @@ const DEFAULT_MENTORS: Mentor[] = [
 ];
 
 export default function MentoringPage() {
+    const router = useRouter();
     const { user } = useAuth();
     const [mentors, setMentors] = useState<Mentor[]>([]);
     const [isLoadingMentors, setIsLoadingMentors] = useState(true);
@@ -250,9 +252,8 @@ export default function MentoringPage() {
         <div className={styles.container}>
             {/* HEADER */}
             <header className={styles.topHeader}>
-                <div className={styles.headerLogo}>
-                    <div className={styles.logoMark}>PM</div>
-                    <span className={styles.logoText}>PaceMatch</span>
+                <div className={styles.headerLogo} onClick={() => router.push('/dashboard')} style={{ cursor: 'pointer' }}>
+                    <img src="/gradlae-logo.png" alt="Gradlae" className="brandLogo" />
                 </div>
                 <nav className={styles.headerNav}>
                     <a href="/dashboard">Dashboard</a>

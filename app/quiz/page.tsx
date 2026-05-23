@@ -56,48 +56,51 @@ export default function QuizPage() {
     }
   }, [authLoading, user, router]);
 
-  // State for course data loaded from CSV
-  const [courseCatalog, setCourseCatalog] = useState<Record<string, { name: string; credits: number; prereqs: string[] }>>({});
-
-  // Load CSV and check for selected course
+  // Load selected course from the canonical CSV-backed API
   useEffect(() => {
+    const extractPrereqCodes = (...values: string[]): string[] => {
+      return values
+        .flatMap(value => Array.from(value.matchAll(/[A-Z]{2,5}\s*\d{3}[A-Z]*/g)).map(match => match[0]))
+        .map(code => code.replace(/\s+/g, ' ').trim())
+        .filter((code, index, arr) => arr.indexOf(code) === index);
+    };
+
+    const fetchCourseInfo = async (courseCode: string) => {
+      const response = await fetch(`/api/courses?q=${encodeURIComponent(courseCode)}&limit=20`);
+      if (!response.ok) return null;
+      const data = await response.json();
+      const normalized = courseCode.replace(/\s+/g, ' ').trim().toUpperCase();
+      const courses = (data.courses || []) as Array<Record<string, string | number>>;
+      const match = courses.find(course => (
+        `${course.subject || ''} ${course.catalogNumber || ''}`.replace(/\s+/g, ' ').trim().toUpperCase() === normalized
+      )) || courses[0];
+
+      if (!match) return null;
+
+      return {
+        code: `${match.subject || ''} ${match.catalogNumber || ''}`.trim(),
+        name: String(match.title || 'General Readiness'),
+        credits: Number(match.minUnits || 3),
+        prereqs: extractPrereqCodes(
+          String(match.enrollmentRequirements || ''),
+          String(match.courseRequisites || '')
+        )
+      };
+    };
+
     const loadData = async () => {
       try {
-        const response = await fetch('/data/uofa_courses.csv');
-        const text = await response.text();
-        const rows = text.split('\n').slice(1);
-        const catalog: Record<string, { name: string; credits: number; prereqs: string[] }> = {};
-
-        rows.forEach(row => {
-          const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-          if (cols.length >= 7) {
-            const code = cols[0].trim();
-            if (code) {
-              const prereqs = [];
-              if (cols[6] && cols[6].trim() !== 'None') prereqs.push(cols[6].trim());
-              if (cols[7] && cols[7].trim() !== 'None') prereqs.push(cols[7].trim());
-
-              catalog[code] = {
-                name: cols[1].trim(),
-                credits: parseFloat(cols[4]) || 3,
-                prereqs: prereqs
-              };
-            }
-          }
-        });
-        setCourseCatalog(catalog);
-
         // Check for passed course from placements page
         const upgradeFor = localStorage.getItem('upgradeFor');
         if (upgradeFor) {
           const { courseCode } = JSON.parse(upgradeFor);
           setCourseNumber(courseCode);
 
-          const courseInfo = catalog[courseCode];
-
+          const courseInfo = await fetchCourseInfo(courseCode);
           if (courseInfo && courseInfo.prereqs.length > 0) {
             const preReqCode = courseInfo.prereqs[0];
-            const preReqName = catalog[preReqCode]?.name || 'Prerequisite Course';
+            const prerequisiteInfo = await fetchCourseInfo(preReqCode);
+            const preReqName = prerequisiteInfo?.name || 'Prerequisite Course';
 
             setPreReqCourse({
               courseNumber: preReqCode,
@@ -280,9 +283,8 @@ export default function QuizPage() {
   const QuizHeader = () => (
     <>
       <header className={styles.topHeader}>
-        <div className={styles.headerLogo}>
-          <div className={styles.logoMark}>PM</div>
-          <span className={styles.logoText}>PaceMatch</span>
+        <div className={styles.headerLogo} onClick={() => router.push('/dashboard')} style={{ cursor: 'pointer' }}>
+          <img src="/gradlae-logo.png" alt="Gradlae" className="brandLogo" />
         </div>
         <nav className={styles.headerNav}>
           <a href="/dashboard">Dashboard</a>

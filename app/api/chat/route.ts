@@ -4,20 +4,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { CourseGraph } from '@/app/lib/courseGraph';
 import { Course, StudentProfile, ChatMessage, DegreePlan } from '@/types';
 import { chatRequestSchema, validateBody, sanitizeAIInput } from '@/app/lib/validation';
+import { loadGraphCourses } from '@/app/lib/loadCourses';
 import fs from 'fs';
 import path from 'path';
 
 // ─── DATA LOADING ────────────────────────────────────────────────────────────
 
-let cachedCourses: Course[] | null = null;
 let cachedDegreePlans: DegreePlan[] | null = null;
 
 function loadCourseData(): Course[] {
-  if (cachedCourses) return cachedCourses;
-  const dataPath = path.join(process.cwd(), 'data', 'courses.json');
-  const data = fs.readFileSync(dataPath, 'utf-8');
-  cachedCourses = JSON.parse(data);
-  return cachedCourses!;
+  return loadGraphCourses();
 }
 
 function loadAllDegreePlans(): DegreePlan[] {
@@ -68,7 +64,7 @@ const GE_SUBJECTS = new Set([
 ]);
 
 /**
- * Filter the full 17K+ course catalog to only courses relevant to the student
+ * Filter the full course catalog to only courses relevant to the student
  */
 function filterCoursesForMajor(
   allCourses: Course[],

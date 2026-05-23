@@ -1,4 +1,4 @@
-# PaceMatch Auth Setup Guide
+# Gradlae Auth Setup Guide
 
 ## Environment Variables
 
@@ -68,7 +68,7 @@ Set these in **Vercel Dashboard → Settings → Environment Variables** (and in
 ## Supabase Dashboard Config
 
 ### Required for Production
-1. **Authentication → URL Configuration → Site URL**: Set to your Vercel production URL (e.g. `https://pacematch.vercel.app`)
+1. **Authentication → URL Configuration → Site URL**: Set to your Vercel production URL.
 2. **Authentication → URL Configuration → Redirect URLs**: Add:
    - `https://your-vercel-domain.vercel.app/**`
    - `http://localhost:3000/**` (for local dev)

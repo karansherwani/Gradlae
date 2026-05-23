@@ -386,9 +386,8 @@ export default function ProgressPage() {
         <div className={styles.container}>
             {/* HEADER */}
             <header className={styles.topHeader}>
-                <div className={styles.headerLogo}>
-                    <div className={styles.logoMark}>PM</div>
-                    <span className={styles.logoText}>PaceMatch</span>
+                <div className={styles.headerLogo} onClick={() => router.push('/dashboard')} style={{ cursor: 'pointer' }}>
+                    <img src="/gradlae-logo.png" alt="Gradlae" className="brandLogo" />
                 </div>
                 <nav className={styles.headerNav}>
                     <a href="/dashboard">Dashboard</a>

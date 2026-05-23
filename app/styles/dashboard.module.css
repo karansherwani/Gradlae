@@ -30,7 +30,7 @@
   height: 68px;
   padding: 0 clamp(20px, 5vw, 56px);
   border-bottom: 1px solid var(--pm-line);
-  background: rgba(255, 255, 255, 0.86);
+  background: var(--pm-bg);
   backdrop-filter: blur(12px);
 }
 
@@ -324,9 +324,7 @@
 .aiAdvisorHero {
   margin-bottom: 28px;
   padding: clamp(30px, 5vw, 54px);
-  background:
-    linear-gradient(135deg, rgba(12, 35, 75, 0.96), rgba(6, 24, 50, 0.9)),
-    var(--uofa-blue);
+  background: var(--uofa-blue);
 }
 
 .aiAdvisorBadge {

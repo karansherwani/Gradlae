@@ -19,6 +19,11 @@ export default function StaffDashboard() {
 
   const staffName = dbUser?.name || user?.user_metadata?.full_name || 'Staff Member';
   const staffId = dbUser?.id || '';
+  const isStaffAccount =
+    dbUser?.role === 'instructor' ||
+    dbUser?.role === 'staff' ||
+    dbUser?.name?.startsWith('Prof.') ||
+    user?.user_metadata?.full_name?.startsWith('Prof.');
 
   useEffect(() => {
     if (authLoading) return;
@@ -27,18 +32,18 @@ export default function StaffDashboard() {
       return;
     }
     // Check if user is staff (role check)
-    if (dbUser && dbUser.role !== 'instructor' && dbUser.role !== 'staff') {
+    if (dbUser && !isStaffAccount) {
       router.push('/dashboard');
     }
-  }, [authLoading, user, dbUser, router]);
+  }, [authLoading, user, dbUser, isStaffAccount, router]);
 
   return (
     <div className={styles.container}>
       {/* TOP HEADER */}
       <header className={styles.topHeader}>
-        <div className={styles.headerLogo}>
-          <div className={styles.logoMark}>PM</div>
-          <span className={styles.logoText}>PaceMatch Staff</span>
+        <div className={styles.headerLogo} onClick={() => router.push('/staff/dashboard')} style={{ cursor: 'pointer' }}>
+          <img src="/gradlae-logo.png" alt="Gradlae" className="brandLogo" />
+          <span className={styles.logoText}>Staff</span>
         </div>
         <div className={styles.headerRight}>
           <span className={styles.staffName}>{staffName}</span>

@@ -36,7 +36,7 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
   return (
     <div className={styles.loginContainer}>
       <div className={styles.loginBox}>
-        <h2>PaceMatch Login</h2>
+        <h2>Gradlae Login</h2>
         <form onSubmit={handleSubmit}>
           <div className={styles.formGroup}>
             <label>Student ID</label>

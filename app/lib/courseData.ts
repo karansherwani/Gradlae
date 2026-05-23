@@ -11,7 +11,7 @@ export interface Course {
     prerequisite2: string;
 }
 
-// Fetch courses from the API (reads from CSV on server, searches 18K+ courses)
+// Fetch courses from the API, which reads the canonical courses.csv on the server.
 export async function fetchCourses(query?: string): Promise<Course[]> {
     const url = query && query.length >= 2
         ? `/api/courses?q=${encodeURIComponent(query)}&limit=50`

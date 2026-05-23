@@ -9,13 +9,14 @@
 
 /* Header */
 .header {
-    background: var(--color-primary);
+    background: var(--pm-bg);
     padding: 0 40px;
     height: 64px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-shrink: 0;
+    border-bottom: 1px solid var(--pm-line);
 }
 
 .headerLeft {
@@ -46,7 +47,7 @@
 .logoText {
     font-size: 1.25rem;
     font-weight: 600;
-    color: white;
+    color: var(--pm-blue);
     letter-spacing: -0.3px;
 }
 
@@ -62,13 +63,13 @@
 }
 
 .savedIndicator {
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--color-text-secondary);
     font-size: 0.8rem;
     font-weight: 500;
 }
 
 .savingIndicator {
-    color: rgba(255, 200, 100, 0.9);
+    color: var(--pm-red);
     font-size: 0.8rem;
     font-weight: 500;
 }
@@ -77,9 +78,9 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
+    background: transparent;
+    border: 1px solid var(--pm-blue);
+    color: var(--pm-blue);
     padding: 8px 16px;
     border-radius: 8px;
     font-size: 0.85rem;
@@ -89,8 +90,9 @@
 }
 
 .backButton:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.3);
+    background: var(--pm-blue);
+    border-color: var(--pm-blue);
+    color: var(--pm-white);
 }
 
 /* Main Layout */

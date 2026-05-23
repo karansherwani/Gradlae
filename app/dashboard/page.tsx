@@ -77,8 +77,12 @@ export default function Dashboard() {
     if (authLoading) return;
     if (!user) {
       router.push('/auth');
+      return;
     }
-  }, [authLoading, user, router]);
+    if (dbUser?.role === 'instructor' || dbUser?.role === 'staff' || dbUser?.name?.startsWith('Prof.')) {
+      router.push('/staff/dashboard');
+    }
+  }, [authLoading, user, dbUser, router]);
 
   const name = dbUser?.name
     || user?.user_metadata?.full_name
@@ -132,9 +136,8 @@ export default function Dashboard() {
       {/* ── HEADER ── */}
       <header className={styles.header}>
         <div className={styles.headerLeft}>
-          <div className={styles.logo}>
-            <div className={styles.logoMark}>PM</div>
-            <span className={styles.logoText}>PaceMatch</span>
+          <div className={styles.logo} onClick={() => router.push('/dashboard')} style={{ cursor: 'pointer' }}>
+            <img src="/gradlae-logo.png" alt="Gradlae" className="brandLogo" />
           </div>
         </div>
         <div className={styles.headerRight}>
@@ -298,7 +301,7 @@ export default function Dashboard() {
 
       <footer className={styles.footer}>
         <div className={styles.footerBottom}>
-          © 2026 PaceMatch · University of Arizona Student Portal
+          © 2026 Gradlae · University of Arizona Student Portal
         </div>
       </footer>
     </div>

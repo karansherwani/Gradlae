@@ -15,46 +15,42 @@
 
 .container {
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    background:
-        radial-gradient(circle at 12% 18%, rgba(171, 5, 32, 0.045), transparent 30%),
-        radial-gradient(circle at 88% 76%, rgba(12, 35, 75, 0.065), transparent 32%),
-        linear-gradient(180deg, var(--pm-white) 0%, var(--advisor-surface) 48%, var(--pm-white) 100%);
+    display: grid;
+    grid-template-columns: 288px minmax(0, 1fr);
+    background: var(--advisor-surface);
     color: var(--advisor-ink);
     font-family: var(--advisor-ui);
 }
 
 .header {
-    position: sticky;
+    position: fixed;
     top: 0;
+    bottom: 0;
+    left: 0;
     z-index: 100;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    min-height: 68px;
-    padding: 12px clamp(20px, 5vw, 56px);
-    border-bottom: 1px solid var(--advisor-line);
-    background: rgba(255, 255, 255, 0.86);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    width: 288px;
+    flex-direction: column;
+    padding: 22px 16px;
+    background: var(--advisor-surface);
 }
 
-.headerLeft,
-.headerRight,
 .logo,
 .backButton,
 .transcriptBannerContent,
 .inputWrapper,
 .selectedFileBar,
 .selectedFileInfo,
-.heroStats {
+.heroStats,
+.sidebarFooter {
     display: flex;
     align-items: center;
 }
 
 .logo {
     gap: 10px;
+    width: 100%;
+    padding: 6px 8px 20px;
 }
 
 .logoMark {
@@ -62,7 +58,7 @@
     place-items: center;
     width: 36px;
     height: 36px;
-    border-radius: 999px;
+    border-radius: 8px;
     background: var(--uofa-blue);
     color: var(--pm-white);
     font-size: 0.76rem;
@@ -75,7 +71,79 @@
     font-weight: 800;
 }
 
+.sideNav {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.sidebarSection {
+    width: 100%;
+    flex: 1;
+    padding-top: 18px;
+}
+
+.sidebarLabel {
+    margin: 0 0 12px;
+    padding: 0 8px;
+    color: var(--advisor-muted);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.sideNavItem {
+    width: 100%;
+    min-height: 42px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--advisor-muted);
+    cursor: pointer;
+    font: 800 0.9rem var(--advisor-ui);
+    text-align: left;
+    transition: background 0.18s ease, color 0.18s ease;
+}
+
+.sideNavItem:hover,
+.sideNavItemActive {
+    background: transparent;
+    color: var(--uofa-blue);
+}
+
+.sidebarFooter {
+    width: 100%;
+    gap: 10px;
+    margin-top: auto;
+    padding: 14px 8px 0;
+    color: var(--uofa-blue);
+}
+
+.sidebarFooter span {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: var(--pm-blue-soft);
+    font-size: 0.76rem;
+    font-weight: 800;
+}
+
+.sidebarFooter strong {
+    min-width: 0;
+    overflow: hidden;
+    font-size: 0.82rem;
+    font-weight: 800;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .backButton,
+.topBackButton,
 .transcriptBannerBtn,
 .promptButton,
 .sendButton,
@@ -106,24 +174,44 @@
 }
 
 .main {
-    width: min(100%, 1180px);
-    margin: 0 auto;
-    padding: clamp(28px, 5vw, 56px) clamp(18px, 4vw, 36px) 34px;
+    grid-column: 2;
+    position: relative;
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    padding: clamp(36px, 5vw, 72px);
+}
+
+.topBackButton {
+    position: absolute;
+    top: 24px;
+    right: clamp(24px, 5vw, 72px);
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--uofa-blue);
+    font-size: 0.9rem;
+}
+
+.topBackButton:hover {
+    color: var(--uofa-red);
 }
 
 .advisorHero {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 28px;
-    align-items: end;
-    margin-bottom: 24px;
-    padding: clamp(30px, 5vw, 54px);
-    border: 1px solid var(--advisor-line);
-    border-radius: 1.5rem;
-    background:
-        linear-gradient(135deg, rgba(12, 35, 75, 0.10), rgba(171, 5, 32, 0.05)),
-        rgba(255, 255, 255, 0.9);
-    box-shadow: var(--pm-shadow-card);
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    min-height: 34vh;
+    padding-bottom: 28px;
+    text-align: center;
 }
 
 .heroLabel,
@@ -137,19 +225,19 @@
 }
 
 .advisorHero h1 {
-    max-width: 760px;
+    max-width: 860px;
     margin: 0;
     color: var(--uofa-blue);
     font-family: var(--advisor-display);
-    font-size: clamp(3rem, 6.5vw, 5.7rem);
+    font-size: clamp(3.2rem, 6.6vw, 6.5rem);
     font-weight: 400;
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
     line-height: 0.96;
 }
 
 .advisorHero p:not(.heroLabel) {
-    max-width: 670px;
-    margin: 20px 0 0;
+    max-width: 680px;
+    margin: 18px auto 0;
     color: var(--advisor-muted);
     font-size: 1rem;
     line-height: 1.7;
@@ -157,9 +245,10 @@
 
 .heroStats {
     flex-wrap: wrap;
-    justify-content: flex-end;
+    justify-content: center;
     gap: 8px;
-    max-width: 300px;
+    max-width: 520px;
+    margin-top: 22px;
 }
 
 .heroStats span {
@@ -172,44 +261,42 @@
 }
 
 .chatContainer {
-    overflow: hidden;
     display: flex;
     flex-direction: column;
-    min-height: 660px;
-    border: 1px solid var(--advisor-line);
-    border-radius: 1.5rem;
-    background: rgba(255, 255, 255, 0.94);
-    box-shadow: var(--pm-shadow-card);
+    width: min(100%, 980px);
+    margin: 0 auto;
+    background: transparent;
 }
 
 .quickPrompts {
-    padding: 24px 28px;
-    border-bottom: 1px solid var(--advisor-line);
-    background: var(--pm-bg);
+    order: 3;
+    padding: 18px 0 0;
+    background: transparent;
 }
 
 .promptsGrid {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 10px;
 }
 
 .promptButton {
     min-height: 42px;
     padding: 10px 18px;
-    border: 1px solid var(--advisor-line);
-    border-radius: 999px;
-    background: var(--pm-bg);
+    border: 0;
+    border-radius: 0;
+    background: transparent;
     color: var(--advisor-ink);
     font-size: 0.9rem;
 }
 
 .promptButton:hover {
-    transform: translateY(-1px);
-    border-color: var(--pm-sage);
-    background: var(--pm-sage-light);
+    transform: none;
+    border-color: transparent;
+    background: transparent;
     color: var(--pm-black);
-    box-shadow: var(--pm-shadow-sm);
+    box-shadow: none;
 }
 
 .promptButton:active {
@@ -227,38 +314,42 @@
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 22px;
-    padding: 30px clamp(20px, 4vw, 42px);
-    background: var(--advisor-surface);
+    gap: 30px;
+    padding: 34px 0 24px;
+    background: transparent;
+}
+
+.advisorChat {
+    display: flex;
+    min-height: 0;
+    flex-direction: column;
+}
+
+.advisorChatHome {
+    justify-content: center;
+}
+
+.advisorChatActive {
+    min-height: 62vh;
+    background: transparent;
 }
 
 .message,
 .typingIndicator {
     display: flex;
     gap: 12px;
-    max-width: 82%;
+    max-width: 100%;
     animation: fadeIn 0.25s ease;
 }
 
 .messageAi,
-.typingIndicator {
-    align-self: flex-start;
-}
-
+.typingIndicator,
 .messageUser {
-    align-self: flex-end;
-    flex-direction: row-reverse;
+    align-self: stretch;
 }
 
 .avatar {
-    flex: 0 0 auto;
-    display: grid;
-    place-items: center;
-    width: 38px;
-    height: 38px;
-    border-radius: 999px;
-    font-size: 0.78rem;
-    font-weight: 800;
+    display: none;
 }
 
 .avatarAi {
@@ -274,48 +365,50 @@
 .messageContent {
     display: flex;
     flex-direction: column;
-    gap: 7px;
+    gap: 8px;
+    width: 100%;
 }
 
 .messageBubble {
-    padding: 18px 22px;
-    font-size: 0.95rem;
-    line-height: 1.75;
-}
-
-.messageBubbleAi {
-    border: 1px solid var(--advisor-line);
-    border-radius: 1.25rem 1.25rem 1.25rem 0.35rem;
-    background: var(--pm-bg);
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
     color: var(--advisor-ink);
-    box-shadow: 0 10px 28px rgba(12, 35, 75, 0.06);
+    font-size: 1rem;
+    line-height: 1.85;
 }
 
+.messageBubbleAi,
 .messageBubbleUser {
-    border-radius: 1.25rem 1.25rem 0.35rem 1.25rem;
-    background: var(--uofa-red);
-    color: var(--pm-white);
-    box-shadow: 0 12px 28px rgba(171, 5, 32, 0.18);
+    background: transparent;
+    color: var(--advisor-ink);
+    box-shadow: none;
+}
+
+.messageUser .messageBubble {
+    color: var(--uofa-blue);
+    font-weight: 700;
 }
 
 .messageTime {
-    padding: 0 6px;
+    padding: 0;
     color: var(--advisor-muted);
     font-size: 0.72rem;
 }
 
 .messageUser .messageTime {
-    text-align: right;
+    text-align: left;
 }
 
 .typingBubble {
     display: flex;
     gap: 5px;
-    padding: 17px 20px;
-    border: 1px solid var(--advisor-line);
-    border-radius: 1.25rem 1.25rem 1.25rem 0.35rem;
-    background: var(--pm-bg);
-    box-shadow: 0 10px 28px rgba(12, 35, 75, 0.06);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
 }
 
 .typingDot {
@@ -335,13 +428,31 @@
 }
 
 .inputArea {
-    padding: 18px clamp(20px, 4vw, 42px) 20px;
-    border-top: 1px solid var(--advisor-line);
-    background: var(--pm-bg);
+    padding: 0;
+    background: transparent;
+}
+
+.advisorChatActive .inputArea {
+    padding: 22px 0 20px;
+    background: transparent;
 }
 
 .inputWrapper {
     gap: 12px;
+    min-height: 110px;
+    padding: 14px;
+    border: 0;
+    border-radius: 14px;
+    background: var(--pm-white);
+    box-shadow: none;
+}
+
+.advisorChatActive .inputWrapper {
+    min-height: auto;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
 }
 
 .textInput {
@@ -350,19 +461,18 @@
     max-height: 150px;
     padding: 16px 20px;
     resize: none;
-    border: 1px solid var(--advisor-line);
-    border-radius: 999px;
+    border: 0;
+    border-radius: 10px;
     outline: none;
-    background: var(--advisor-surface);
+    background: var(--pm-bg);
     color: var(--advisor-ink);
     font: 500 0.96rem var(--advisor-ui);
     transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
 }
 
 .textInput:focus {
-    border-color: var(--uofa-red);
     background: var(--pm-bg);
-    box-shadow: 0 0 0 4px rgba(171, 5, 32, 0.12);
+    box-shadow: none;
 }
 
 .textInput::placeholder {
@@ -376,18 +486,17 @@
     place-items: center;
     width: 54px;
     height: 54px;
-    border-radius: 999px;
+    border-radius: 10px;
 }
 
 .attachButton {
-    border: 1px solid var(--advisor-line);
+    border: 0;
     background: var(--pm-bg);
     color: var(--advisor-muted);
 }
 
 .attachButton:hover:not(:disabled) {
-    transform: translateY(-1px);
-    border-color: var(--uofa-blue);
+    transform: none;
     background: var(--uofa-blue-soft);
     color: var(--uofa-blue);
 }
@@ -399,9 +508,9 @@
 }
 
 .sendButton:hover:not(:disabled) {
-    transform: translateY(-1px);
+    transform: none;
     background: var(--pm-blue-dark);
-    box-shadow: var(--pm-shadow-card);
+    box-shadow: none;
 }
 
 .sendButton:disabled,
@@ -423,8 +532,11 @@
 }
 
 .transcriptBanner {
+    order: -1;
     padding: 18px 28px;
-    border-bottom: 1px solid var(--advisor-line);
+    margin-bottom: 16px;
+    border: 0;
+    border-radius: 12px;
     background: var(--uofa-red-soft);
 }
 
@@ -481,9 +593,16 @@
     gap: 14px;
     margin: 0 clamp(20px, 4vw, 42px) 12px;
     padding: 12px 14px;
-    border: 1px solid var(--advisor-line);
+    border: 0;
     border-radius: 999px;
     background: var(--uofa-blue-soft);
+}
+
+.errorNotice {
+    margin-bottom: 14px;
+    color: var(--uofa-red);
+    font-size: 0.85rem;
+    font-weight: 700;
 }
 
 .selectedFileInfo {
@@ -569,12 +688,72 @@
 }
 
 @media (max-width: 900px) {
+    .container {
+        display: block;
+    }
+
+    .header {
+        position: sticky;
+        top: 0;
+        bottom: auto;
+        width: 100%;
+        min-height: auto;
+        flex-direction: row;
+        gap: 12px;
+        padding: 12px 14px;
+    }
+
+    .logo {
+        width: auto;
+        padding: 0;
+    }
+
+    .sideNav {
+        flex: 1;
+        flex-direction: row;
+        gap: 4px;
+        overflow-x: auto;
+        padding: 0;
+    }
+
+    .sidebarSection {
+        flex: 1;
+        min-width: 0;
+        padding-top: 0;
+    }
+
+    .sidebarLabel {
+        display: none;
+    }
+
+    .sideNavItem {
+        width: auto;
+        flex: 0 0 auto;
+        min-height: 36px;
+        padding: 0 12px;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    .sidebarFooter {
+        display: none;
+    }
+
+    .main {
+        min-height: calc(100vh - 61px);
+    }
+
+    .topBackButton {
+        top: 76px;
+        right: 18px;
+    }
+
     .advisorHero {
-        grid-template-columns: 1fr;
+        min-height: 34vh;
     }
 
     .heroStats {
-        justify-content: flex-start;
+        justify-content: center;
         max-width: none;
     }
 
@@ -597,18 +776,32 @@
         padding: 20px 14px 24px;
     }
 
+    .topBackButton {
+        position: static;
+        align-self: flex-end;
+        margin-bottom: 8px;
+    }
+
     .advisorHero {
-        padding: 26px 20px;
+        min-height: 32vh;
+        padding: 18px 0 22px;
+    }
+
+    .advisorHero h1 {
+        font-size: clamp(2.8rem, 16vw, 4rem);
     }
 
     .chatContainer {
-        min-height: 620px;
-        border-radius: 1.25rem;
+        width: 100%;
     }
 
     .quickPrompts,
-    .messagesArea,
-    .inputArea {
+    .messagesArea {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .advisorChatActive .inputArea {
         padding-left: 16px;
         padding-right: 16px;
     }
@@ -633,6 +826,8 @@
 
     .inputWrapper {
         align-items: flex-end;
+        min-height: 92px;
+        padding: 10px;
     }
 
     .attachButton,

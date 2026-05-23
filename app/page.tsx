@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from './components/AuthProvider';
 import styles from './styles/landing.module.css';
 
 export default function LandingPage() {
   const router = useRouter();
+  const { user } = useAuth();
   const [showFeedback, setShowFeedback] = useState(false);
   const [activeFeatureTab, setActiveFeatureTab] = useState<'progress' | 'care' | 'explore'>('progress');
 
@@ -33,7 +35,7 @@ export default function LandingPage() {
   ];
 
   const whyCards = [
-    { tag: 'Students', title: 'Know your pace before the course starts', desc: 'Upload your transcript, see the track that fits, and understand exactly why PaceMatch made the recommendation.' },
+    { tag: 'Students', title: 'Know your pace before the course starts', desc: 'Upload your transcript, see the track that fits, and understand exactly why Gradlae made the recommendation.' },
     { tag: 'Advisors', title: 'Spend less time sorting and more time guiding', desc: 'Surface readiness signals, prerequisite gaps, and next-best steps before advising appointments.' },
     { tag: 'Admins', title: 'Create course sections around real demand', desc: 'Use placement trends to balance Batch A, B, and supported sections with confidence.' },
   ];
@@ -76,7 +78,7 @@ export default function LandingPage() {
       type: 'student',
       name: 'Sarah Martinez',
       role: 'Computer Science, Stanford',
-      text: 'PaceMatch placed me in the accelerated track based on my strong calculus background. I completed the course in 7 weeks.',
+      text: 'Gradlae placed me in the accelerated track based on my strong calculus background. I completed the course in 7 weeks.',
     },
     {
       type: 'faculty',
@@ -103,6 +105,30 @@ export default function LandingPage() {
     router.push('/auth');
   };
 
+  const handleLogoClick = () => {
+    router.push(user ? '/dashboard' : '/');
+  };
+
+  const scrollToSection = (sectionId: string) => {
+    const target = document.getElementById(sectionId);
+    if (!target) return;
+
+    const start = window.scrollY;
+    const targetY = target.getBoundingClientRect().top + window.scrollY - 82;
+    const distance = targetY - start;
+    const duration = 420;
+    const startedAt = performance.now();
+
+    const animate = (now: number) => {
+      const progress = Math.min((now - startedAt) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      window.scrollTo(0, start + distance * eased);
+      if (progress < 1) requestAnimationFrame(animate);
+    };
+
+    requestAnimationFrame(animate);
+  };
+
   const handleFeedbackSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     alert('Thank you for your feedback!');
@@ -113,14 +139,13 @@ export default function LandingPage() {
     <div className={styles.container}>
       {/* HEADER */}
       <header className={styles.topHeader}>
-        <div className={styles.headerLogo}>
-          <div className={styles.logoMark}>PM</div>
-          <span className={styles.logoText}>PaceMatch</span>
-        </div>
+        <button className={styles.headerLogo} onClick={handleLogoClick} type="button">
+          <img src="/gradlae-logo.png" alt="Gradlae" className="brandLogo" />
+        </button>
         <nav className={styles.headerNav}>
-          <a href="#features">Product</a>
-          <a href="#how-it-works">How It Works</a>
-          <a href="#testimonials">Testimonials</a>
+          <button type="button" onClick={() => scrollToSection('features')}>Product</button>
+          <button type="button" onClick={() => scrollToSection('how-it-works')}>How It Works</button>
+          <button type="button" onClick={() => scrollToSection('testimonials')}>Testimonials</button>
         </nav>
         <div className={styles.headerActions}>
           <button className={styles.headerGhost} onClick={handleGetStarted}>
@@ -132,7 +157,7 @@ export default function LandingPage() {
       {/* ══ HERO ══ */}
       <section className={styles.hero}>
         <div className={styles.heroContent}>
-          <div className={styles.heroEyebrow}>Adaptive academic placement</div>
+          <div className={styles.heroEyebrow}>Adaptive academic ecosystem</div>
           <h1>Your pace, <em>matched</em> to your story.</h1>
           <p className={styles.heroSubtext}>
             Data-driven batch placement based on your prerequisite grades. Get matched to the right course pace for academic success.
@@ -144,25 +169,25 @@ export default function LandingPage() {
             >
               Get Started
             </button>
-            <a className={styles.secondaryHeroLink} href="#how-it-works">
+            <button className={styles.secondaryHeroLink} onClick={() => scrollToSection('how-it-works')} type="button">
               See how it works
-            </a>
+            </button>
           </div>
           <div className={styles.heroProof}>
             <span>Free for students</span>
-            <span>2,600+ universities</span>
+            <span>1 university</span>
             <span>Placement in minutes</span>
           </div>
         </div>
 
-        <div className={styles.heroVisual} aria-label="PaceMatch product preview">
+        <div className={styles.heroVisual} aria-label="Gradlae product preview">
           <div className={styles.browserMockup}>
             <div className={styles.browserChrome}>
               <span></span><span></span><span></span>
             </div>
             <div className={styles.mockupBody}>
               <aside className={styles.mockSidebar}>
-                <strong>PaceMatch</strong>
+                <strong>Gradlae</strong>
                 <span>Dashboard</span>
                 <span>Transcript</span>
                 <span>Advisor</span>
@@ -201,40 +226,39 @@ export default function LandingPage() {
       <section className={styles.stats}>
         <div className={styles.statsGrid}>
           <div className={styles.statCard}>
-            <div className={styles.statNumber}>700M+</div>
+            <div className={styles.statNumber}>17,000+</div>
             <div className={styles.statLabel}>Courses Analyzed</div>
           </div>
           <div className={styles.statCard}>
-            <div className={styles.statNumber}>2,600+</div>
+            <div className={styles.statNumber}>1+</div>
             <div className={styles.statLabel}>Universities</div>
           </div>
           <div className={styles.statCard}>
-            <div className={styles.statNumber}>140K+</div>
+            <div className={styles.statNumber}>1+</div>
             <div className={styles.statLabel}>Instructors</div>
           </div>
           <div className={styles.statCard}>
-            <div className={styles.statNumber}>3.2M+</div>
+            <div className={styles.statNumber}>5+</div>
             <div className={styles.statLabel}>Students</div>
           </div>
         </div>
       </section>
 
       <section className={styles.trustedStrip}>
-        <span>Trusted by teams inspired by</span>
+        <span>Built with real academic data</span>
         <div>
           <strong>University of Arizona</strong>
-          <strong>Stanford</strong>
-          <strong>MIT</strong>
-          <strong>UC Berkeley</strong>
-          <strong>ASU</strong>
+          <strong>17,000+ courses</strong>
+          <strong>5+ students</strong>
+          <strong>1+ instructor</strong>
         </div>
       </section>
 
       <section className={styles.whySection}>
-        <div className={styles.sectionLabel}>Why PaceMatch</div>
+        <div className={styles.sectionLabel}>Why Gradlae</div>
         <h2>Academic planning that feels clear from the first click.</h2>
         <p className={styles.sectionSubtext}>
-          Stellic-inspired structure, adapted for UofA: calm surfaces, sharp academic context, and guidance that meets each user where they are.
+          Turn transcripts, course data, and goals into a plan students can trust before registration opens.
         </p>
         <div className={styles.whyGrid}>
           {whyCards.map((card) => (
@@ -340,7 +364,7 @@ export default function LandingPage() {
       <footer className={styles.footer}>
         <div className={styles.footerContent}>
           <div className={styles.footerSection}>
-            <h4>PaceMatch</h4>
+            <h4>Gradlae</h4>
             <p>Matching students to the right course pace.</p>
           </div>
           <div className={styles.footerSection}>
@@ -357,7 +381,7 @@ export default function LandingPage() {
           </div>
         </div>
         <div className={styles.footerBottom}>
-          © 2026 PaceMatch. All rights reserved.
+          © 2026 Gradlae. All rights reserved.
         </div>
       </footer>
 

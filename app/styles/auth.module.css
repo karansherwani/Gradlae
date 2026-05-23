@@ -31,7 +31,7 @@
   gap: 18px;
   padding: 18px clamp(20px, 5vw, 56px);
   border-bottom: 1px solid var(--auth-line);
-  background: rgba(255, 255, 255, 0.86);
+  background: var(--pm-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
@@ -62,6 +62,16 @@
   letter-spacing: -0.02em;
 }
 
+.authLogo {
+  display: block;
+  width: 148px;
+  max-width: 148px;
+  height: auto;
+  max-height: 42px;
+  object-fit: contain;
+  cursor: pointer;
+}
+
 .uniName {
   margin: 3px 0 0;
   color: var(--auth-muted);
@@ -79,7 +89,7 @@
 }
 
 .main::before {
-  content: "Adaptive academic placement\A Get started with your student success workspace.";
+  content: "Adaptive academic ecosystem\A Get started with your student success workspace.";
   white-space: pre-line;
   min-height: 520px;
   display: flex;

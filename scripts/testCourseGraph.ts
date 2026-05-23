@@ -1,15 +1,10 @@
 // scripts/testCourseGraph.ts
 
-import fs from 'fs';
 import { CourseGraph } from '@/app/lib/courseGraph';
-import { Course, CompletedCourse } from '../types';
+import { loadGraphCourses } from '@/app/lib/loadCourses';
+import { CompletedCourse } from '../types';
 
-// Load course data
-const coursesData: Course[] = JSON.parse(
-  fs.readFileSync('data/courses.json', 'utf-8')
-);
-
-const graph = new CourseGraph(coursesData);
+const graph = new CourseGraph(loadGraphCourses());
 
 console.log('🧪 Testing Course Graph\n');
 

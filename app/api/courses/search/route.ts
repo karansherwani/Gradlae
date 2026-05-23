@@ -3,13 +3,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { CourseGraph } from '@/app/lib/courseGraph';
 import { Course } from '@/types';
-import fs from 'fs';
-import path from 'path';
+import { loadGraphCourses } from '@/app/lib/loadCourses';
 
 function loadCourseData(): Course[] {
-  const dataPath = path.join(process.cwd(), 'data', 'courses.json');
-  const data = fs.readFileSync(dataPath, 'utf-8');
-  return JSON.parse(data);
+  return loadGraphCourses();
 }
 
 export async function GET(request: NextRequest) {

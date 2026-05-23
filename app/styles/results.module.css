@@ -85,7 +85,7 @@
 
 /* Hero Section */
 .hero {
-  background: linear-gradient(135deg, var(--uofa-blue) 0%, var(--uofa-blue-light) 100%);
+  background: var(--uofa-blue);
   color: white;
   padding: 60px 48px 80px;
   text-align: center;
@@ -170,7 +170,7 @@
 
 .sectionCard.selected {
   border-color: var(--uofa-blue);
-  background: linear-gradient(135deg, rgba(12, 35, 75, 0.03) 0%, rgba(12, 35, 75, 0.01) 100%);
+  background: var(--pm-blue-soft);
 }
 
 .sectionCard.recommended {
@@ -271,7 +271,7 @@
 
 /* Batch Recommendation */
 .batchCard {
-  background: linear-gradient(135deg, rgba(12, 35, 75, 0.03) 0%, rgba(12, 35, 75, 0.01) 100%);
+  background: var(--pm-blue-soft);
   border: 2px solid var(--uofa-blue);
   border-radius: 16px;
   padding: 2rem;

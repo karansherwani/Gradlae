@@ -19,6 +19,14 @@
   .container {
     min-height: 100vh;
     background: var(--gray-50);
+    font-family: Georgia, serif;
+  }
+
+  .container button,
+  .container input,
+  .container textarea,
+  .container select {
+    font-family: Georgia, serif;
   }
   
   .topHeader {

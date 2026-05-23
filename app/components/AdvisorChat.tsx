@@ -105,11 +105,28 @@ export default function AdvisorChat({
     const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const isHomeMode = messages.length === 1 && messages[0]?.id === 'welcome' && !isTyping;
 
     // Keep activeContext in sync with prop changes
     useEffect(() => {
         if (studentContext) setActiveContext(studentContext);
     }, [studentContext]);
+
+    useEffect(() => {
+        const handlePrompt = (event: Event) => {
+            const prompt = (event as CustomEvent<string>).detail;
+            if (typeof prompt === 'string') {
+                setInputValue(prompt);
+                requestAnimationFrame(() => {
+                    const textarea = document.querySelector(`.${styles.textInput}`) as HTMLTextAreaElement | null;
+                    textarea?.focus();
+                });
+            }
+        };
+
+        window.addEventListener('advisor-prompt', handlePrompt);
+        return () => window.removeEventListener('advisor-prompt', handlePrompt);
+    }, []);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -275,59 +292,51 @@ export default function AdvisorChat({
     };
 
     return (
-        <>
+        <div className={`${styles.advisorChat} ${isHomeMode ? styles.advisorChatHome : styles.advisorChatActive}`}>
             {error && (
-                <div style={{
-                    padding: '10px 16px',
-                    background: 'rgba(220, 38, 38, 0.08)',
-                    border: '1px solid rgba(220, 38, 38, 0.2)',
-                    borderRadius: '8px',
-                    color: '#dc2626',
-                    fontSize: '0.85rem',
-                    marginBottom: '12px',
-                }}>
+                <div className={styles.errorNotice}>
                     Notice: {error}
                 </div>
             )}
 
-            {/* Messages */}
-            <div className={styles.messagesArea}>
-                {messages.map((message) => (
-                    <div
-                        key={message.id}
-                        className={`${styles.message} ${message.role === 'assistant' ? styles.messageAi : styles.messageUser}`}
-                    >
-                        <div className={`${styles.avatar} ${message.role === 'assistant' ? styles.avatarAi : styles.avatarUser}`}>
-                            {message.role === 'assistant' ? 'AI' : studentName.charAt(0).toUpperCase()}
-                        </div>
-                        <div className={styles.messageContent}>
-                            <div className={`${styles.messageBubble} ${message.role === 'assistant' ? styles.messageBubbleAi : styles.messageBubbleUser}`}>
-                                {message.content.split('\n').map((line, i) => (
-                                    <span key={i}>
-                                        {line}
-                                        {i < message.content.split('\n').length - 1 && <br />}
-                                    </span>
-                                ))}
+            {!isHomeMode && (
+                <div className={styles.messagesArea}>
+                    {messages.map((message) => (
+                        <div
+                            key={message.id}
+                            className={`${styles.message} ${message.role === 'assistant' ? styles.messageAi : styles.messageUser}`}
+                        >
+                            <div className={`${styles.avatar} ${message.role === 'assistant' ? styles.avatarAi : styles.avatarUser}`}>
+                                {message.role === 'assistant' ? 'AI' : studentName.charAt(0).toUpperCase()}
                             </div>
-                            <span className={styles.messageTime}>{formatTime(message.timestamp)}</span>
+                            <div className={styles.messageContent}>
+                                <div className={`${styles.messageBubble} ${message.role === 'assistant' ? styles.messageBubbleAi : styles.messageBubbleUser}`}>
+                                    {message.content.split('\n').map((line, i) => (
+                                        <span key={i}>
+                                            {line}
+                                            {i < message.content.split('\n').length - 1 && <br />}
+                                        </span>
+                                    ))}
+                                </div>
+                                <span className={styles.messageTime}>{formatTime(message.timestamp)}</span>
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    ))}
 
-                {/* Typing Indicator */}
-                {isTyping && (
-                    <div className={styles.typingIndicator}>
-                        <div className={`${styles.avatar} ${styles.avatarAi}`}>AI</div>
-                        <div className={styles.typingBubble}>
-                            <span className={styles.typingDot}></span>
-                            <span className={styles.typingDot}></span>
-                            <span className={styles.typingDot}></span>
+                    {isTyping && (
+                        <div className={styles.typingIndicator}>
+                            <div className={`${styles.avatar} ${styles.avatarAi}`}>AI</div>
+                            <div className={styles.typingBubble}>
+                                <span className={styles.typingDot}></span>
+                                <span className={styles.typingDot}></span>
+                                <span className={styles.typingDot}></span>
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
 
-                <div ref={messagesEndRef} />
-            </div>
+                    <div ref={messagesEndRef} />
+                </div>
+            )}
 
             {/* Uploaded file indicator */}
             {uploadedFileName && (
@@ -403,6 +412,6 @@ export default function AdvisorChat({
                     Press Enter to send. Upload any PDF transcript, planner, or syllabus. Powered by Gemini.
                 </p>
             </div>
-        </>
+        </div>
     );
 }

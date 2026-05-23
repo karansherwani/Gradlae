@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../components/AuthProvider';
 import styles from '../styles/support.module.css';
 
 interface Message {
@@ -11,8 +12,9 @@ interface Message {
 
 export default function HelpCenterPage() {
     const router = useRouter();
+    const { user } = useAuth();
     const [messages, setMessages] = useState<Message[]>([
-        { text: "Hello! I'm the PaceMatch support assistant. How can I help you today?", sender: 'bot' }
+        { text: "Hello! I'm the Gradlae support assistant. How can I help you today?", sender: 'bot' }
     ]);
     const [inputValue, setInputValue] = useState('');
     const [step, setStep] = useState(0);
@@ -67,8 +69,8 @@ export default function HelpCenterPage() {
     return (
         <div className={styles.container}>
             <header className={styles.header}>
-                <div className={styles.logoMark} style={{ background: 'white', color: 'var(--uofa-blue)', padding: '4px 8px', borderRadius: '4px', fontWeight: 'bold', marginRight: '10px' }}>PM</div>
-                <div className={styles.logo} style={{ fontWeight: 'bold', fontSize: '1.2rem', flex: 1 }}>PaceMatch Help Center</div>
+                <img src="/gradlae-logo.png" alt="Gradlae" className="brandLogoSmall" />
+                <div className={styles.logo} onClick={() => router.push(user ? '/dashboard' : '/')} style={{ fontWeight: 'bold', fontSize: '1.2rem', flex: 1, cursor: 'pointer' }}>Help Center</div>
                 <button className={styles.backBtn} onClick={() => router.push('/')}>
                     Return Home
                 </button>
@@ -90,7 +92,7 @@ export default function HelpCenterPage() {
                             <div style={{ fontSize: '0.8rem', fontWeight: 800, letterSpacing: '0.12em', marginBottom: '15px', color: 'var(--uofa-blue)' }}>EMAIL</div>
                             <h3 style={{ color: 'var(--uofa-blue)' }}>Email Us</h3>
                             <p>For general inquiries and feedback.</p>
-                            <a href="mailto:support@pacematch.com" className={styles.actionBtn} style={{ background: 'var(--uofa-blue)', color: 'white', padding: '8px 16px', borderRadius: '20px', display: 'inline-block' }}>Send Email</a>
+                            <a href="mailto:support@merse.com" className={styles.actionBtn} style={{ background: 'var(--uofa-blue)', color: 'white', padding: '8px 16px', borderRadius: '20px', display: 'inline-block' }}>Send Email</a>
                         </div>
                     </div>
 
