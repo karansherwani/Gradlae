@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../components/AuthProvider';
 import styles from '../styles/advisor.module.css';
@@ -14,6 +14,22 @@ interface TranscriptCourse {
     term: string;
 }
 
+interface AdvisorMessage {
+    id: string;
+    role: 'user' | 'assistant';
+    content: string;
+    timestamp: Date;
+}
+
+interface SavedConversation {
+    id: string;
+    title: string;
+    updatedAt: string;
+    messages: AdvisorMessage[];
+}
+
+type AdvisorView = 'home' | 'credits' | 'timeline' | 'recent' | 'conversation';
+
 const QUICK_PROMPTS = [
     { text: 'Help me plan my next semester' },
     { text: 'What prerequisites do I need for CS courses?' },
@@ -21,6 +37,9 @@ const QUICK_PROMPTS = [
     { text: 'Create a graduation plan for me' },
     { text: 'How many credits do I still need?' },
 ];
+
+const DEGREE_TOTAL_CREDITS = 128;
+const CONVERSATION_STORAGE_KEY = 'gradlaeAdvisorConversations';
 
 function getGreeting() {
     const hour = new Date().getHours();
@@ -84,6 +103,25 @@ function buildTranscriptContext(
     return ctx;
 }
 
+function getConversationTitle(messages: AdvisorMessage[]) {
+    const firstQuestion = messages.find(message => message.role === 'user')?.content || 'Advisor conversation';
+    return firstQuestion.replace(/\s+/g, ' ').trim().slice(0, 54);
+}
+
+function serializeMessages(messages: AdvisorMessage[]) {
+    return messages.map(message => ({
+        ...message,
+        timestamp: message.timestamp instanceof Date ? message.timestamp.toISOString() : message.timestamp,
+    }));
+}
+
+function restoreMessages(messages: AdvisorMessage[]) {
+    return messages.map(message => ({
+        ...message,
+        timestamp: new Date(message.timestamp),
+    }));
+}
+
 export default function AdvisorPage() {
     const router = useRouter();
     const { user, dbUser, accessToken, loading: authLoading } = useAuth();
@@ -91,10 +129,95 @@ export default function AdvisorPage() {
     const [welcomeMessage, setWelcomeMessage] = useState('');
     const [studentContext, setStudentContext] = useState('');
     const [hasTranscript, setHasTranscript] = useState<boolean | null>(null);
+    const [transcriptCourses, setTranscriptCourses] = useState<TranscriptCourse[]>([]);
+    const [activeView, setActiveView] = useState<AdvisorView>('home');
+    const [conversations, setConversations] = useState<SavedConversation[]>([]);
+    const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
 
     const studentName = dbUser?.name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || '';
     const cleanName = studentName.startsWith('Student ') ? studentName.replace('Student ', '') : studentName;
     const displayName = cleanName || 'there';
+
+    const creditSummary = computeCorrectedCredits(transcriptCourses);
+    const creditsRemaining = Math.max(DEGREE_TOTAL_CREDITS - creditSummary.earnedCredits, 0);
+    const termGroups = transcriptCourses.reduce<Record<string, TranscriptCourse[]>>((groups, course) => {
+        const term = course.term || 'Transfer / Prior Credit';
+        groups[term] = groups[term] || [];
+        groups[term].push(course);
+        return groups;
+    }, {});
+    const orderedTerms = Object.keys(termGroups);
+    const timelineItems = [
+        { label: 'Freshman year', detail: orderedTerms[0] ? `${orderedTerms[0]} started your Gradlae record` : 'Start foundational writing, math, and intro major courses' },
+        { label: 'Sophomore year', detail: orderedTerms[1] ? `${orderedTerms[1]} built your prerequisite base` : 'Build prerequisites and core major momentum' },
+        { label: 'Junior year', detail: orderedTerms[2] ? `${orderedTerms[2]} moved into upper-division planning` : 'Move through upper-division requirements and electives' },
+        { label: 'Senior year', detail: `${creditsRemaining} credits remaining toward the ${DEGREE_TOTAL_CREDITS}-credit target` },
+        { label: 'Graduation ready', detail: creditsRemaining === 0 ? 'Credit target met' : 'Finish remaining credits, electives, and advisor-approved requirements' },
+    ];
+
+    useEffect(() => {
+        try {
+            const saved = localStorage.getItem(CONVERSATION_STORAGE_KEY);
+            if (saved) {
+                const parsed = JSON.parse(saved) as SavedConversation[];
+                setConversations(parsed.map(conversation => ({
+                    ...conversation,
+                    messages: restoreMessages(conversation.messages),
+                })));
+            }
+        } catch (error) {
+            console.error('Failed to load advisor conversations:', error);
+        }
+    }, []);
+
+    const persistConversations = useCallback((next: SavedConversation[]) => {
+        setConversations(next);
+        localStorage.setItem(CONVERSATION_STORAGE_KEY, JSON.stringify(next.map(conversation => ({
+            ...conversation,
+            messages: serializeMessages(conversation.messages),
+        }))));
+    }, []);
+
+    const startNewConversation = useCallback(() => {
+        setActiveConversationId(null);
+        setActiveView('home');
+    }, []);
+
+    const handleMessagesChange = useCallback((messages: AdvisorMessage[]) => {
+        const hasUserMessage = messages.some(message => message.role === 'user');
+        if (!hasUserMessage) return;
+
+        const now = new Date().toISOString();
+        const firstUserMessage = messages.find(message => message.role === 'user');
+        const id = activeConversationId || `conversation-${firstUserMessage?.id || Date.now()}`;
+        const nextConversation: SavedConversation = {
+            id,
+            title: getConversationTitle(messages),
+            updatedAt: now,
+            messages,
+        };
+
+        setActiveConversationId(id);
+        setActiveView('conversation');
+        setConversations(prev => {
+            const withoutCurrent = prev.filter(conversation => conversation.id !== id);
+            const next = [nextConversation, ...withoutCurrent].slice(0, 30);
+            localStorage.setItem(CONVERSATION_STORAGE_KEY, JSON.stringify(next.map(conversation => ({
+                ...conversation,
+                messages: serializeMessages(conversation.messages),
+            }))));
+            return next;
+        });
+    }, [activeConversationId]);
+
+    const deleteConversation = useCallback((conversationId: string) => {
+        const next = conversations.filter(conversation => conversation.id !== conversationId);
+        persistConversations(next);
+        if (activeConversationId === conversationId) {
+            setActiveConversationId(null);
+            setActiveView('recent');
+        }
+    }, [activeConversationId, conversations, persistConversations]);
 
     useEffect(() => {
         if (authLoading) return;
@@ -119,6 +242,7 @@ export default function AdvisorPage() {
                     setHasTranscript(true);
 
                     const courses: TranscriptCourse[] = data.courses;
+                    setTranscriptCourses(courses);
                     const ctx = buildTranscriptContext(courses, cleanName);
                     setStudentContext(ctx);
 
@@ -169,6 +293,97 @@ export default function AdvisorPage() {
         setHasTranscript(true);
     };
 
+    const activeConversation = conversations.find(conversation => conversation.id === activeConversationId);
+    const chatInitialMessages = activeConversation?.messages;
+
+    const renderCreditsView = () => (
+        <section className={styles.savedPanel}>
+            <p className={styles.panelEyebrow}>Credits Remaining</p>
+            <h2>{creditsRemaining} credits left</h2>
+            <p className={styles.panelLead}>
+                Based on your uploaded transcript, Gradlae counts {creditSummary.earnedCredits} earned credits toward a {DEGREE_TOTAL_CREDITS}-credit degree target.
+            </p>
+            <div className={styles.creditGrid}>
+                <div>
+                    <strong>{creditSummary.earnedCredits}</strong>
+                    <span>Credits Taken</span>
+                </div>
+                <div>
+                    <strong>{creditsRemaining}</strong>
+                    <span>Credits Remaining</span>
+                </div>
+            </div>
+        </section>
+    );
+
+    const renderTimelineView = () => (
+        <section className={styles.savedPanel}>
+            <p className={styles.panelEyebrow}>Graduation Timeline</p>
+            <h2>A clear path from freshman year to graduation</h2>
+            <div className={styles.timeline}>
+                <div className={styles.timelinePole} aria-hidden="true"></div>
+                {timelineItems.map((item) => (
+                    <div className={styles.timelineItem} key={item.label}>
+                        <div className={styles.timelineYear}>
+                            <h3>{item.label}</h3>
+                        </div>
+                        <div className={styles.timelineMark} aria-hidden="true"></div>
+                        <div className={styles.timelineCopy}>
+                            <p>{item.detail}</p>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </section>
+    );
+
+    const renderRecentView = () => (
+        <section className={styles.savedPanel}>
+            <p className={styles.panelEyebrow}>Recent Talk</p>
+            <h2>Saved advisor conversations</h2>
+            <div className={styles.recentList}>
+                {conversations.length === 0 && <p className={styles.emptyState}>No saved advisor conversations yet.</p>}
+                {conversations.map(conversation => (
+                    <button
+                        key={conversation.id}
+                        className={styles.recentCard}
+                        onClick={() => {
+                            setActiveConversationId(conversation.id);
+                            setActiveView('conversation');
+                        }}
+                    >
+                        <span>{conversation.title}</span>
+                        <small>{new Date(conversation.updatedAt).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</small>
+                        <span
+                            className={styles.deleteConversation}
+                            role="button"
+                            tabIndex={0}
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                deleteConversation(conversation.id);
+                            }}
+                            onKeyDown={(event) => {
+                                if (event.key === 'Enter' || event.key === ' ') {
+                                    event.preventDefault();
+                                    event.stopPropagation();
+                                    deleteConversation(conversation.id);
+                                }
+                            }}
+                            aria-label={`Delete ${conversation.title}`}
+                        >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M3 6h18" />
+                                <path d="M8 6V4h8v2" />
+                                <path d="M19 6l-1 14H6L5 6" />
+                                <path d="M10 11v5M14 11v5" />
+                            </svg>
+                        </span>
+                    </button>
+                ))}
+            </div>
+        </section>
+    );
+
     if (loading) {
         return <div className={styles.loading}>Loading...</div>;
     }
@@ -181,12 +396,12 @@ export default function AdvisorPage() {
                 </div>
 
                 <div className={styles.sidebarSection}>
-                    <p className={styles.sidebarLabel}>Past Conversations</p>
-                    <nav className={styles.sideNav} aria-label="Past conversations">
-                        <button className={`${styles.sideNavItem} ${styles.sideNavItemActive}`}>Today&apos;s academic plan</button>
-                        <button className={styles.sideNavItem}>Credits remaining</button>
-                        <button className={styles.sideNavItem}>Prerequisite check</button>
-                        <button className={styles.sideNavItem}>Graduation timeline</button>
+                    <p className={styles.sidebarLabel}>Advisor</p>
+                    <nav className={styles.sideNav} aria-label="Advisor sections">
+                        <button className={`${styles.sideNavItem} ${activeView === 'home' || activeView === 'conversation' ? styles.sideNavItemActive : ''}`} onClick={startNewConversation}>Today&apos;s academic plan</button>
+                        <button className={`${styles.sideNavItem} ${activeView === 'credits' ? styles.sideNavItemActive : ''}`} onClick={() => setActiveView('credits')}>Credits remaining</button>
+                        <button className={`${styles.sideNavItem} ${activeView === 'timeline' ? styles.sideNavItemActive : ''}`} onClick={() => setActiveView('timeline')}>Graduation timeline</button>
+                        <button className={`${styles.sideNavItem} ${activeView === 'recent' ? styles.sideNavItemActive : ''}`} onClick={() => setActiveView('recent')}>Recent talk</button>
                     </nav>
                 </div>
 
@@ -204,21 +419,28 @@ export default function AdvisorPage() {
                     Dashboard
                 </button>
 
-                <section className={styles.advisorHero}>
-                    <div>
-                        <p className={styles.heroLabel}>AI Academic Advisor</p>
-                        <h1>{getGreeting()}, {displayName}</h1>
-                        <p>
-                            Ask about prerequisites, remaining credits, transcript details, or graduation timelines using the same Gradlae data that powers your dashboard.
-                        </p>
-                    </div>
-                    <div className={styles.heroStats}>
-                        <span>Transcript-aware</span>
-                        <span>UofA course data</span>
-                        <span>PDF uploads</span>
-                    </div>
-                </section>
+                {(activeView === 'home' || activeView === 'conversation') && (
+                    <section className={styles.advisorHero}>
+                        <div>
+                            <p className={styles.heroLabel}>AI Academic Advisor</p>
+                            <h1>{getGreeting()}, {displayName}</h1>
+                            <p>
+                                Ask about prerequisites, remaining credits, transcript details, or graduation timelines using the same Gradlae data that powers your dashboard.
+                            </p>
+                        </div>
+                        <div className={styles.heroStats}>
+                            <span>Transcript-aware</span>
+                            <span>UofA course data</span>
+                            <span>PDF uploads</span>
+                        </div>
+                    </section>
+                )}
                 <div className={styles.chatContainer}>
+                    {activeView === 'credits' && renderCreditsView()}
+                    {activeView === 'timeline' && renderTimelineView()}
+                    {activeView === 'recent' && renderRecentView()}
+                    {(activeView === 'home' || activeView === 'conversation') && (
+                    <>
                     {hasTranscript === false && (
                         <div className={styles.transcriptBanner}>
                             <div className={styles.transcriptBannerContent}>
@@ -248,7 +470,11 @@ export default function AdvisorPage() {
                         studentName={cleanName}
                         welcomeMessage={welcomeMessage}
                         studentContext={studentContext}
+                        accessToken={accessToken || undefined}
+                        initialMessages={chatInitialMessages}
+                        conversationKey={activeConversationId || 'new'}
                         onTranscriptParsed={handleTranscriptParsed}
+                        onMessagesChange={handleMessagesChange}
                     />
 
                     {welcomeMessage && (
@@ -267,6 +493,8 @@ export default function AdvisorPage() {
                                 ))}
                             </div>
                         </div>
+                    )}
+                    </>
                     )}
                 </div>
             </main>

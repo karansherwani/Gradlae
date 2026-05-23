@@ -158,14 +158,14 @@ function buildCourseSample(courses: CSVCourse[], maxCourses = 400): string {
 // ─── TRANSCRIPT CONTEXT (credit rules) ─────────────────────────────────────
 
 function buildTranscriptContextFromDB(courses: TranscriptCourse[], studentName: string): string {
-    // Filter out W grades
-    const passing = courses.filter(c => c.grade !== 'W' && c.grade !== 'IP');
+    // Filter out entries with missing course codes and W grades
+    const passing = courses.filter(c => c.course && c.grade !== 'W' && c.grade !== 'IP');
 
     // De-duplicate by course code
     const seen = new Map<string, TranscriptCourse>();
     for (const c of passing) {
-        const key = c.course.trim().toUpperCase();
-        if (!seen.has(key)) seen.set(key, c);
+        const key = (c.course ?? '').trim().toUpperCase();
+        if (key && !seen.has(key)) seen.set(key, c);
     }
     const uniqueCompleted = Array.from(seen.values());
     const earnedCredits = uniqueCompleted.reduce((s, c) => s + c.credits, 0);
@@ -339,14 +339,15 @@ export async function POST(request: NextRequest) {
         // ─── Try to load from Supabase for authenticated users ──────────
         let studentContext: string | undefined = clientContext || undefined;
         let dbPlannerContext: string | null = null;
+        let advisorUser: Awaited<ReturnType<typeof getUserFromRequest>> = null;
 
-        const user = await getUserFromRequest(request);
-        if (user) {
+        advisorUser = await getUserFromRequest(request);
+        if (advisorUser) {
             // Load transcript from Supabase
             const { data: transcript } = await supabaseAdmin
                 .from('transcripts')
                 .select('parsed_json')
-                .eq('user_id', user.id)
+                .eq('user_id', advisorUser.id)
                 .order('created_at', { ascending: false })
                 .limit(1)
                 .single();
@@ -354,7 +355,7 @@ export async function POST(request: NextRequest) {
             if (transcript?.parsed_json) {
                 const parsed = transcript.parsed_json as { courses: TranscriptCourse[]; studentInfo?: { name?: string } };
                 if (parsed.courses?.length > 0) {
-                    const name = parsed.studentInfo?.name || user.name || 'Student';
+                    const name = parsed.studentInfo?.name || advisorUser.name || 'Student';
                     studentContext = buildTranscriptContextFromDB(parsed.courses, name);
                 }
             }
@@ -363,7 +364,7 @@ export async function POST(request: NextRequest) {
             const { data: planner } = await supabaseAdmin
                 .from('planners')
                 .select('planner_json')
-                .eq('user_id', user.id)
+                .eq('user_id', advisorUser.id)
                 .order('updated_at', { ascending: false })
                 .limit(1)
                 .single();
@@ -372,22 +373,6 @@ export async function POST(request: NextRequest) {
                 dbPlannerContext = buildPlannerContext(planner.planner_json as PlannerData);
             }
 
-            // Log the session
-            const lastUserMsg = messages.filter((m: { role: string }) => m.role === 'user').pop();
-            if (lastUserMsg) {
-                // Fire-and-forget session logging
-                void (async () => {
-                    try {
-                        await supabaseAdmin
-                            .from('advisor_sessions')
-                            .insert({
-                                user_id: user.id,
-                                question: lastUserMsg.content?.substring(0, 2000) || '',
-                                answer: '',
-                            });
-                    } catch { /* ignore logging errors */ }
-                })();
-            }
         }
 
         // Build context – prefer DB planner, fall back to static file
@@ -451,6 +436,21 @@ export async function POST(request: NextRequest) {
             }
         }
 
+        const lastUserMsg = messages.filter((m: { role: string }) => m.role === 'user').pop();
+        if (advisorUser && lastUserMsg) {
+            void (async () => {
+                try {
+                    await supabaseAdmin
+                        .from('advisor_sessions')
+                        .insert({
+                            user_id: advisorUser.id,
+                            question: lastUserMsg.content?.substring(0, 2000) || '',
+                            answer: aiMessage?.substring(0, 8000) || '',
+                        });
+                } catch { /* ignore logging errors */ }
+            })();
+        }
+
         return NextResponse.json({ message: aiMessage });
     } catch (error) {
         console.error('Advisor API error:', error);
@@ -470,4 +470,3 @@ export async function POST(request: NextRequest) {
         );
     }
 }
-

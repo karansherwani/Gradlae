@@ -126,6 +126,36 @@ export default function SettingsPage() {
                     </div>
                 </div>
 
+                {/* Billing & Academic Pacing card */}
+                <div className={styles.card}>
+                    <div className={styles.cardTitle}>Billing &amp; Academic Pacing</div>
+                    <div className={styles.dataRow}>
+                        <span className={styles.dataLabel}>Academic Placement Track</span>
+                        <span className={`${styles.badge}`} style={{ background: '#003366', color: '#fff', fontSize: '0.8rem', padding: '4px 8px', borderRadius: '4px' }}>
+                            Batch B (Standard Track)
+                        </span>
+                    </div>
+                    <div className={styles.dataRow}>
+                        <span className={styles.dataLabel}>Mentoring Support Billing</span>
+                        <span className={styles.dataValue}>Stripe Pay-as-you-go</span>
+                    </div>
+                    <div className={styles.dataRow}>
+                        <span className={styles.dataLabel}>Session Credits Available</span>
+                        <span className={styles.dataValue} style={{ fontWeight: 600 }}>
+                            {summary?.data.advisorSessions ? `${summary.data.advisorSessions} Session(s)` : '0 Session(s) (Stripe Checkout)'}
+                        </span>
+                    </div>
+                    <div className={styles.dataRow} style={{ marginTop: '10px' }}>
+                        <button 
+                            onClick={() => router.push('/mentoring')} 
+                            className={styles.backBtn}
+                            style={{ width: '100%', border: '1px solid #003366', color: '#003366', background: 'transparent', padding: '10px', fontSize: '0.85rem' }}
+                        >
+                            Book Mentoring Slots on Stripe
+                        </button>
+                    </div>
+                </div>
+
                 {/* Data summary card */}
                 <div className={styles.card}>
                     <div className={styles.cardTitle}>Stored Data</div>

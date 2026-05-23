@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '../lib/supabaseClient';
 import styles from '../styles/auth.module.css';
 
@@ -19,8 +19,10 @@ const universities = [
   { id: 'berkeley', name: 'UC Berkeley', domain: 'berkeley.edu' },
 ];
 
-export default function AuthPage() {
+function AuthPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirect');
 
   // Flow step: university to role to credentials
   const [flowStep, setFlowStep] = useState<'university' | 'role' | 'credentials'>('university');
@@ -173,10 +175,10 @@ export default function AuthPage() {
 
         console.log('Login successful via Supabase Auth');
 
-        // Navigate to the appropriate dashboard
+        // Navigate to the redirect target or the appropriate dashboard
         setTimeout(() => {
-          const dashboardRoute = userRole === 'staff' ? '/staff/dashboard' : '/dashboard';
-          window.location.href = dashboardRoute;
+          const defaultRoute = userRole === 'staff' ? '/staff/dashboard' : '/dashboard';
+          window.location.href = redirectTo || defaultRoute;
         }, 100);
       } else {
         setError(data.message || 'Authentication failed. Please try again.');
@@ -467,7 +469,8 @@ export default function AuthPage() {
               </button>
             </form>
           ) : (
-            <form onSubmit={handleSubmit} name="login-form" autoComplete="on">
+            <>
+              <form onSubmit={handleSubmit} name="login-form" autoComplete="on">
               <div className={styles.formGroup}>
                 <label htmlFor="netId">NetID</label>
                 <input
@@ -581,6 +584,60 @@ export default function AuthPage() {
                 </p>
               )}
             </form>
+            
+            <div style={{ display: 'flex', alignItems: 'center', margin: '20px 0', color: '#cbd5e1' }}>
+              <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }}></div>
+              <span style={{ padding: '0 10px', fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>or continue with</span>
+              <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }}></div>
+            </div>
+
+            <button
+              type="button"
+              onClick={async () => {
+                setError('');
+                setLoading(true);
+                try {
+                  const { error: oauthError } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                      redirectTo: `${window.location.origin}/auth/callback?redirect=${redirectTo || '/dashboard'}`,
+                    }
+                  });
+                  if (oauthError) throw oauthError;
+                } catch (err: any) {
+                  setError(err.message || 'Failed to initialize Google Sign-in');
+                  setLoading(false);
+                }
+              }}
+              style={{
+                width: '100%',
+                background: '#ffffff',
+                border: '1px solid #cbd5e1',
+                borderRadius: '8px',
+                padding: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                cursor: 'pointer',
+                fontWeight: 600,
+                fontSize: '0.95rem',
+                color: '#334155',
+                transition: 'background 0.2s',
+                marginBottom: '15px',
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = '#f8fafc'}
+              onMouseLeave={(e) => e.currentTarget.style.background = '#ffffff'}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" style={{ display: 'block' }}>
+                <path
+                  fill="#EA4335"
+                  d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.214-5.207 4.214-3.524 0-6.388-2.864-6.388-6.388 0-3.524 2.864-6.388 6.388-6.388 1.625 0 3.09.61 4.22 1.625l3.125-3.125C19.26 2.457 15.937 1 12.24 1 5.753 1 .5 6.253.5 12.74S5.753 24.48 12.24 24.48c6.19 0 11.23-4.5 11.23-11.23 0-.648-.065-1.285-.18-1.895h-11.05z"
+                />
+              </svg>
+              <span>Google Workspace SSO</span>
+            </button>
+          </>
           )}
 
           {mode !== 'reset' && (
@@ -622,5 +679,29 @@ export default function AuthPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense fallback={
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#f8fafc',
+        fontFamily: "'Inter', sans-serif",
+        color: '#0f172a',
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ width: '40px', height: '40px', border: '3px solid #e2e8f0', borderTopColor: '#003366', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 16px auto' }}></div>
+          <style dangerouslySetInnerHTML={{ __html: '@keyframes spin { to { transform: rotate(360deg); } }' }} />
+          <p style={{ margin: 0, fontWeight: 500, fontSize: '0.95rem' }}>Loading authorization portal...</p>
+        </div>
+      </div>
+    }>
+      <AuthPageContent />
+    </Suspense>
   );
 }

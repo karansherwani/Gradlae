@@ -143,7 +143,10 @@ export default function Dashboard() {
         <div className={styles.headerRight}>
           <div className={styles.userInfo} onClick={() => router.push('/profile')} style={{ cursor: 'pointer' }}>
             <div className={styles.userAvatar}>
-              {displayName ? displayName.split(' ').map((n: string) => n.charAt(0).toUpperCase()).join('').slice(0, 2) : '?'}
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
             </div>
             <span className={styles.userName}>{displayName || 'User'}</span>
           </div>
@@ -231,6 +234,10 @@ export default function Dashboard() {
               </div>
               <button className={styles.aiAdvisorCta} onClick={() => router.push('/advisor')}>
                 Plan My Semester
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '8px' }}>
+                  <path d="M5 12h14" />
+                  <path d="m12 5 7 7-7 7" />
+                </svg>
               </button>
             </div>
           </div>
@@ -302,6 +309,10 @@ export default function Dashboard() {
       <footer className={styles.footer}>
         <div className={styles.footerBottom}>
           © 2026 Gradlae · University of Arizona Student Portal
+          <div style={{ marginTop: '8px', display: 'flex', gap: '16px', justifyContent: 'center', opacity: 0.7, fontSize: '0.85rem' }}>
+            <a href="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>Privacy Policy</a>
+            <a href="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>Terms &amp; Conditions</a>
+          </div>
         </div>
       </footer>
     </div>

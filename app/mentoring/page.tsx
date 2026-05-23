@@ -278,7 +278,7 @@ export default function MentoringPage() {
             <main className={styles.main}>
                 {isLoadingMentors ? (
                     <div style={{ textAlign: 'center', padding: '60px 20px' }}>
-                        <div style={{
+                        <div className="spinner" style={{
                             width: '40px',
                             height: '40px',
                             border: '3px solid rgba(12, 35, 75, 0.2)',

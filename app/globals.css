@@ -300,3 +300,22 @@ textarea {
 :where([class*="Icon"], [class*="icon"], [class*="Badge"], [class*="badge"]) {
   flex-shrink: 0;
 }
+
+/* Page Header Global Background Styling */
+header {
+  background-color: rgb(245, 243, 240) !important;
+  background: rgb(245, 243, 240) !important;
+}
+
+/* Remove all container borders and shadows for Advisor Graduation Timeline & Panels */
+[class*="savedPanel"],
+[class*="timeline"] {
+  border: none !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+

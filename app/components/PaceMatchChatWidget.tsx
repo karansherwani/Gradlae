@@ -24,7 +24,7 @@ export default function PaceMatchChatWidget() {
       {open && (
         <section className={styles.panel} aria-label="Gradlae chat options">
           <div className={styles.badge}>
-            <CompassIcon />
+            <img src="/gradlae-logo.png" alt="Gradlae" width={32} height={32} />
           </div>
           <button className={styles.closeButton} onClick={() => setOpen(false)} aria-label="Close chat">
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -37,7 +37,7 @@ export default function PaceMatchChatWidget() {
 
           <div className={styles.options}>
             <a href="/auth">I am a student trying to sign in</a>
-            <a href="/advisor">I need academic planning support</a>
+            <a href="/auth?redirect=/advisor">I need academic planning support</a>
             <a href="/help">I need product support</a>
           </div>
 

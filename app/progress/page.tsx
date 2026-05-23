@@ -413,28 +413,48 @@ export default function ProgressPage() {
                 {/* Stats Cards */}
                 <div className={styles.statsGrid}>
                     <div className={styles.statCard}>
-                        <div className={styles.statIcon}>GPA</div>
+                        <div className={styles.statIcon}>
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                                <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
+                            </svg>
+                        </div>
                         <div className={styles.statInfo}>
                             <span className={styles.statValue}>{previousGPA || '—'}</span>
                             <span className={styles.statLabel}>Current GPA</span>
                         </div>
                     </div>
                     <div className={styles.statCard}>
-                        <div className={styles.statIcon}>CRS</div>
+                        <div className={styles.statIcon}>
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                            </svg>
+                        </div>
                         <div className={styles.statInfo}>
                             <span className={styles.statValue}>{currentSemesterCourses.length || gpaCalculatorCourses.length}</span>
                             <span className={styles.statLabel}>Current Courses</span>
                         </div>
                     </div>
                     <div className={styles.statCard}>
-                        <div className={styles.statIcon}>CR</div>
+                        <div className={styles.statIcon}>
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                <circle cx="12" cy="8" r="7" />
+                                <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
+                            </svg>
+                        </div>
                         <div className={styles.statInfo}>
                             <span className={styles.statValue}>{totalCurrentCredits}</span>
                             <span className={styles.statLabel}>Credits This Term</span>
                         </div>
                     </div>
                     <div className={styles.statCard}>
-                        <div className={styles.statIcon}>PRJ</div>
+                        <div className={styles.statIcon}>
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+                                <polyline points="16 7 22 7 22 13" />
+                            </svg>
+                        </div>
                         <div className={styles.statInfo}>
                             <span className={styles.statValue}>{calculateCumulativeGPA()}</span>
                             <span className={styles.statLabel}>Projected GPA</span>
@@ -450,7 +470,15 @@ export default function ProgressPage() {
                 {/* GPA Calculator Section */}
                 <section className={styles.gpaCalculatorSection}>
                     <div className={styles.sectionHeader}>
-                        <div className={styles.sectionIcon}>GPA</div>
+                        <div className={styles.sectionIcon}>
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
+                                <line x1="9" y1="22" x2="15" y2="22" />
+                                <line x1="8" y1="6" x2="16" y2="6" />
+                                <line x1="16" y1="14" x2="16" y2="18" />
+                                <path d="M16 10h.01M12 10h.01M8 10h.01M12 14h.01M8 14h.01M12 18h.01M8 18h.01" strokeWidth="3" />
+                            </svg>
+                        </div>
                         <div>
                             <h2>Cumulative GPA Calculator</h2>
                             <p>Calculate your projected cumulative GPA based on expected grades</p>

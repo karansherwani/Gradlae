@@ -83,15 +83,13 @@
 }
 
 .userAvatar {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 999px;
-  background: var(--uofa-red-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: transparent;
   color: var(--uofa-red);
-  font-size: 0.78rem;
-  font-weight: 800;
 }
 
 .userName {
@@ -300,6 +298,13 @@
   background: var(--uofa-blue);
   color: var(--pm-white);
   padding: 12px 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.aiAdvisorCta svg {
+  transition: transform 0.2s ease;
 }
 
 .quickAccessCtaAlt {
@@ -314,6 +319,10 @@
   background: var(--pm-blue-dark);
   box-shadow: var(--pm-shadow-card);
   transform: translateY(-1px);
+}
+
+.aiAdvisorCta:hover svg {
+  transform: translateX(4px);
 }
 
 .quickAccessCtaAlt:hover {

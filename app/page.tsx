@@ -378,6 +378,7 @@ export default function LandingPage() {
             <a href="/help">Help Center</a>
             <a href="/feedback">Feedback</a>
             <a href="/privacy">Privacy</a>
+            <a href="/terms">Terms</a>
           </div>
         </div>
         <div className={styles.footerBottom}>

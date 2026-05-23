@@ -22,16 +22,20 @@ interface AdvisorChatProps {
     studentName: string;
     welcomeMessage?: string;
     studentContext?: string; // Pre-built context from advisor page
+    accessToken?: string;
+    initialMessages?: Message[];
+    conversationKey?: string;
     onTranscriptParsed?: (ctx: string) => void; // Callback when a transcript is uploaded in-chat
+    onMessagesChange?: (messages: Message[]) => void;
 }
 
 // ─── Credit helpers (W removed, duplicates de-duped) ─────────────────────
 function computeCorrectedCredits(courses: TranscriptCourse[]) {
-    const passing = courses.filter(c => c.grade !== 'W' && c.grade !== 'IP');
+    const passing = courses.filter(c => c.course && c.grade !== 'W' && c.grade !== 'IP');
     const seen = new Map<string, TranscriptCourse>();
     for (const c of passing) {
-        const key = c.course.trim().toUpperCase();
-        if (!seen.has(key)) {
+        const key = (c.course ?? '').trim().toUpperCase();
+        if (key && !seen.has(key)) {
             seen.set(key, c);
         }
     }
@@ -83,9 +87,14 @@ export default function AdvisorChat({
     studentName,
     welcomeMessage,
     studentContext,
+    accessToken,
+    initialMessages,
+    conversationKey,
     onTranscriptParsed,
+    onMessagesChange,
 }: AdvisorChatProps) {
     const [messages, setMessages] = useState<Message[]>(() => {
+        if (initialMessages?.length) return initialMessages;
         if (welcomeMessage) {
             return [{
                 id: 'welcome',
@@ -106,6 +115,27 @@ export default function AdvisorChat({
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const isHomeMode = messages.length === 1 && messages[0]?.id === 'welcome' && !isTyping;
+
+    useEffect(() => {
+        if (initialMessages?.length) {
+            setMessages(initialMessages.map(message => ({
+                ...message,
+                timestamp: message.timestamp instanceof Date ? message.timestamp : new Date(message.timestamp),
+            })));
+        } else if (welcomeMessage) {
+            setMessages([{
+                id: 'welcome',
+                role: 'assistant',
+                content: welcomeMessage,
+                timestamp: new Date(),
+            }]);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [conversationKey]);
+
+    useEffect(() => {
+        onMessagesChange?.(messages);
+    }, [messages, onMessagesChange]);
 
     // Keep activeContext in sync with prop changes
     useEffect(() => {
@@ -242,7 +272,10 @@ export default function AdvisorChat({
 
             const response = await fetch('/api/advisor', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+                },
                 body: JSON.stringify({
                     messages: chatMessages,
                     studentContext: fullCtx || undefined,

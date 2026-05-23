@@ -1201,3 +1201,14 @@
         width: 100%;
     }
 }
+
+/* Remove all container borders and shadows from all elements on the progress page, excluding spinner animations */
+.container :not([class*="spinner"]):not([class*="Spinner"]),
+.container *:not([class*="spinner"]):not([class*="Spinner"]),
+.main :not([class*="spinner"]):not([class*="Spinner"]),
+.main *:not([class*="spinner"]):not([class*="Spinner"]) {
+    border: none !important;
+    border-width: 0 !important;
+    border-style: none !important;
+    box-shadow: none !important;
+}

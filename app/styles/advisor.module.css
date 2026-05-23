@@ -4,7 +4,7 @@
     --uofa-red-soft: var(--pm-red-soft);
     --uofa-blue: var(--pm-blue);
     --uofa-blue-soft: var(--pm-blue-soft);
-    --advisor-bg: var(--pm-white);
+    --advisor-bg: var(--pm-bg);
     --advisor-surface: var(--pm-bg);
     --advisor-ink: var(--pm-black);
     --advisor-muted: var(--pm-gray);
@@ -229,7 +229,7 @@
     margin: 0;
     color: var(--uofa-blue);
     font-family: var(--advisor-display);
-    font-size: clamp(3.2rem, 6.6vw, 6.5rem);
+    font-size: clamp(2.8rem, 5.2vw, 5.2rem);
     font-weight: 400;
     letter-spacing: 0;
     line-height: 0.96;
@@ -272,6 +272,220 @@
     order: 3;
     padding: 18px 0 0;
     background: transparent;
+}
+
+.savedPanel {
+    width: min(100%, 880px);
+    margin: 120px auto 0;
+    color: var(--advisor-ink);
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    transform: none !important;
+    transition: none !important;
+}
+
+.panelEyebrow {
+    margin: 0 0 12px;
+    color: var(--uofa-red);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.savedPanel h2 {
+    max-width: 760px;
+    margin: 0;
+    color: var(--uofa-blue);
+    font-family: var(--advisor-display);
+    font-size: clamp(2.15rem, 4vw, 3.9rem);
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 1;
+}
+
+.panelLead {
+    max-width: 680px;
+    margin: 18px 0 0;
+    color: var(--advisor-muted);
+    font-size: 1rem;
+    line-height: 1.75;
+}
+
+.creditGrid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 34px;
+}
+
+.creditGrid div,
+.recentCard {
+    background: transparent;
+    border: 0;
+}
+
+.creditGrid div {
+    padding: 20px;
+    border-radius: 0;
+}
+
+.creditGrid strong {
+    display: block;
+    color: var(--uofa-blue);
+    font-family: var(--advisor-display);
+    font-size: 1.95rem;
+    font-weight: 400;
+    line-height: 1;
+}
+
+.creditGrid span {
+    display: block;
+    margin-top: 8px;
+    color: var(--advisor-muted);
+    font-size: 0.8rem;
+    font-weight: 800;
+}
+
+.courseLedger {
+    margin-top: 24px;
+    border-top: 1px solid var(--advisor-line);
+}
+
+.courseLedger div {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--advisor-line);
+    color: var(--advisor-ink);
+}
+
+.courseLedger span {
+    font-weight: 800;
+}
+
+.courseLedger strong {
+    color: var(--uofa-blue);
+}
+
+.timeline {
+    position: relative;
+    display: grid;
+    gap: 22px;
+    margin-top: 36px;
+    padding: 32px 0;
+}
+
+.timelineItem {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(150px, 0.9fr) 92px minmax(0, 1.35fr);
+    align-items: center;
+    gap: 28px;
+    min-height: 106px;
+}
+
+.timelinePole {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(40% + 14px);
+    width: 82px;
+    transform: translateX(-50%);
+    background-image: url("/graduation-timeline-pole.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: auto 100%;
+    opacity: 0.95;
+    pointer-events: none;
+}
+
+.timelineYear {
+    text-align: right;
+}
+
+.timelineMark {
+    width: 92px;
+    height: 1px;
+    background: rgba(12, 35, 75, 0.34);
+}
+
+.timelineYear h3 {
+    margin: 0;
+    color: var(--uofa-blue);
+    font-family: var(--advisor-display);
+    font-size: clamp(1.35rem, 2vw, 1.65rem);
+    font-weight: 400;
+    line-height: 1;
+}
+
+.timelineCopy p {
+    margin: 0;
+    color: var(--advisor-muted);
+    font-size: 0.98rem;
+    line-height: 1.65;
+}
+
+.recentList {
+    display: grid;
+    gap: 12px;
+    margin-top: 28px;
+}
+
+.recentCard {
+    position: relative;
+    display: block;
+    width: 100%;
+    min-height: 86px;
+    padding: 18px 56px 18px 18px;
+    border-radius: 0;
+    color: var(--advisor-ink);
+    cursor: pointer;
+    text-align: left;
+}
+
+.recentCard:hover {
+    color: var(--uofa-blue);
+}
+
+.recentCard > span:first-child {
+    display: block;
+    color: var(--uofa-blue);
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+.recentCard small {
+    display: block;
+    margin-top: 8px;
+    color: var(--advisor-muted);
+    font-size: 0.78rem;
+}
+
+.deleteConversation {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    color: var(--advisor-muted);
+}
+
+.deleteConversation:hover {
+    background: var(--uofa-red-soft);
+    color: var(--uofa-red);
+}
+
+.emptyState {
+    margin: 0;
+    color: var(--advisor-muted);
 }
 
 .promptsGrid {
@@ -443,7 +657,7 @@
     padding: 14px;
     border: 0;
     border-radius: 14px;
-    background: var(--pm-white);
+    background: var(--advisor-surface);
     box-shadow: none;
 }
 
@@ -464,14 +678,14 @@
     border: 0;
     border-radius: 10px;
     outline: none;
-    background: var(--pm-bg);
+    background: var(--advisor-surface);
     color: var(--advisor-ink);
     font: 500 0.96rem var(--advisor-ui);
     transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
 }
 
 .textInput:focus {
-    background: var(--pm-bg);
+    background: var(--advisor-surface);
     box-shadow: none;
 }
 
@@ -491,7 +705,7 @@
 
 .attachButton {
     border: 0;
-    background: var(--pm-bg);
+    background: var(--advisor-surface);
     color: var(--advisor-muted);
 }
 
@@ -761,6 +975,10 @@
     .typingIndicator {
         max-width: 92%;
     }
+
+    .savedPanel {
+        margin-top: 84px;
+    }
 }
 
 @media (max-width: 640px) {
@@ -788,11 +1006,33 @@
     }
 
     .advisorHero h1 {
-        font-size: clamp(2.8rem, 16vw, 4rem);
+        font-size: clamp(2.35rem, 12vw, 3.35rem);
     }
 
     .chatContainer {
         width: 100%;
+    }
+
+    .savedPanel {
+        margin-top: 24px;
+    }
+
+    .creditGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .timelineItem {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 10px;
+    }
+
+    .timelinePole,
+    .timelineMark {
+        display: none;
+    }
+
+    .timelineYear {
+        text-align: left;
     }
 
     .quickPrompts,
@@ -841,3 +1081,15 @@
         padding: 13px 16px;
     }
 }
+
+/* Remove all container borders and shadows from all elements on the advisor page, excluding spinner animations */
+.container :not([class*="spinner"]):not([class*="Spinner"]),
+.container *:not([class*="spinner"]):not([class*="Spinner"]),
+.main :not([class*="spinner"]):not([class*="Spinner"]),
+.main *:not([class*="spinner"]):not([class*="Spinner"]) {
+    border: none !important;
+    border-width: 0 !important;
+    border-style: none !important;
+    box-shadow: none !important;
+}
+
