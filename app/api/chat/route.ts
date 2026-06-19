@@ -12,6 +12,19 @@ import path from 'path';
 
 let cachedDegreePlans: DegreePlan[] | null = null;
 
+interface IntentCourseContext {
+  id: string;
+  title: string;
+  units: Course['units'];
+  eligible: boolean;
+  missing: string[];
+}
+
+interface IntentContext {
+  intent: 'general' | 'four_year_plan' | 'prerequisite_check' | 'recommendation' | 'schedule_planning' | 'degree_audit' | 'prerequisite_info';
+  courses: IntentCourseContext[];
+}
+
 function loadCourseData(): Course[] {
   return loadGraphCourses();
 }
@@ -410,9 +423,9 @@ function analyzeUserIntent(
   userMessage: string,
   graph: CourseGraph,
   studentProfile: StudentProfile
-): any {
+): IntentContext {
   const lowerMessage = userMessage.toLowerCase();
-  const context: any = {
+  const context: IntentContext = {
     intent: 'general',
     courses: []
   };
@@ -420,7 +433,7 @@ function analyzeUserIntent(
   // Extract course codes from message (e.g., "ECE 101", "CSC-355")
   const courseMatches = userMessage.match(/([A-Z]{2,5})[\s-]?(\d{3}[A-Z]*)/gi);
   if (courseMatches) {
-    context.courses = courseMatches.map(match => {
+    context.courses = courseMatches.flatMap(match => {
       const normalized = match.replace(/\s+/g, '-').toUpperCase();
       const course = graph.getCourse(normalized);
       if (course) {
@@ -433,8 +446,8 @@ function analyzeUserIntent(
           missing: prereqCheck.missing
         };
       }
-      return null;
-    }).filter(Boolean);
+      return [];
+    });
   }
 
   // Detect intent
@@ -460,7 +473,7 @@ function analyzeUserIntent(
 async function callAI(
   systemPrompt: string,
   messages: ChatMessage[],
-  context: any
+  context: IntentContext
 ): Promise<string> {
   const apiKey = process.env.OPENAI_API_KEY || process.env.ROUTELLM_API_KEY;
 

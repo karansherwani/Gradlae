@@ -40,104 +40,236 @@ interface Mentor {
     timeSlots: TimeSlot[];
 }
 
+async function readJsonResponse(response: Response) {
+    const text = await response.text();
+    const trimmed = text.trim();
+
+    if (!trimmed) {
+        if (response.ok) return {};
+        throw new Error(`Payment request failed with status ${response.status}`);
+    }
+
+    try {
+        return JSON.parse(trimmed);
+    } catch {
+        const shortText = trimmed
+            .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+            .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+            .replace(/<[^>]*>/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .slice(0, 180);
+
+        throw new Error(shortText || `Payment request failed with status ${response.status}`);
+    }
+}
+
 // Fallback mentors (shown when no dynamic mentors are available)
 const DEFAULT_MENTORS: Mentor[] = [
     {
         id: 1,
-        name: "Santiago Ponce",
-        avatar: "SP",
+        name: "Karan Kumar",
+        avatar: "KK",
         avatarColor: 'blue',
         rating: 4.9,
-        reviewCount: 127,
-        major: "Senior @ UofA, Statistics major",
-        bio: "Got A's in all listed courses. Love helping others succeed! Specialized in data analysis and probability.",
-        courses: ["MATH 363", "MATH 466", "DATA 363"],
-        slotsAvailable: 3,
+        reviewCount: 134,
+        major: "Senior @ UofA, Management Information Systems",
+        bio: "Straight A's across all my business courses. I break down case studies and financial concepts into simple, real-world examples. Let's get you that A!",
+        courses: ["BNAD 302", "MGMT 300", "MIS 331"],
+        slotsAvailable: 4,
         supportsInPerson: true,
         supportsOnline: true,
         price: 25,
         reviews: [
-            { id: 1, user: "John D.", text: "Sarah explained complex statistical models in a way that finally clicked for me.", rating: 5, date: "Dec 28, 2024" },
-            { id: 2, user: "Maria L.", text: "Super patient and very knowledgeable about MATH 466!", rating: 4.8, date: "Dec 15, 2024" }
+            { id: 1, user: "Priya M.", text: "Karan made operations management actually make sense. His case study walkthroughs are incredible.", rating: 5, date: "May 8, 2026" },
+            { id: 2, user: "Tyler R.", text: "Best tutor I've had for BNAD 302. Super organized and always prepared.", rating: 4.9, date: "Apr 22, 2026" },
+            { id: 3, user: "Emma S.", text: "He explains MIS concepts so clearly. Went from a C to an A- in one semester.", rating: 5, date: "Mar 15, 2026" }
         ],
         timeSlots: [
-            { id: 1, day: "Monday", date: "Jan 13", time: "10:00 AM" },
-            { id: 2, day: "Wednesday", date: "Jan 15", time: "2:00 PM" },
-            { id: 3, day: "Friday", date: "Jan 17", time: "11:30 AM" }
+            { id: 1, day: "Monday", date: "Jun 2", time: "10:00 AM" },
+            { id: 2, day: "Monday", date: "Jun 2", time: "2:00 PM" },
+            { id: 3, day: "Wednesday", date: "Jun 4", time: "11:00 AM" },
+            { id: 4, day: "Friday", date: "Jun 6", time: "9:00 AM" }
         ]
     },
     {
         id: 2,
-        name: "Karan Kumar",
-        avatar: "KK",
+        name: "Renato Garcia",
+        avatar: "RG",
         avatarColor: 'blue',
         rating: 4.8,
-        reviewCount: 89,
+        reviewCount: 97,
         major: "Junior @ UofA, Computer Science",
-        bio: "Aced all CS courses. Great at debugging and explaining code! I can help with systems programming and web dev.",
-        courses: ["CSC 337", "CSC 352", "CSC 210"],
+        bio: "Passionate about clean code and solid fundamentals. I've aced every CS course listed and love helping students debug and think algorithmically.",
+        courses: ["CSC 210", "CSC 252", "CSC 337"],
         slotsAvailable: 3,
         supportsInPerson: false,
         supportsOnline: true,
         price: 25,
         reviews: [
-            { id: 1, user: "Chris P.", text: "Helped me understand pointers finally!", rating: 5, date: "Dec 12, 2024" }
+            { id: 1, user: "Jason L.", text: "Renato helped me understand recursion and dynamic programming. Couldn't have passed CSC 252 without him.", rating: 5, date: "May 12, 2026" },
+            { id: 2, user: "Alicia K.", text: "Super patient with debugging sessions. He doesn't just fix your code—he teaches you why it broke.", rating: 4.8, date: "Apr 30, 2026" }
         ],
         timeSlots: [
-            { id: 1, day: "Tuesday", date: "Jan 7", time: "9:00 AM" },
-            { id: 2, day: "Tuesday", date: "Jan 7", time: "4:00 PM" },
-            { id: 3, day: "Thursday", date: "Jan 9", time: "1:00 PM" }
+            { id: 1, day: "Tuesday", date: "Jun 3", time: "9:00 AM" },
+            { id: 2, day: "Tuesday", date: "Jun 3", time: "4:00 PM" },
+            { id: 3, day: "Thursday", date: "Jun 5", time: "1:00 PM" }
         ]
     },
     {
         id: 3,
-        name: "Renato Garcia",
-        avatar: "RG",
+        name: "Alex Coose",
+        avatar: "AC",
         avatarColor: 'blue',
         rating: 5.0,
-        reviewCount: 54,
-        major: "Senior @ UofA, Data Science",
-        bio: "Perfect grades in data courses. Passionate about teaching! I focus on making learning interactive.",
-        courses: ["DATA 201", "DATA 375", "MATH 313"],
+        reviewCount: 62,
+        major: "Senior @ UofA, Statistics & Data Science",
+        bio: "Double major in Stats and Data Science with a 3.95 GPA. I make probability and regression feel intuitive. Tons of practice problems ready to go.",
+        courses: ["DATA 363", "MATH 466", "DATA 375"],
         slotsAvailable: 3,
         supportsInPerson: true,
         supportsOnline: true,
         price: 25,
         reviews: [
-            { id: 1, user: "Kevin S.", text: "The best math tutor I've ever had. So clear.", rating: 5, date: "Nov 20, 2024" }
+            { id: 1, user: "Nina P.", text: "Alex is hands-down the best stats tutor at UofA. He made hypothesis testing click for me in one session.", rating: 5, date: "May 5, 2026" },
+            { id: 2, user: "David W.", text: "Really thorough with DATA 363 material. Brought his own practice exams which were super helpful.", rating: 5, date: "Apr 18, 2026" }
         ],
         timeSlots: [
-            { id: 1, day: "Monday", date: "Jan 6", time: "3:00 PM" },
-            { id: 2, day: "Wednesday", date: "Jan 8", time: "10:00 AM" }
+            { id: 1, day: "Monday", date: "Jun 2", time: "3:00 PM" },
+            { id: 2, day: "Wednesday", date: "Jun 4", time: "10:00 AM" },
+            { id: 3, day: "Friday", date: "Jun 6", time: "1:00 PM" }
         ]
     },
     {
         id: 4,
-        name: "Harsh Kaul",
-        avatar: "EP",
+        name: "Jack Thomas",
+        avatar: "JT",
         avatarColor: 'blue',
         rating: 4.7,
-        reviewCount: 112,
-        major: "Sophomore @ UofA, Math major",
-        bio: "Excelled in calculus courses. Ready to help you ace your exams! I have plenty of study sheets to share.",
+        reviewCount: 108,
+        major: "Junior @ UofA, Mathematics",
+        bio: "Math is my thing—calculus, linear algebra, you name it. I've tutored 50+ students and have a knack for making tricky proofs feel manageable.",
         courses: ["MATH 125", "MATH 129", "MATH 313"],
-        slotsAvailable: 2,
+        slotsAvailable: 5,
         supportsInPerson: true,
-        supportsOnline: false,
+        supportsOnline: true,
         price: 25,
         reviews: [
-            { id: 1, user: "David G.", text: "Calculus was a nightmare until I started meeting with Michael.", rating: 5, date: "Dec 5, 2024" }
+            { id: 1, user: "Sophie T.", text: "Jack saved my grade in MATH 129. He walks through every step so patiently.", rating: 5, date: "May 10, 2026" },
+            { id: 2, user: "Marcus J.", text: "Really solid at linear algebra. Explains eigenvalues better than my professor honestly.", rating: 4.7, date: "Apr 25, 2026" },
+            { id: 3, user: "Rachel B.", text: "Great energy and always has extra practice problems. Highly recommend for calc.", rating: 4.8, date: "Mar 28, 2026" }
         ],
         timeSlots: [
-            { id: 1, day: "Thursday", date: "Jan 9", time: "2:00 PM" },
-            { id: 2, day: "Friday", date: "Jan 10", time: "4:00 PM" }
+            { id: 1, day: "Monday", date: "Jun 2", time: "8:00 AM" },
+            { id: 2, day: "Tuesday", date: "Jun 3", time: "11:00 AM" },
+            { id: 3, day: "Wednesday", date: "Jun 4", time: "3:00 PM" },
+            { id: 4, day: "Thursday", date: "Jun 5", time: "10:00 AM" },
+            { id: 5, day: "Friday", date: "Jun 6", time: "2:00 PM" }
+        ]
+    },
+    {
+        id: 5,
+        name: "Ava Rease",
+        avatar: "AR",
+        avatarColor: 'red',
+        rating: 4.9,
+        reviewCount: 81,
+        major: "Senior @ UofA, Psychology",
+        bio: "Graduating with honors in Psych. I've TA'd for intro and abnormal psych and know exactly what professors look for. I'll help you crush your essays and exams.",
+        courses: ["PSY 101", "PSY 220", "PSY 345"],
+        slotsAvailable: 3,
+        supportsInPerson: true,
+        supportsOnline: true,
+        price: 25,
+        reviews: [
+            { id: 1, user: "Mia C.", text: "Ava is so knowledgeable about research methods. She helped me redesign my entire study for PSY 345.", rating: 5, date: "May 14, 2026" },
+            { id: 2, user: "Ethan G.", text: "Made abnormal psych concepts way easier to remember with her mnemonic tricks.", rating: 4.9, date: "Apr 20, 2026" }
+        ],
+        timeSlots: [
+            { id: 1, day: "Tuesday", date: "Jun 3", time: "10:00 AM" },
+            { id: 2, day: "Thursday", date: "Jun 5", time: "3:00 PM" },
+            { id: 3, day: "Friday", date: "Jun 6", time: "11:00 AM" }
+        ]
+    },
+    {
+        id: 6,
+        name: "Karly Philips",
+        avatar: "KP",
+        avatarColor: 'red',
+        rating: 4.8,
+        reviewCount: 73,
+        major: "Senior @ UofA, Accounting",
+        bio: "4.0 in all my accounting courses and passed the CPA ethics exam already. I specialize in financial and managerial accounting—let's make debits and credits second nature.",
+        courses: ["ACCT 200", "ACCT 210", "ACCT 310"],
+        slotsAvailable: 4,
+        supportsInPerson: true,
+        supportsOnline: true,
+        price: 25,
+        reviews: [
+            { id: 1, user: "Brandon H.", text: "Karly breaks down journal entries so well. I went from failing to a B+ in ACCT 200.", rating: 5, date: "May 6, 2026" },
+            { id: 2, user: "Jessica N.", text: "She's incredibly organized and always has real-world examples for managerial accounting concepts.", rating: 4.8, date: "Apr 15, 2026" },
+            { id: 3, user: "Omar F.", text: "Super helpful for exam prep. She knows exactly what topics to focus on.", rating: 4.9, date: "Mar 22, 2026" }
+        ],
+        timeSlots: [
+            { id: 1, day: "Monday", date: "Jun 2", time: "12:00 PM" },
+            { id: 2, day: "Wednesday", date: "Jun 4", time: "9:00 AM" },
+            { id: 3, day: "Wednesday", date: "Jun 4", time: "2:00 PM" },
+            { id: 4, day: "Friday", date: "Jun 6", time: "10:00 AM" }
+        ]
+    },
+    {
+        id: 7,
+        name: "Sofia Mendez",
+        avatar: "SM",
+        avatarColor: 'red',
+        rating: 4.9,
+        reviewCount: 66,
+        major: "Junior @ UofA, Marketing",
+        bio: "Dean's List every semester with a focus on digital marketing and consumer behavior. I bring real campaign examples into our sessions so you actually remember the material.",
+        courses: ["MKTG 361", "MKTG 371", "BNAD 302"],
+        slotsAvailable: 3,
+        supportsInPerson: false,
+        supportsOnline: true,
+        price: 25,
+        reviews: [
+            { id: 1, user: "Liam D.", text: "Sofia's marketing frameworks are so clear. She helped me build an amazing final project for MKTG 361.", rating: 5, date: "May 11, 2026" },
+            { id: 2, user: "Chloe A.", text: "Explains consumer behavior theories with real brand examples. Makes it so much easier to study.", rating: 4.9, date: "Apr 28, 2026" }
+        ],
+        timeSlots: [
+            { id: 1, day: "Tuesday", date: "Jun 3", time: "1:00 PM" },
+            { id: 2, day: "Thursday", date: "Jun 5", time: "11:00 AM" },
+            { id: 3, day: "Friday", date: "Jun 6", time: "4:00 PM" }
+        ]
+    },
+    {
+        id: 8,
+        name: "Marcus Chen",
+        avatar: "MC",
+        avatarColor: 'blue',
+        rating: 4.8,
+        reviewCount: 55,
+        major: "Senior @ UofA, Public Health",
+        bio: "Pre-med track with a public health major and a 3.9 GPA. I've interned at the Pima County Health Dept and love connecting textbook concepts to real public health challenges.",
+        courses: ["CPH 200", "CPH 310", "EPID 309"],
+        slotsAvailable: 3,
+        supportsInPerson: true,
+        supportsOnline: true,
+        price: 25,
+        reviews: [
+            { id: 1, user: "Jasmine R.", text: "Marcus made epidemiology so much less intimidating. His study guides are top-notch.", rating: 5, date: "May 9, 2026" },
+            { id: 2, user: "Derek M.", text: "Really passionate about public health and it shows in how he teaches. Great tutor.", rating: 4.8, date: "Apr 12, 2026" }
+        ],
+        timeSlots: [
+            { id: 1, day: "Monday", date: "Jun 2", time: "11:00 AM" },
+            { id: 2, day: "Wednesday", date: "Jun 4", time: "4:00 PM" },
+            { id: 3, day: "Thursday", date: "Jun 5", time: "9:00 AM" }
         ]
     }
 ];
 
 export default function MentoringPage() {
     const router = useRouter();
-    const { user } = useAuth();
+    const { user, accessToken } = useAuth();
     const [mentors, setMentors] = useState<Mentor[]>([]);
     const [isLoadingMentors, setIsLoadingMentors] = useState(true);
     const [selectedMentor, setSelectedMentor] = useState<Mentor | null>(null);
@@ -210,6 +342,11 @@ export default function MentoringPage() {
 
     const handleBookSlot = async (slot: TimeSlot) => {
         if (!selectedMentor) return;
+        if (!accessToken) {
+            alert('Please sign in again before booking a session.');
+            router.push('/auth');
+            return;
+        }
 
         setIsProcessingPayment(true);
         try {
@@ -217,7 +354,10 @@ export default function MentoringPage() {
 
             const response = await fetch('/api/payments/checkout', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+                },
                 body: JSON.stringify({
                     sessionType,
                     mentorName: selectedMentor.name,
@@ -226,7 +366,11 @@ export default function MentoringPage() {
                 }),
             });
 
-            const data = await response.json();
+            const data = await readJsonResponse(response);
+
+            if (!response.ok) {
+                throw new Error(data.error || `Payment request failed with status ${response.status}`);
+            }
 
             if (data.url) {
                 // Redirect to Stripe Checkout
@@ -236,7 +380,7 @@ export default function MentoringPage() {
             }
         } catch (error) {
             console.error('Payment error:', error);
-            alert('Failed to process payment. Please try again.');
+            alert(error instanceof Error ? error.message : 'Failed to process payment. Please try again.');
         } finally {
             setIsProcessingPayment(false);
         }

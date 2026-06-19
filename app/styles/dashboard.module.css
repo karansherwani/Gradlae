@@ -9,7 +9,7 @@
   --ink: var(--pm-black);
   --muted: var(--pm-gray);
   --line: var(--pm-line);
-  --display: "Instrument Serif", Georgia, serif;
+  --display: var(--ui);
   --ui: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
@@ -181,9 +181,9 @@
 .quickAccessHeader h3,
 .quickAccessEmptyTitle {
   color: var(--uofa-blue);
-  font-family: var(--display);
+  font-family: var(--ui);
   font-weight: 400;
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
 }
 
 .welcomeSection h1 {

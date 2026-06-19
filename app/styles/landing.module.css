@@ -9,7 +9,7 @@
   --color-ink: var(--pm-black);
   --color-muted: var(--pm-gray);
   --color-line: var(--pm-line);
-  --font-display: "Instrument Serif", Georgia, serif;
+  --font-display: var(--font-ui);
   --font-ui: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
@@ -31,7 +31,7 @@
   padding: 16px clamp(20px, 5vw, 72px);
   background: var(--pm-bg);
   border-bottom: 1px solid var(--pm-line);
-  font-family: Georgia, serif;
+  font-family: var(--font-ui);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
@@ -168,7 +168,7 @@
 .finalCTA h2 {
   margin: 0;
   color: var(--uofa-blue);
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-weight: 400;
   letter-spacing: -0.02em;
   line-height: 0.98;
@@ -420,7 +420,7 @@
 
 .statNumber {
   color: var(--uofa-blue);
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 2.25rem;
   letter-spacing: -0.02em;
 }
@@ -540,7 +540,7 @@
 .supportCard h3,
 .footerSection h4 {
   color: var(--uofa-blue);
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 1.65rem;
   font-weight: 400;
   letter-spacing: -0.02em;
@@ -664,9 +664,20 @@
 .testimonialText {
   margin: 0 0 24px;
   color: var(--pm-white);
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 1.55rem;
   line-height: 1.25;
+}
+
+.signalMetric {
+  display: inline-flex;
+  margin-bottom: 18px;
+  padding: 8px 13px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--pm-white);
+  font-size: 0.78rem;
+  font-weight: 800;
 }
 
 .authorName {
@@ -797,7 +808,7 @@
 .findUniTitle,
 .modalContent > h2 {
   color: var(--uofa-blue);
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 2rem;
   font-weight: 400;
   margin: 0;

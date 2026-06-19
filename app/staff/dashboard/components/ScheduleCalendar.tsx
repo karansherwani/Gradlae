@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styles from '../../../styles/staff-dashboard.module.css';
 
 interface TimeSlot {
@@ -23,10 +23,26 @@ export default function ScheduleCalendar({ staffId, staffName }: { staffId: stri
   const [currentWeek, setCurrentWeek] = useState(new Date());
 
   useEffect(() => {
-    loadTimeSlots();
+    let isMounted = true;
+
+    fetch(`/api/staff/timeslots?staffId=${staffId}`)
+      .then(response => response.ok ? response.json() : null)
+      .then(data => {
+        if (isMounted && data) {
+          console.log('Loaded time slots:', data.slots);
+          setTimeSlots(data.slots || []);
+        }
+      })
+      .catch(error => {
+        console.error('Error loading time slots:', error);
+      });
+
+    return () => {
+      isMounted = false;
+    };
   }, [staffId]);
 
-  const loadTimeSlots = async () => {
+  const loadTimeSlots = useCallback(async () => {
     try {
       const response = await fetch(`/api/staff/timeslots?staffId=${staffId}`);
       if (response.ok) {
@@ -37,7 +53,7 @@ export default function ScheduleCalendar({ staffId, staffName }: { staffId: stri
     } catch (error) {
       console.error('Error loading time slots:', error);
     }
-  };
+  }, [staffId]);
 
   const createTimeSlot = async () => {
     if (!selectedDate || !selectedTime) {

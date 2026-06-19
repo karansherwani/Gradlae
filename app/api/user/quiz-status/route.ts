@@ -13,26 +13,10 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'Missing courseId' }, { status: 400 });
     }
 
-    // Try Bearer auth first
     const user = await getUserFromRequest(request);
 
     if (!user) {
-        // Fallback: check userId query param (legacy)
-        const userEmail = request.nextUrl.searchParams.get('userId');
-        if (!userEmail) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-        const { data: userRow } = await supabaseAdmin
-            .from('users')
-            .select('id')
-            .eq('email', userEmail.toLowerCase())
-            .single();
-
-        if (!userRow) {
-            return NextResponse.json({ taken: false });
-        }
-
-        return checkQuizStatus(userRow.id, courseId);
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     return checkQuizStatus(user.id, courseId);
@@ -61,6 +45,6 @@ async function checkQuizStatus(userId: string, courseId: string) {
     return NextResponse.json({ taken: false });
 }
 
-export async function POST(request: NextRequest) {
+export async function POST() {
     return NextResponse.json({ error: 'Not implemented' }, { status: 501 });
 }

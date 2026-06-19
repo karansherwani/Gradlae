@@ -604,8 +604,8 @@ function AuthPageContent() {
                     }
                   });
                   if (oauthError) throw oauthError;
-                } catch (err: any) {
-                  setError(err.message || 'Failed to initialize Google Sign-in');
+                } catch (err) {
+                  setError(err instanceof Error ? err.message : 'Failed to initialize Google Sign-in');
                   setLoading(false);
                 }
               }}

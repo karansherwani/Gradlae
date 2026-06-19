@@ -54,8 +54,6 @@ export async function POST(request: NextRequest) {
             sessionData = result.data;
         } catch (fetchErr) {
             console.error('[signin/route] Supabase fetch error:', fetchErr);
-            console.error('[signin/route] Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
-            console.error('[signin/route] Service key length:', process.env.SUPABASE_SERVICE_ROLE_KEY?.length);
             return NextResponse.json(
                 { message: 'Unable to reach authentication service. Please try again later.' },
                 { status: 502 },

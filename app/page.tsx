@@ -8,36 +8,47 @@ import styles from './styles/landing.module.css';
 export default function LandingPage() {
   const router = useRouter();
   const { user } = useAuth();
-  const [showFeedback, setShowFeedback] = useState(false);
   const [activeFeatureTab, setActiveFeatureTab] = useState<'progress' | 'care' | 'explore'>('progress');
 
   const steps = [
     {
       number: '01',
-      title: 'Upload Transcript',
-      description: 'Upload your academic transcript. Our system analyzes your grades and academic history automatically.'
+      title: 'Connect the student record',
+      description: 'Students upload a transcript or connect verified academic data so Gradlae can understand completed courses, credits, and progress.',
     },
     {
       number: '02',
-      title: 'Get Batch Recommendation',
-      description: 'Based on your prerequisite grades, we recommend the optimal batch placement for your success.'
+      title: 'Map the degree path',
+      description: 'Gradlae compares the student record against real university requirements, prerequisites, and course availability.',
     },
     {
       number: '03',
-      title: 'Optional Assessment',
-      description: 'If placed in Batch B, take an optional quiz to qualify for the accelerated Batch A track.'
+      title: 'Create the next action plan',
+      description: 'Students see what to take next, what is missing, where they are at risk, and which decisions need advisor review.',
     },
     {
       number: '04',
-      title: 'Start Learning',
-      description: 'Enroll in your matched batch and begin your coursework at the pace designed for you.'
-    }
+      title: 'Match campus opportunities',
+      description: 'Gradlae recommends tutoring, research, clubs, events, and support resources that fit the student path and goals.',
+    },
   ];
 
   const whyCards = [
-    { tag: 'Students', title: 'Know your pace before the course starts', desc: 'Upload your transcript, see the track that fits, and understand exactly why Gradlae made the recommendation.' },
-    { tag: 'Advisors', title: 'Spend less time sorting and more time guiding', desc: 'Surface readiness signals, prerequisite gaps, and next-best steps before advising appointments.' },
-    { tag: 'Admins', title: 'Create course sections around real demand', desc: 'Use placement trends to balance Batch A, B, and supported sections with confidence.' },
+    {
+      tag: 'Students',
+      title: 'One place to know what to do next',
+      desc: 'Course planning, credit tracking, graduation requirements, advising answers, and campus opportunities come together in one academic dashboard.',
+    },
+    {
+      tag: 'Advisors',
+      title: 'Better context before every meeting',
+      desc: 'Gradlae surfaces transcript history, requirement gaps, common questions, and advisor-review moments before appointments happen.',
+    },
+    {
+      tag: 'Universities',
+      title: 'Student success that becomes measurable',
+      desc: 'Track advising demand, planning friction, resource discovery, and academic risk without forcing students through another disconnected portal.',
+    },
   ];
 
   const featureTabs = [
@@ -48,56 +59,52 @@ export default function LandingPage() {
 
   const featureSets = {
     progress: [
-      { title: 'Transcript Intelligence', desc: 'Turn prerequisite grades into clear readiness scores and placement decisions.' },
-      { title: 'Batch Matching', desc: 'Recommend accelerated, standard, or supported pacing with plain-language reasoning.' },
-      { title: 'Grade Planning', desc: 'Calculate what students need on future work to stay on target.' },
-      { title: 'Course Timeline', desc: 'Preview the next courses and milestones for each academic path.' },
-      { title: 'Readiness Quiz', desc: 'Let motivated students show they are ready for the faster track.' },
-      { title: 'Progress Signals', desc: 'Show where momentum is strong and where a student may need support.' },
+      { title: 'Transcript Intelligence', desc: 'Turn completed courses, grades, credits, and transfer history into a clear academic picture.' },
+      { title: 'Degree Requirement Tracking', desc: 'Show what is complete, what is missing, and what can block graduation.' },
+      { title: 'Course Planning', desc: 'Recommend practical semester paths using prerequisites, availability, and student goals.' },
+      { title: 'Credit Progress', desc: 'Help students understand credit totals, requirement categories, and graduation timelines.' },
+      { title: 'Risk Signals', desc: 'Flag prerequisite gaps, overloaded terms, and courses that need human advisor review.' },
+      { title: 'What-If Planning', desc: 'Let students explore switching majors, adding minors, summer courses, or faster graduation routes.' },
     ],
     care: [
-      { title: 'Mentor Booking', desc: 'Route students to tutors and mentors who fit their courses and needs.' },
-      { title: 'Advisor Notes', desc: 'Keep academic context close to every recommendation and follow-up.' },
-      { title: 'Journal Check-ins', desc: 'Help students reflect on workload, stress, and weekly goals.' },
-      { title: 'Supportive Tracks', desc: 'Pair pacing decisions with extra help instead of simple pass/fail labels.' },
-      { title: 'Faculty Reviews', desc: 'Give staff a focused view of student feedback and appointment history.' },
-      { title: 'Risk Awareness', desc: 'Spot readiness gaps early enough to intervene constructively.' },
+      { title: 'AI Academic Guidance', desc: 'Answer student questions with university-specific policy and course context.' },
+      { title: 'Advisor Escalation', desc: 'Route uncertain, high-stakes, or sensitive decisions to a human advisor.' },
+      { title: 'Tutoring Match', desc: 'Connect students to tutoring and peer support tied to the exact courses they are taking.' },
+      { title: 'Mentor Booking', desc: 'Route students to mentors who match their program, interests, and goals.' },
+      { title: 'Support Check-ins', desc: 'Capture workload, confidence, and planning stress before students disappear.' },
+      { title: 'Staff Dashboard', desc: 'Give academic teams a focused view of patterns, bottlenecks, and follow-up needs.' },
     ],
     explore: [
-      { title: 'Clubs & Events', desc: 'Connect coursework with campus communities and study groups.' },
-      { title: 'AI Academic Advisor', desc: 'Generate semester plans shaped by goals, prerequisites, and pace.' },
-      { title: 'Course Search', desc: 'Find classes with requirement context and prerequisite visibility.' },
-      { title: 'Degree Planning', desc: 'Map graduation timing with a practical, student-friendly interface.' },
-      { title: 'Campus Fit', desc: 'Recommend resources that match interests beyond the classroom.' },
-      { title: 'Next Best Action', desc: 'Guide each student toward the clearest next step.' },
+      { title: 'Clubs & Events', desc: 'Recommend student organizations and events connected to interests, major, and goals.' },
+      { title: 'Research Discovery', desc: 'Surface labs, faculty work, and research opportunities that fit the academic path.' },
+      { title: 'Career-Relevant Experiences', desc: 'Connect coursework to resume-building activities and campus programs.' },
+      { title: 'Resource Matching', desc: 'Point students to financial, academic, wellness, and community resources at the right time.' },
+      { title: 'Campus Fit', desc: 'Help students find belonging beyond classes without searching across scattered websites.' },
+      { title: 'Next Best Action', desc: 'Turn the university ecosystem into a personal weekly action plan.' },
     ],
   };
 
-  const testimonials = [
+  const pilotSignals = [
     {
-      type: 'student',
-      name: 'Sarah Martinez',
-      role: 'Computer Science, Stanford',
-      text: 'Gradlae placed me in the accelerated track based on my strong calculus background. I completed the course in 7 weeks.',
+      title: 'Advisor load',
+      metric: 'Target: -25%',
+      text: 'Measure repetitive degree-planning and requirement questions deflected during registration periods.',
     },
     {
-      type: 'faculty',
-      name: 'Dr. Robert Chen',
-      role: 'Associate Professor, MIT',
-      text: 'The batch matching system has significantly improved student success rates by placing them at the right pace.',
+      title: 'Planning clarity',
+      metric: 'Target: 80%',
+      text: 'Track how many beta students can identify their next courses, missing credits, and graduation blockers.',
     },
     {
-      type: 'student',
-      name: 'Marcus Johnson',
-      role: 'Engineering, UC Berkeley',
-      text: 'I started in Batch B but took the quiz to prove my readiness. Now I am in the fast track and thriving.',
+      title: 'Resource discovery',
+      metric: 'Target: 3x',
+      text: 'Measure whether students discover more relevant tutoring, clubs, research, and campus resources.',
     },
     {
-      type: 'faculty',
-      name: 'Dr. Elena Ford',
-      role: 'Academic Advisor, University of Arizona',
-      text: 'The interface makes readiness conversations easier because students can see the reasoning, not just the result.',
-    }
+      title: 'Pilot scope',
+      metric: '90 days',
+      text: 'Start with one department, one set of requirements, real student feedback, and advisor review.',
+    },
   ];
 
   const handleGetStarted = () => {
@@ -129,15 +136,8 @@ export default function LandingPage() {
     requestAnimationFrame(animate);
   };
 
-  const handleFeedbackSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    alert('Thank you for your feedback!');
-    setShowFeedback(false);
-  };
-
   return (
     <div className={styles.container}>
-      {/* HEADER */}
       <header className={styles.topHeader}>
         <button className={styles.headerLogo} onClick={handleLogoClick} type="button">
           <img src="/gradlae-logo.png" alt="Gradlae" className="brandLogo" />
@@ -145,38 +145,34 @@ export default function LandingPage() {
         <nav className={styles.headerNav}>
           <button type="button" onClick={() => scrollToSection('features')}>Product</button>
           <button type="button" onClick={() => scrollToSection('how-it-works')}>How It Works</button>
-          <button type="button" onClick={() => scrollToSection('testimonials')}>Testimonials</button>
+          <button type="button" onClick={() => scrollToSection('pilot')}>Pilot</button>
         </nav>
         <div className={styles.headerActions}>
           <button className={styles.headerGhost} onClick={handleGetStarted}>
-            Get Started
+            Open Demo
           </button>
         </div>
       </header>
 
-      {/* ══ HERO ══ */}
       <section className={styles.hero}>
         <div className={styles.heroContent}>
-          <div className={styles.heroEyebrow}>Adaptive academic ecosystem</div>
-          <h1>Your pace, <em>matched</em> to your story.</h1>
+          <div className={styles.heroEyebrow}>AI academic ecosystem for universities</div>
+          <h1>Every student gets a clear academic path.</h1>
           <p className={styles.heroSubtext}>
-            Data-driven batch placement based on your prerequisite grades. Get matched to the right course pace for academic success.
+            Gradlae turns transcripts, degree requirements, course data, advising knowledge, and campus opportunities into one personalized action plan for university students.
           </p>
           <div className={styles.heroActions}>
-            <button
-              className={styles.ctaButton}
-              onClick={handleGetStarted}
-            >
-              Get Started
+            <button className={styles.ctaButton} onClick={handleGetStarted}>
+              View Student Demo
             </button>
             <button className={styles.secondaryHeroLink} onClick={() => scrollToSection('how-it-works')} type="button">
-              See how it works
+              See Pilot Model
             </button>
           </div>
           <div className={styles.heroProof}>
-            <span>Free for students</span>
-            <span>1 university</span>
-            <span>Placement in minutes</span>
+            <span>Transcript-aware planning</span>
+            <span>Advisor review built in</span>
+            <span>Campus resources matched to goals</span>
           </div>
         </div>
 
@@ -188,34 +184,34 @@ export default function LandingPage() {
             <div className={styles.mockupBody}>
               <aside className={styles.mockSidebar}>
                 <strong>Gradlae</strong>
-                <span>Dashboard</span>
-                <span>Transcript</span>
+                <span>Plan</span>
+                <span>Credits</span>
                 <span>Advisor</span>
-                <span>Support</span>
+                <span>Opportunities</span>
               </aside>
               <div className={styles.mockMain}>
                 <div className={styles.mockHeader}>
-                  <span>Placement Review</span>
-                  <strong>Batch A Ready</strong>
+                  <span>Academic Path</span>
+                  <strong>Advisor Verified</strong>
                 </div>
                 <div className={styles.mockKpis}>
-                  <div><span>Readiness</span><strong>92%</strong></div>
-                  <div><span>Credits</span><strong>15</strong></div>
-                  <div><span>Timeline</span><strong>7 wks</strong></div>
+                  <div><span>Credits earned</span><strong>72</strong></div>
+                  <div><span>Requirements left</span><strong>8</strong></div>
+                  <div><span>Grad target</span><strong>2027</strong></div>
                 </div>
                 <div className={styles.mockPanel}>
                   <div className={styles.mockPanelTop}>
-                    <span>Prerequisite strength</span>
-                    <strong>Excellent</strong>
+                    <span>Next semester plan</span>
+                    <strong>12 credits</strong>
                   </div>
                   <div className={styles.progressTrack}><span style={{ width: '92%' }} /></div>
                   <div className={styles.progressTrack}><span style={{ width: '84%' }} /></div>
                   <div className={styles.progressTrack}><span style={{ width: '76%' }} /></div>
                 </div>
                 <div className={styles.mockCourses}>
-                  <span>Calculus I <strong>A</strong></span>
-                  <span>Programming I <strong>A-</strong></span>
-                  <span>Discrete Math <strong>B+</strong></span>
+                  <span>FIN 311 <strong>Major</strong></span>
+                  <span>MIS 304 <strong>Prereq met</strong></span>
+                  <span>Research Lab <strong>Match</strong></span>
                 </div>
               </div>
             </div>
@@ -226,39 +222,39 @@ export default function LandingPage() {
       <section className={styles.stats}>
         <div className={styles.statsGrid}>
           <div className={styles.statCard}>
-            <div className={styles.statNumber}>17,000+</div>
-            <div className={styles.statLabel}>Courses Analyzed</div>
+            <div className={styles.statNumber}>17k+</div>
+            <div className={styles.statLabel}>Course records processed</div>
           </div>
           <div className={styles.statCard}>
-            <div className={styles.statNumber}>1+</div>
-            <div className={styles.statLabel}>Universities</div>
+            <div className={styles.statNumber}>1</div>
+            <div className={styles.statLabel}>University dataset focus</div>
           </div>
           <div className={styles.statCard}>
-            <div className={styles.statNumber}>1+</div>
-            <div className={styles.statLabel}>Instructors</div>
+            <div className={styles.statNumber}>90</div>
+            <div className={styles.statLabel}>Day pilot design</div>
           </div>
           <div className={styles.statCard}>
-            <div className={styles.statNumber}>5+</div>
-            <div className={styles.statLabel}>Students</div>
+            <div className={styles.statNumber}>4</div>
+            <div className={styles.statLabel}>Student-success workflows</div>
           </div>
         </div>
       </section>
 
       <section className={styles.trustedStrip}>
-        <span>Built with real academic data</span>
+        <span>Built around real academic workflows</span>
         <div>
-          <strong>University of Arizona</strong>
-          <strong>17,000+ courses</strong>
-          <strong>5+ students</strong>
-          <strong>1+ instructor</strong>
+          <strong>Transcript planning</strong>
+          <strong>Degree requirements</strong>
+          <strong>AI advising</strong>
+          <strong>Campus opportunities</strong>
         </div>
       </section>
 
       <section className={styles.whySection}>
         <div className={styles.sectionLabel}>Why Gradlae</div>
-        <h2>Academic planning that feels clear from the first click.</h2>
+        <h2>An action layer for the student journey.</h2>
         <p className={styles.sectionSubtext}>
-          Turn transcripts, course data, and goals into a plan students can trust before registration opens.
+          Gradlae starts with academic planning, then expands into the resources and opportunities students need to build a stronger college life.
         </p>
         <div className={styles.whyGrid}>
           {whyCards.map((card) => (
@@ -271,7 +267,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* FEATURES */}
       <section id="features" className={styles.featuresSection}>
         <div className={styles.sectionLabel}>Features</div>
         <h2>One platform for progress, care, and discovery.</h2>
@@ -297,16 +292,15 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* HOW IT WORKS */}
       <section id="how-it-works" className={styles.howItWorks}>
         <div className={styles.sectionLabel}>How It Works</div>
-        <h2>Get matched in <em>four steps</em>.</h2>
+        <h2>From transcript to <em>next best action</em>.</h2>
         <p className={styles.sectionSubtext}>
-          From transcript analysis to batch placement, the process stays transparent and student-friendly.
+          The first pilot stays narrow enough to measure, while the product shows the larger academic ecosystem vision.
         </p>
         <div className={styles.stepsContainer}>
-          {steps.map((step, index) => (
-            <div key={index} className={styles.stepItem}>
+          {steps.map((step) => (
+            <div key={step.number} className={styles.stepItem}>
               <div className={styles.stepNumber}>{step.number}</div>
               <h3>{step.title}</h3>
               <p>{step.description}</p>
@@ -315,17 +309,17 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* TESTIMONIALS */}
-      <section id="testimonials" className={styles.testimonials}>
-        <div className={styles.sectionLabel}>Testimonials</div>
-        <h2>Trusted by students and academic teams.</h2>
+      <section id="pilot" className={styles.testimonials}>
+        <div className={styles.sectionLabel}>Pilot Metrics</div>
+        <h2>The first version should prove operational value.</h2>
         <div className={styles.testimonialsGrid}>
-          {testimonials.map((testimonial, idx) => (
-            <div key={idx} className={styles.testimonialCard}>
-              <p className={styles.testimonialText}>&ldquo;{testimonial.text}&rdquo;</p>
+          {pilotSignals.map((signal) => (
+            <div key={signal.title} className={styles.testimonialCard}>
+              <div className={styles.signalMetric}>{signal.metric}</div>
+              <p className={styles.testimonialText}>{signal.text}</p>
               <div className={styles.testimonialAuthor}>
-                <div className={styles.authorName}>{testimonial.name}</div>
-                <div className={styles.authorRole}>{testimonial.role}</div>
+                <div className={styles.authorName}>{signal.title}</div>
+                <div className={styles.authorRole}>Measured during beta</div>
               </div>
             </div>
           ))}
@@ -333,45 +327,43 @@ export default function LandingPage() {
       </section>
 
       <section className={styles.pressSection}>
-        <div className={styles.sectionLabel}>Press & News</div>
-        <h2>Built for the conversations happening across campus.</h2>
+        <div className={styles.sectionLabel}>Demo Story</div>
+        <h2>What a university buyer should see in the demo.</h2>
         <div className={styles.pressGrid}>
           <article>
-            <span>Campus Technology</span>
-            <blockquote>Adaptive planning tools are moving from optional dashboards to daily advising infrastructure.</blockquote>
+            <span>Student View</span>
+            <blockquote>A student sees credits, requirements, course options, advisor warnings, and personalized campus opportunities in one dashboard.</blockquote>
           </article>
           <article>
-            <span>Student Success Journal</span>
-            <blockquote>Transparent recommendations help students understand the route, not just the requirement.</blockquote>
+            <span>Advisor View</span>
+            <blockquote>An advisor sees the student&apos;s plan, unresolved questions, risk flags, and the source data behind each recommendation.</blockquote>
           </article>
           <article>
-            <span>Academic Operations</span>
-            <blockquote>Course pacing is easier to manage when readiness data is visible before enrollment pressure peaks.</blockquote>
+            <span>University View</span>
+            <blockquote>Student questions become patterns: missing requirements, confusing policies, bottleneck courses, and resources students cannot find.</blockquote>
           </article>
         </div>
       </section>
 
-      {/* FINAL CTA */}
       <section className={styles.finalCTA}>
-        <h2>Ready to Find Your Batch?</h2>
-        <p>Join thousands of students in the right course pace.</p>
+        <h2>Start with one department. Prove the layer.</h2>
+        <p>Gradlae is designed for a focused university pilot before expanding across the full student journey.</p>
         <button className={styles.ctaButton} onClick={handleGetStarted}>
-          Get Started
+          Open Demo
         </button>
       </section>
 
-      {/* FOOTER */}
       <footer className={styles.footer}>
         <div className={styles.footerContent}>
           <div className={styles.footerSection}>
             <h4>Gradlae</h4>
-            <p>Matching students to the right course pace.</p>
+            <p>AI academic ecosystem for university students.</p>
           </div>
           <div className={styles.footerSection}>
             <h4>Product</h4>
             <a href="#features">Features</a>
             <a href="/dashboard">Dashboard</a>
-            <a href="/placements">My Grades</a>
+            <a href="/advisor">Advisor</a>
           </div>
           <div className={styles.footerSection}>
             <h4>Resources</h4>
@@ -385,22 +377,6 @@ export default function LandingPage() {
           © 2026 Gradlae. All rights reserved.
         </div>
       </footer>
-
-      {/* FEEDBACK MODAL */}
-      {showFeedback && (
-        <div className={styles.modal}>
-          <div className={styles.modalContent}>
-            <button className={styles.closeBtn} onClick={() => setShowFeedback(false)}>×</button>
-            <h2>Share Your Feedback</h2>
-            <p>We value your input.</p>
-            <form onSubmit={handleFeedbackSubmit} className={styles.feedbackForm}>
-              <input type="email" placeholder="Your email" required className={styles.feedbackInput} />
-              <textarea placeholder="Your feedback..." required rows={5} className={styles.feedbackTextarea}></textarea>
-              <button type="submit" className={styles.submitBtn}>Submit</button>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

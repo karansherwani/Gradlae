@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import styles from '../../../styles/staff-dashboard.module.css';
 
 interface StaffProfileData {
@@ -41,22 +41,37 @@ export default function StaffProfile({ staffId, staffName }: { staffId: string; 
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
 
   useEffect(() => {
-    loadProfile();
+    let isMounted = true;
+
+    fetch(`/api/staff/profile?staffId=${staffId}`)
+      .then(response => response.ok ? response.json() : null)
+      .then(data => {
+        if (isMounted && data?.profile) {
+          setProfile(current => ({ ...current, ...data.profile }));
+        }
+      })
+      .catch(error => {
+        console.error('Error loading profile:', error);
+      });
+
+    return () => {
+      isMounted = false;
+    };
   }, [staffId]);
 
-  const loadProfile = async () => {
+  const loadProfile = useCallback(async () => {
     try {
       const response = await fetch(`/api/staff/profile?staffId=${staffId}`);
       if (response.ok) {
         const data = await response.json();
         if (data.profile) {
-          setProfile({ ...profile, ...data.profile });
+          setProfile(current => ({ ...current, ...data.profile }));
         }
       }
     } catch (error) {
       console.error('Error loading profile:', error);
     }
-  };
+  }, [staffId]);
 
   const saveProfile = async () => {
     setSaveStatus('saving');

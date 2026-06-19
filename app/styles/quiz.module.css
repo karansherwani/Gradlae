@@ -22,7 +22,7 @@
 .container {
   min-height: 100vh;
   background: var(--bg-light);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-ui);
 }
 
 /* Header - Matching Landing Page */

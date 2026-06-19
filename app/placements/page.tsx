@@ -13,6 +13,48 @@ import { parseTranscriptText } from '../lib/transcriptTextParser';
 
 type Step = 'upload' | 'results';
 
+async function readJsonResponse(response: Response) {
+  const text = await response.text();
+  const trimmed = text.trim();
+
+  if (!trimmed) {
+    if (response.ok) return {};
+    throw new Error(`Request failed with status ${response.status}`);
+  }
+
+  try {
+    return JSON.parse(trimmed);
+  } catch {
+    const shortText = trimmed
+      .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+      .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+      .replace(/<[^>]*>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 180);
+
+    if (response.status === 413) {
+      throw new Error('This PDF is too large for the deployed upload endpoint. Try a smaller PDF export.');
+    }
+
+    if (trimmed.startsWith('<!DOCTYPE') || trimmed.startsWith('<html')) {
+      throw new Error(`The deployed upload endpoint returned an HTML error page instead of JSON${response.status ? ` (status ${response.status})` : ''}.`);
+    }
+
+    throw new Error(shortText || `Upload failed with status ${response.status}`);
+  }
+}
+
+interface TranscriptUploadResponse {
+  success?: boolean;
+  courses?: CourseGrade[];
+  hasTranscript?: boolean;
+  verification?: {
+    verified: boolean;
+    message: string;
+  };
+}
+
 interface CourseGrade {
   course: string;
   description: string;
@@ -60,13 +102,14 @@ export default function PlacementsPage() {
       }
 
       try {
-        const response = await fetch('/api/upload?userId=' + encodeURIComponent(user.email || ''), {
+        const response = await fetch('/api/upload', {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
-        const data = await response.json();
+        const data = await readJsonResponse(response) as TranscriptUploadResponse;
 
-        if (data.hasTranscript && data.courses?.length > 0) {
-          const savedGrades: CourseGrade[] = data.courses.map((c: { course: string; description: string; grade: string; credits: number; term: string }) => ({
+        const savedCourses = data.courses ?? [];
+        if (data.hasTranscript && savedCourses.length > 0) {
+          const savedGrades: CourseGrade[] = savedCourses.map((c: { course: string; description: string; grade: string; credits: number; term: string }) => ({
             course: c.course,
             description: c.description,
             grade: c.grade,
@@ -210,22 +253,7 @@ export default function PlacementsPage() {
     setUploading(true);
     setUploadError(null);
 
-    const readJsonResponse = async (response: Response) => {
-      const contentType = response.headers.get('content-type') || '';
-      if (contentType.includes('application/json')) {
-        return response.json();
-      }
-
-      const text = await response.text();
-      const shortText = text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 180);
-      throw new Error(
-        response.status === 413
-          ? 'This PDF is too large for the deployed upload endpoint. Try a smaller PDF export.'
-          : shortText || `Upload failed with status ${response.status}`
-      );
-    };
-
-    const applyUploadData = (data: any) => {
+    const applyUploadData = (data: TranscriptUploadResponse) => {
       if (data.verification && !data.verification.verified) {
         setTranscriptVerified(false);
         setVerificationMessage(data.verification.message);
@@ -258,29 +286,27 @@ export default function PlacementsPage() {
 
     try {
       if (selectedFile.type === 'application/pdf' || selectedFile.name.toLowerCase().endsWith('.pdf')) {
-        try {
-          const text = await extractPdfTextInBrowser(selectedFile);
-          const transcript = parseTranscriptText(text);
+        const text = await extractPdfTextInBrowser(selectedFile);
+        const transcript = parseTranscriptText(text);
 
-          if (transcript.courses.length > 0) {
-            const saveResponse = await fetch('/api/upload/parsed', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-              },
-              body: JSON.stringify({ transcript }),
-            });
-            const saveData = await readJsonResponse(saveResponse);
-            if (!saveResponse.ok) {
-              throw new Error(saveData.error || 'Failed to save parsed transcript');
-            }
-            applyUploadData(saveData);
-            return;
-          }
-        } catch (browserParseError) {
-          console.warn('Browser transcript parsing failed, falling back to server upload:', browserParseError);
+        if (transcript.courses.length === 0) {
+          throw new Error('I could not find course rows in this PDF. Please export the transcript as a text-based PDF from UAccess and try again.');
         }
+
+        const saveResponse = await fetch('/api/upload', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+          },
+          body: JSON.stringify({ transcript }),
+        });
+        const saveData = await readJsonResponse(saveResponse);
+        if (!saveResponse.ok) {
+          throw new Error(saveData.error || 'Failed to save parsed transcript');
+        }
+        applyUploadData(saveData);
+        return;
       }
 
       const formData = new FormData();

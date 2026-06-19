@@ -3,6 +3,8 @@ import Stripe from 'stripe';
 import { getUserFromRequest } from '@/app/lib/supabaseAuth';
 import { checkoutSchema, validateBody } from '@/app/lib/validation';
 
+export const runtime = 'nodejs';
+
 // Session pricing
 const PRICING = {
     individual: {
@@ -22,6 +24,13 @@ const PRICING = {
     },
 };
 
+function getBaseUrl(request: NextRequest): string {
+    if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL;
+    if (process.env.NEXTAUTH_URL) return process.env.NEXTAUTH_URL;
+    if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+    return request.nextUrl.origin;
+}
+
 export async function POST(request: NextRequest) {
     // SECURITY: Require authentication
     const user = await getUserFromRequest(request);
@@ -29,8 +38,15 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
     try {
+        if (!process.env.STRIPE_SECRET_KEY) {
+            return NextResponse.json(
+                { error: 'Stripe is not configured. Add STRIPE_SECRET_KEY in Vercel environment variables.' },
+                { status: 500 },
+            );
+        }
+
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
         const body = await request.json();
         const validation = validateBody(checkoutSchema, body);
         if (!validation.success) {
@@ -46,6 +62,8 @@ export async function POST(request: NextRequest) {
                 { status: 400 }
             );
         }
+
+        const baseUrl = getBaseUrl(request);
 
         // Create Stripe Checkout Session
         const session = await stripe.checkout.sessions.create({
@@ -64,8 +82,8 @@ export async function POST(request: NextRequest) {
                 },
             ],
             mode: 'payment',
-            success_url: `${process.env.NEXTAUTH_URL}/mentoring?success=true&session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.NEXTAUTH_URL}/mentoring?canceled=true`,
+            success_url: `${baseUrl}/mentoring?success=true&session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${baseUrl}/mentoring?canceled=true`,
             customer_email: userEmail || undefined,
             metadata: {
                 sessionType,
@@ -80,8 +98,9 @@ export async function POST(request: NextRequest) {
         });
     } catch (error) {
         console.error('Stripe checkout error:', error);
+        const message = error instanceof Error ? error.message : 'Unknown Stripe error';
         return NextResponse.json(
-            { error: 'Failed to create checkout session' },
+            { error: `Failed to create checkout session: ${message}` },
             { status: 500 }
         );
     }

@@ -13,7 +13,7 @@
     min-height: 100vh;
     background: var(--bg-light);
     color: var(--text-primary);
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-ui);
 }
 
 .header {

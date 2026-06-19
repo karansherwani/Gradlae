@@ -2,29 +2,16 @@
 // Saved courses for grade calculator — uses Supabase instead of MongoDB.
 
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/app/lib/supabaseServer';
 import { getUserFromRequest } from '@/app/lib/supabaseAuth';
+import { supabaseAdmin } from '@/app/lib/supabaseServer';
 
 // GET - Retrieve user's saved courses for grade calculator
 export async function GET(request: NextRequest) {
     try {
-        // Try Bearer auth
         const user = await getUserFromRequest(request);
 
         if (!user) {
-            // Fallback: query param (legacy)
-            const userId = request.nextUrl.searchParams.get('userId');
-            if (!userId) {
-                return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-            }
-            const { data: userRow } = await supabaseAdmin
-                .from('users')
-                .select('id')
-                .eq('email', userId.toLowerCase())
-                .single();
-
-            if (!userRow) return NextResponse.json({ courses: [] });
-            return getCoursesForUser(userRow.id);
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         return getCoursesForUser(user.id);
@@ -40,26 +27,10 @@ export async function PUT(request: NextRequest) {
         const body = await request.json();
         const { courses } = body;
 
-        // Try Bearer auth
         const user = await getUserFromRequest(request);
 
         if (!user) {
-            // Fallback: userId in body (legacy)
-            const userId = body.userId;
-            if (!userId) {
-                return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-            }
-            const { data: userRow } = await supabaseAdmin
-                .from('users')
-                .select('id')
-                .eq('email', userId.toLowerCase())
-                .single();
-
-            if (!userRow) {
-                return NextResponse.json({ error: 'User not found' }, { status: 404 });
-            }
-
-            return saveCoursesForUser(userRow.id, courses);
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         return saveCoursesForUser(user.id, courses);

@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import styles from '../styles/advisor.module.css';
+import { extractPdfTextInBrowser } from '../lib/browserPdfText';
+import { parseTranscriptText } from '../lib/transcriptTextParser';
 
 interface Message {
     id: string;
@@ -175,16 +177,22 @@ export default function AdvisorChat({
         setUploadedFileName(file.name);
 
         try {
-            const formData = new FormData();
-            formData.append('file', file);
+            const rawText = await extractPdfTextInBrowser(file);
+            const transcript = parseTranscriptText(rawText);
 
-            // Use the general-purpose advisor upload endpoint
-            const res = await fetch('/api/advisor/upload', { method: 'POST', body: formData });
-            const data = await res.json();
+            if (transcript.courses.length > 0) {
+                const res = await fetch('/api/upload', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+                    },
+                    body: JSON.stringify({ transcript }),
+                });
+                const data = await res.json().catch(() => ({}));
 
-            if (!res.ok) throw new Error(data.error || 'Upload failed');
+                if (!res.ok) throw new Error(data.error || 'Upload failed');
 
-            if (data.type === 'transcript' && data.courses?.length > 0) {
                 // ─── Transcript detected ─────────────────────────────────
                 const ctx = buildTranscriptContext(data.courses, studentName);
                 setActiveContext(ctx);
@@ -205,17 +213,21 @@ export default function AdvisorChat({
                     timestamp: new Date(),
                 };
                 setMessages(prev => [...prev, feedbackMsg]);
-            } else if (data.type === 'document' && data.text) {
+            } else if (rawText.trim().length >= 20) {
                 // ─── Generic document (planner, syllabus, etc.) ──────────
-                const docLabel = `UPLOADED DOCUMENT: ${data.fileName}\n${data.text}`;
+                const MAX_TEXT_LENGTH = 15000;
+                const trimmedText = rawText.length > MAX_TEXT_LENGTH
+                    ? rawText.substring(0, MAX_TEXT_LENGTH) + '\n\n[... document truncated ...]'
+                    : rawText;
+                const docLabel = `UPLOADED DOCUMENT: ${file.name}\n${trimmedText}`;
                 setDocumentContexts(prev => [...prev, docLabel]);
 
                 const feedbackMsg: Message = {
                     id: `system-${Date.now()}`,
                     role: 'assistant',
                     content:
-                        `I've read your document "${data.fileName}" (${data.textLength.toLocaleString()} characters).` +
-                        (data.truncated ? ' (It was long so I processed the most relevant portion.)' : '') +
+                        `I've read your document "${file.name}" (${rawText.length.toLocaleString()} characters).` +
+                        (rawText.length > MAX_TEXT_LENGTH ? ' (It was long so I processed the most relevant portion.)' : '') +
                         `\n\nI can now reference this document when answering your questions. Go ahead and ask me about it!`,
                     timestamp: new Date(),
                 };
@@ -231,7 +243,7 @@ export default function AdvisorChat({
         } finally {
             setUploadingFile(false);
         }
-    }, [studentName, onTranscriptParsed]);
+    }, [studentName, onTranscriptParsed, accessToken]);
 
     // ─── Build the full context to send to the advisor ────────────────────
     const buildFullContext = useCallback(() => {

@@ -142,6 +142,13 @@ export const checkoutSchema = z.object({
     userEmail: z.string().email().max(254).optional(),
 });
 
+export const feedbackSchema = z.object({
+    name: z.string().min(1, 'Name is required').max(100).transform(sanitizeString),
+    email: z.string().email('Invalid email address').max(254),
+    type: z.string().min(1, 'Feedback type is required').max(50).transform(sanitizeString),
+    message: z.string().min(1, 'Message is required').max(4000).transform(sanitizeString),
+});
+
 // ─── VALIDATION HELPER ──────────────────────────────────────────────────────
 
 /**

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { parseTranscriptPDF, ParsedTranscript } from '@/app/lib/pdfParser';
 import { getUserFromRequest } from '@/app/lib/supabaseAuth';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
@@ -39,7 +38,6 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Convert file to buffer
         const buffer = Buffer.from(await file.arrayBuffer());
 
         // SECURITY: Validate PDF magic bytes (MIME type alone is easily spoofed)
@@ -51,13 +49,13 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Parse the PDF
-        const transcript = await parseTranscriptPDF(buffer);
-
-        return NextResponse.json({
-            success: true,
-            data: transcript
-        });
+        return NextResponse.json(
+            {
+                error: 'Server-side PDF parsing is disabled on Vercel. Parse the PDF in the browser and send parsed transcript JSON to /api/upload.',
+                success: false,
+            },
+            { status: 415 },
+        );
 
     } catch (error) {
         console.error('Transcript upload error:', error);

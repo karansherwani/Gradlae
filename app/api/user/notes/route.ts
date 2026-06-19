@@ -11,27 +11,7 @@ export async function GET(request: NextRequest) {
         const user = await getUserFromRequest(request);
 
         if (!user) {
-            // Fallback: query param
-            const userId = request.nextUrl.searchParams.get('userId');
-            if (!userId) {
-                return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-            }
-            const { data: userRow } = await supabaseAdmin
-                .from('users')
-                .select('id')
-                .eq('email', userId.toLowerCase())
-                .single();
-
-            if (!userRow) return NextResponse.json({ notes: '' });
-
-            const { data: row } = await supabaseAdmin
-                .from('saved_courses')
-                .select('notes')
-                .eq('user_id', userRow.id)
-                .limit(1)
-                .single();
-
-            return NextResponse.json({ notes: row?.notes || '' });
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         const { data: row } = await supabaseAdmin
@@ -57,21 +37,7 @@ export async function PUT(request: NextRequest) {
         const user = await getUserFromRequest(request);
 
         if (!user) {
-            const userId = body.userId;
-            if (!userId) {
-                return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-            }
-            const { data: userRow } = await supabaseAdmin
-                .from('users')
-                .select('id')
-                .eq('email', userId.toLowerCase())
-                .single();
-
-            if (!userRow) {
-                return NextResponse.json({ error: 'User not found' }, { status: 404 });
-            }
-
-            return saveNotesForUser(userRow.id, notes);
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         return saveNotesForUser(user.id, notes);

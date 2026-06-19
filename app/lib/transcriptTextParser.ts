@@ -103,7 +103,7 @@ export function parseTranscriptText(text: string): ParsedTranscript {
         if (trimmedLine.includes('GPA') || trimmedLine.includes('Term GPA')) continue;
         if (trimmedLine.startsWith('Course Attrib')) continue;
 
-        let courseMatch = trimmedLine.match(coursePattern) || trimmedLine.match(simpleCoursePattern);
+        const courseMatch = trimmedLine.match(coursePattern) || trimmedLine.match(simpleCoursePattern);
         if (courseMatch) {
             const grade = courseMatch[5];
             if (grade && /^[A-FW][+-]?$|^IP$|^P$|^S$/.test(grade)) {

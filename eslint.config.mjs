@@ -9,9 +9,14 @@ const eslintConfig = defineConfig([
   globalIgnores([
     // Default ignores of eslint-config-next:
     ".next/**",
+    "**/.next/**",
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "node_modules/**",
+    "scripts/**",
+    "uofa_gradlae/**",
+    "public/pdf.worker.min.mjs",
   ]),
 ]);
 

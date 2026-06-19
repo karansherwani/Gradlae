@@ -3,13 +3,107 @@
 // Uses Supabase for storage instead of MongoDB.
 
 import { NextRequest, NextResponse } from 'next/server';
-import { parseTranscriptPDF } from '../../lib/pdfParser';
 import { supabaseAdmin } from '@/app/lib/supabaseServer';
 import { getUserFromRequest } from '@/app/lib/supabaseAuth';
 import { VerificationResult, profileHasVerificationData, verifyTranscript } from '@/app/lib/transcriptVerification';
+import { ParsedTranscript } from '@/app/lib/transcriptTextParser';
+
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+async function respondWithParsedTranscript(transcript: ParsedTranscript, request: NextRequest) {
+    const user = await getUserFromRequest(request);
+    let verification: VerificationResult | null = null;
+    let savedToDatabase = false;
+
+    if (!user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { data: userRow } = await supabaseAdmin
+        .from('users')
+        .select('name, date_of_birth, student_id')
+        .eq('id', user.id)
+        .single();
+
+    if (profileHasVerificationData(userRow)) {
+        verification = verifyTranscript(transcript.studentInfo, {
+            fullName: userRow!.name,
+            studentId: userRow!.student_id,
+            dateOfBirth: userRow!.date_of_birth,
+        });
+    } else {
+        verification = {
+            verified: true,
+            nameMatch: false,
+            studentIdMatch: false,
+            dobMatch: false,
+            message: 'Profile not completed — transcript accepted without verification.',
+            extractedInfo: transcript.studentInfo,
+        };
+    }
+
+    if (verification.verified) {
+        const parsedJson = {
+            courses: transcript.courses.map(c => ({
+                courseNumber: c.course,
+                courseName: c.description || '',
+                grade: c.grade,
+                credits: c.credits || 3,
+                term: c.term || 'Unknown',
+                isRetake: c.isRetake || false,
+                originalGrade: c.originalGrade || null,
+                originalTerm: c.originalTerm || null,
+                allGrades: c.allGrades || null,
+                bestGrade: c.bestGrade || c.grade,
+                bestGradeTerm: c.bestGradeTerm || c.term,
+            })),
+            studentInfo: transcript.studentInfo,
+            uploadedAt: new Date().toISOString(),
+        };
+
+        const { data: existing } = await supabaseAdmin
+            .from('transcripts')
+            .select('id')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
+
+        if (existing) {
+            await supabaseAdmin
+                .from('transcripts')
+                .update({ parsed_json: parsedJson })
+                .eq('id', existing.id);
+        } else {
+            await supabaseAdmin
+                .from('transcripts')
+                .insert({ user_id: user.id, parsed_json: parsedJson });
+        }
+
+        savedToDatabase = true;
+        console.log(`Transcript saved to Supabase for user: ${user.email}`);
+    }
+
+    return NextResponse.json({
+        success: true,
+        courses: transcript.courses,
+        totalCourses: transcript.courses.length,
+        savedToDatabase,
+        verification,
+    });
+}
 
 export async function POST(request: NextRequest) {
     try {
+        if (request.headers.get('content-type')?.includes('application/json')) {
+            const { transcript } = await request.json() as { transcript?: ParsedTranscript };
+            if (!transcript?.courses?.length) {
+                return NextResponse.json({ error: 'No parsed transcript courses provided' }, { status: 400 });
+            }
+            return respondWithParsedTranscript(transcript, request);
+        }
+
         const formData = await request.formData();
         const file = formData.get('file') as File;
 
@@ -17,99 +111,12 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'No file provided' }, { status: 400 });
         }
 
-        // Try to authenticate via Bearer token first
-        const user = await getUserFromRequest(request);
-
-        // Convert file to buffer
-        const arrayBuffer = await file.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-
-        // Parse transcript
-        const transcript = await parseTranscriptPDF(buffer);
-
-        let verification: VerificationResult | null = null;
-        let savedToDatabase = false;
-
-        if (user) {
-            // Get profile data for verification
-            const { data: userRow } = await supabaseAdmin
-                .from('users')
-                .select('name, date_of_birth, student_id')
-                .eq('id', user.id)
-                .single();
-
-            if (profileHasVerificationData(userRow)) {
-                verification = verifyTranscript(transcript.studentInfo, {
-                    fullName: userRow!.name,
-                    studentId: userRow!.student_id,
-                    dateOfBirth: userRow!.date_of_birth,
-                });
-            } else {
-                verification = {
-                    verified: true,
-                    nameMatch: false,
-                    studentIdMatch: false,
-                    dobMatch: false,
-                    message: 'Profile not completed — transcript accepted without verification.',
-                    extractedInfo: transcript.studentInfo,
-                };
-            }
-
-            // Save transcript if verification passed
-            if (verification.verified) {
-                const parsedJson = {
-                    courses: transcript.courses.map((c: { course: string; description?: string; grade: string; credits?: number; term?: string }) => ({
-                        courseNumber: c.course,
-                        courseName: c.description || '',
-                        grade: c.grade,
-                        credits: c.credits || 3,
-                        term: c.term || 'Unknown',
-                    })),
-                    studentInfo: transcript.studentInfo,
-                    uploadedAt: new Date().toISOString(),
-                };
-
-                // Check if user already has a transcript
-                const { data: existing } = await supabaseAdmin
-                    .from('transcripts')
-                    .select('id')
-                    .eq('user_id', user.id)
-                    .order('created_at', { ascending: false })
-                    .limit(1)
-                    .single();
-
-                if (existing) {
-                    await supabaseAdmin
-                        .from('transcripts')
-                        .update({ parsed_json: parsedJson })
-                        .eq('id', existing.id);
-                } else {
-                    await supabaseAdmin
-                        .from('transcripts')
-                        .insert({ user_id: user.id, parsed_json: parsedJson });
-                }
-
-                savedToDatabase = true;
-                console.log(`Transcript saved to Supabase for user: ${user.email}`);
-            }
-        } else {
-            verification = {
-                verified: true,
-                nameMatch: false,
-                studentIdMatch: false,
-                dobMatch: false,
-                message: 'Not authenticated — transcript accepted without verification.',
-                extractedInfo: transcript.studentInfo,
-            };
-        }
-
-        return NextResponse.json({
-            success: true,
-            courses: transcript.courses,
-            totalCourses: transcript.courses.length,
-            savedToDatabase,
-            verification,
-        });
+        return NextResponse.json(
+            {
+                error: 'Server-side PDF parsing is disabled on Vercel. Parse the PDF in the browser and send parsed transcript JSON to this endpoint.',
+            },
+            { status: 415 },
+        );
     } catch (error) {
         console.error('PDF parsing error:', error);
         return NextResponse.json(
@@ -122,27 +129,10 @@ export async function POST(request: NextRequest) {
 // GET - Retrieve saved transcript for a user
 export async function GET(request: NextRequest) {
     try {
-        // Try Bearer auth first
         const user = await getUserFromRequest(request);
 
         if (!user) {
-            // Fallback: check query param (for legacy compatibility during migration)
-            const userId = request.nextUrl.searchParams.get('userId');
-            if (!userId) {
-                return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-            }
-            // Look up user by email (legacy)
-            const { data: userRow } = await supabaseAdmin
-                .from('users')
-                .select('id')
-                .eq('email', userId.toLowerCase())
-                .single();
-
-            if (!userRow) {
-                return NextResponse.json({ hasTranscript: false, courses: [] });
-            }
-
-            return getTranscriptForUserId(userRow.id);
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         return getTranscriptForUserId(user.id);

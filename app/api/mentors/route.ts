@@ -2,6 +2,25 @@ import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
+interface StaffProfile {
+    staffId: string;
+    name: string;
+    major?: string;
+    bio?: string;
+    courses?: string[];
+    supportsInPerson?: boolean;
+    supportsOnline?: boolean;
+    price?: number;
+}
+
+interface StaffTimeslot {
+    staffId: string;
+    day: string;
+    date: string;
+    time: string;
+    isBooked?: boolean;
+}
+
 // GET - Fetch all staff profiles for the student-facing mentoring page
 export async function GET() {
     try {
@@ -9,14 +28,14 @@ export async function GET() {
         const timeslotsPath = path.join(process.cwd(), 'app/data/timeslots.json');
 
         // Read staff profiles
-        let staffProfiles: any[] = [];
+        let staffProfiles: StaffProfile[] = [];
         if (fs.existsSync(staffProfilesPath)) {
             const data = fs.readFileSync(staffProfilesPath, 'utf-8');
             staffProfiles = JSON.parse(data);
         }
 
         // Read timeslots
-        let timeslots: any[] = [];
+        let timeslots: StaffTimeslot[] = [];
         if (fs.existsSync(timeslotsPath)) {
             const data = fs.readFileSync(timeslotsPath, 'utf-8');
             timeslots = JSON.parse(data);

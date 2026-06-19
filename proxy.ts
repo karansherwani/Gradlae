@@ -69,11 +69,11 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
         'Content-Security-Policy',
         [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com",
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.googletagmanager.com",
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
             "font-src 'self' https://fonts.gstatic.com",
             "img-src 'self' data: blob: https:",
-            "connect-src 'self' https://*.supabase.co https://api.openai.com https://routellm.abacus.ai https://api.stripe.com",
+            "connect-src 'self' https://*.supabase.co https://api.openai.com https://routellm.abacus.ai https://api.stripe.com https://www.google-analytics.com https://region1.google-analytics.com",
             "frame-src https://js.stripe.com https://hooks.stripe.com",
             "object-src 'none'",
             "base-uri 'self'",

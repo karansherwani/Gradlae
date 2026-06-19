@@ -131,7 +131,23 @@ export default function AdvisorPage() {
     const [hasTranscript, setHasTranscript] = useState<boolean | null>(null);
     const [transcriptCourses, setTranscriptCourses] = useState<TranscriptCourse[]>([]);
     const [activeView, setActiveView] = useState<AdvisorView>('home');
-    const [conversations, setConversations] = useState<SavedConversation[]>([]);
+    const [conversations, setConversations] = useState<SavedConversation[]>(() => {
+        if (typeof window === 'undefined') return [];
+
+        try {
+            const saved = window.localStorage.getItem(CONVERSATION_STORAGE_KEY);
+            if (!saved) return [];
+
+            const parsed = JSON.parse(saved) as SavedConversation[];
+            return parsed.map(conversation => ({
+                ...conversation,
+                messages: restoreMessages(conversation.messages),
+            }));
+        } catch (error) {
+            console.error('Failed to load advisor conversations:', error);
+            return [];
+        }
+    });
     const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
 
     const studentName = dbUser?.name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || '';
@@ -154,21 +170,6 @@ export default function AdvisorPage() {
         { label: 'Senior year', detail: `${creditsRemaining} credits remaining toward the ${DEGREE_TOTAL_CREDITS}-credit target` },
         { label: 'Graduation ready', detail: creditsRemaining === 0 ? 'Credit target met' : 'Finish remaining credits, electives, and advisor-approved requirements' },
     ];
-
-    useEffect(() => {
-        try {
-            const saved = localStorage.getItem(CONVERSATION_STORAGE_KEY);
-            if (saved) {
-                const parsed = JSON.parse(saved) as SavedConversation[];
-                setConversations(parsed.map(conversation => ({
-                    ...conversation,
-                    messages: restoreMessages(conversation.messages),
-                })));
-            }
-        } catch (error) {
-            console.error('Failed to load advisor conversations:', error);
-        }
-    }, []);
 
     const persistConversations = useCallback((next: SavedConversation[]) => {
         setConversations(next);
@@ -233,7 +234,7 @@ export default function AdvisorPage() {
             }
 
             try {
-                const response = await fetch(`/api/upload?userId=${encodeURIComponent(user.email || '')}`, {
+                const response = await fetch('/api/upload', {
                     headers: { Authorization: `Bearer ${accessToken}` },
                 });
                 const data = await response.json();
@@ -321,13 +322,15 @@ export default function AdvisorPage() {
             <p className={styles.panelEyebrow}>Graduation Timeline</p>
             <h2>A clear path from freshman year to graduation</h2>
             <div className={styles.timeline}>
-                <div className={styles.timelinePole} aria-hidden="true"></div>
                 {timelineItems.map((item) => (
                     <div className={styles.timelineItem} key={item.label}>
                         <div className={styles.timelineYear}>
                             <h3>{item.label}</h3>
                         </div>
-                        <div className={styles.timelineMark} aria-hidden="true"></div>
+                        <div className={styles.timelineImageWrap} aria-hidden="true">
+                            <img src="/graduation-timeline-pole.png" alt="" className={styles.timelinePole} />
+                            <span className={styles.timelineMark}></span>
+                        </div>
                         <div className={styles.timelineCopy}>
                             <p>{item.detail}</p>
                         </div>

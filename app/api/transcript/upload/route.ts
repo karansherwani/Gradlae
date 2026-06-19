@@ -4,7 +4,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/app/lib/supabaseServer';
 import { getUserFromRequest } from '@/app/lib/supabaseAuth';
-import { parseTranscriptPDF } from '@/app/lib/pdfParser';
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+const PDF_MAGIC_BYTES = [0x25, 0x50, 0x44, 0x46]; // %PDF
 
 export async function POST(request: NextRequest) {
     try {
@@ -21,12 +23,19 @@ export async function POST(request: NextRequest) {
         if (!file) {
             return NextResponse.json({ error: 'No file provided' }, { status: 400 });
         }
+        if (file.size > MAX_FILE_SIZE) {
+            return NextResponse.json({ error: 'File too large. Maximum size is 10MB.' }, { status: 413 });
+        }
         if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
             return NextResponse.json({ error: 'Only PDF files are supported' }, { status: 400 });
         }
 
         const arrayBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
+        const header = Array.from(buffer.slice(0, 4));
+        if (!PDF_MAGIC_BYTES.every((byte, index) => header[index] === byte)) {
+            return NextResponse.json({ error: 'Invalid PDF file' }, { status: 400 });
+        }
 
         // 3. Upload raw PDF to Supabase Storage
         const storagePath = `${user.authId}/${Date.now()}_${file.name}`;
@@ -42,55 +51,13 @@ export async function POST(request: NextRequest) {
             // Continue — we can still parse even if storage upload fails
         }
 
-        // 4. Parse the transcript
-        const transcript = await parseTranscriptPDF(buffer);
-
-        // Normalize to a clean JSON structure
-        const parsedJson = {
-            studentInfo: transcript.studentInfo,
-            courses: transcript.courses.map(c => ({
-                course: c.course,
-                description: c.description,
-                grade: c.grade,
-                credits: c.credits,
-                term: c.term,
-                isRetake: c.isRetake || false,
-                bestGrade: c.bestGrade || c.grade,
-            })),
-            totalCourses: transcript.courses.length,
-            parsedAt: new Date().toISOString(),
-        };
-
-        // 5. Upsert a row in the transcripts table
-        //    (delete previous transcript for this user, insert new)
-        await supabaseAdmin
-            .from('transcripts')
-            .delete()
-            .eq('user_id', user.id);
-
-        const { data: transcriptRow, error: insertError } = await supabaseAdmin
-            .from('transcripts')
-            .insert({
-                user_id: user.id,
-                raw_file_url: uploadError ? null : storagePath,
-                parsed_json: parsedJson,
-            })
-            .select()
-            .single();
-
-        if (insertError) {
-            console.error('Transcript insert error:', insertError.message);
-            return NextResponse.json({ error: 'Failed to save transcript' }, { status: 500 });
-        }
-
-        return NextResponse.json({
-            success: true,
-            transcriptId: transcriptRow.id,
-            courses: parsedJson.courses,
-            totalCourses: parsedJson.totalCourses,
-            studentInfo: parsedJson.studentInfo,
-            storagePath: uploadError ? null : storagePath,
-        });
+        return NextResponse.json(
+            {
+                error: 'Server-side PDF parsing is disabled on Vercel. Parse the PDF in the browser and send parsed transcript JSON to /api/upload.',
+                storagePath: uploadError ? null : storagePath,
+            },
+            { status: 415 },
+        );
     } catch (error) {
         console.error('Transcript upload error:', error);
         return NextResponse.json(

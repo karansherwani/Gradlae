@@ -81,6 +81,7 @@ export default function ProgressPage() {
     // GPA Calculator State
     const [previousCredits, setPreviousCredits] = useState<string>('');
     const [previousGPA, setPreviousGPA] = useState<string>('');
+    const [semesterLabel, setSemesterLabel] = useState<string>('Current Semester');
     const [gpaCalculatorCourses, setGpaCalculatorCourses] = useState<GPACalculatorCourse[]>([]);
 
     useEffect(() => {
@@ -123,7 +124,7 @@ export default function ProgressPage() {
         }
 
         try {
-            const response = await fetch(`/api/upload?userId=${encodeURIComponent(user.email)}`, {
+            const response = await fetch('/api/upload', {
                 headers: { Authorization: `Bearer ${accessToken}` },
             });
             const data = await response.json();
@@ -132,22 +133,25 @@ export default function ProgressPage() {
                 setTranscriptCourses(data.courses);
                 setHasTranscript(true);
 
-                // Get current semester courses (in-progress or most recent term)
-                const currentCourses = data.courses.filter((c: TranscriptCourse) =>
-                    c.grade === 'IP' ||
-                    (data.courses.some((x: TranscriptCourse) => x.grade === 'IP') ? false :
-                        c.term === data.courses[data.courses.length - 1].term)
-                );
+                // Check if any courses are in-progress
+                const hasInProgress = data.courses.some((x: TranscriptCourse) => x.grade === 'IP');
 
-                // Initialize GPA calculator with current semester courses
-                if (currentCourses.length > 0) {
-                    const gpaCourses: GPACalculatorCourse[] = currentCourses.map((c: TranscriptCourse, i: number) => ({
+                if (hasInProgress) {
+                    // Show only in-progress courses as "Current Semester"
+                    const ipCourses = data.courses.filter((c: TranscriptCourse) => c.grade === 'IP');
+                    setSemesterLabel('Current Semester');
+
+                    const gpaCourses: GPACalculatorCourse[] = ipCourses.map((c: TranscriptCourse, i: number) => ({
                         id: `transcript-${i}`,
                         name: `${c.course} - ${c.description}`,
                         credits: c.credits,
-                        expectedGrade: c.grade === 'IP' ? 'B' : c.grade,
+                        expectedGrade: 'B',
                     }));
                     setGpaCalculatorCourses(gpaCourses);
+                } else {
+                    // No in-progress courses — semester is complete, start fresh
+                    setSemesterLabel('Next Semester');
+                    setGpaCalculatorCourses([]);
                 }
 
                 // Calculate previous credits and GPA from completed courses
@@ -379,7 +383,10 @@ export default function ProgressPage() {
     };
 
     // Get current semester from transcript
-    const currentSemesterCourses = transcriptCourses.filter(c => c.grade === 'IP');
+    const hasIPCourses = transcriptCourses.some(c => c.grade === 'IP');
+    const currentSemesterCourses = hasIPCourses
+        ? transcriptCourses.filter(c => c.grade === 'IP')
+        : gpaCalculatorCourses;
     const totalCurrentCredits = gpaCalculatorCourses.reduce((sum, c) => sum + c.credits, 0);
 
     return (
@@ -433,7 +440,7 @@ export default function ProgressPage() {
                         </div>
                         <div className={styles.statInfo}>
                             <span className={styles.statValue}>{currentSemesterCourses.length || gpaCalculatorCourses.length}</span>
-                            <span className={styles.statLabel}>Current Courses</span>
+                            <span className={styles.statLabel}>{semesterLabel} Courses</span>
                         </div>
                     </div>
                     <div className={styles.statCard}>
@@ -496,7 +503,7 @@ export default function ProgressPage() {
                                 min="0"
                                 step="1"
                             />
-                            <span className={styles.inputHint}>Total credits before this semester</span>
+                            <span className={styles.inputHint}>Total credits before {semesterLabel.toLowerCase()}</span>
                         </div>
                         <div className={styles.gpaInputCard}>
                             <label>Previous GPA</label>
@@ -509,12 +516,12 @@ export default function ProgressPage() {
                                 max="4"
                                 step="0.01"
                             />
-                            <span className={styles.inputHint}>Your GPA before this semester</span>
+                            <span className={styles.inputHint}>Your GPA before {semesterLabel.toLowerCase()}</span>
                         </div>
                     </div>
 
                     <div className={styles.currentCoursesSection}>
-                        <h3>Current Semester Courses</h3>
+                        <h3>{semesterLabel} Courses</h3>
                         {loadingTranscript ? (
                             <div className={styles.loadingState}>
                                 <div className={styles.spinner}></div>
@@ -522,7 +529,7 @@ export default function ProgressPage() {
                             </div>
                         ) : gpaCalculatorCourses.length === 0 ? (
                             <div className={styles.emptyGPACourses}>
-                                <p>{hasTranscript ? 'No current semester courses found in transcript.' : 'No transcript uploaded. Add courses manually to calculate your GPA.'}</p>
+                                <p>{hasTranscript ? `No ${semesterLabel.toLowerCase()} courses found in transcript.` : 'No transcript uploaded. Add courses manually to calculate your GPA.'}</p>
                                 <button onClick={addGPACourse} className={styles.addGPACourseBtn}>
                                     + Add Course Manually
                                 </button>

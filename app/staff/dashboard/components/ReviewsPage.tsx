@@ -14,10 +14,13 @@ interface Review {
   helpful: number;
 }
 
+type RatingFilter = 'all' | '5' | '4' | '3' | '2' | '1';
+type ReviewSort = 'recent' | 'rating' | 'helpful';
+
 export default function ReviewsPage({ staffId }: { staffId: string }) {
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [filter, setFilter] = useState<'all' | '5' | '4' | '3' | '2' | '1'>('all');
-  const [sortBy, setSortBy] = useState<'recent' | 'rating' | 'helpful'>('recent');
+  const [filter, setFilter] = useState<RatingFilter>('all');
+  const [sortBy, setSortBy] = useState<ReviewSort>('recent');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -122,7 +125,7 @@ export default function ReviewsPage({ staffId }: { staffId: string }) {
             <button
               key={star}
               className={`${styles.filterBtn} ${filter === String(star) ? styles.filterBtnActive : ''}`}
-              onClick={() => setFilter(String(star) as any)}
+              onClick={() => setFilter(String(star) as RatingFilter)}
             >
               {star} stars
             </button>
@@ -132,7 +135,7 @@ export default function ReviewsPage({ staffId }: { staffId: string }) {
         <select
           className={styles.sortSelect}
           value={sortBy}
-          onChange={(e) => setSortBy(e.target.value as any)}
+          onChange={(e) => setSortBy(e.target.value as ReviewSort)}
         >
           <option value="recent">Most Recent</option>
           <option value="rating">Highest Rated</option>
