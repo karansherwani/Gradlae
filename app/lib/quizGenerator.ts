@@ -17,7 +17,17 @@ export interface GeneratedQuiz {
     generationSeed: string;
 }
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+function cleanEnv(value: string | undefined): string {
+    return (value || '').trim().replace(/^['"]|['"]$/g, '');
+}
+
+function getGeminiClient(): GoogleGenerativeAI {
+    const apiKey = cleanEnv(process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY);
+    if (!apiKey) {
+        throw new Error('Gemini API key is not configured');
+    }
+    return new GoogleGenerativeAI(apiKey);
+}
 
 // Generate a unique seed for this user/course combination
 function generateQuizSeed(userId: string, courseNumber: string, attemptNumber: number = 1): string {
@@ -33,6 +43,7 @@ export async function generateQuizForCourse(
 ): Promise<GeneratedQuiz> {
     try {
         const seed = generateQuizSeed(userId, courseNumber, attemptNumber);
+        const genAI = getGeminiClient();
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         const difficultyHint = {

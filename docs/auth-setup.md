@@ -9,10 +9,12 @@ Set these in **Vercel Dashboard → Settings → Environment Variables** (and in
 | `NEXT_PUBLIC_SUPABASE_URL` | Client + Server | Your Supabase project URL (e.g. `https://xxxx.supabase.co`) |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Client | Supabase anon/public key (starts with `eyJ...` or `sb_publishable_...`) |
 | `SUPABASE_SERVICE_ROLE_KEY` | Server only | Supabase service role key (secret — never expose to client) |
-| `GEMINI_API_KEY` | Server only | Google Gemini API key for quiz generation |
-| `NEXT_PUBLIC_GOOGLE_AI_API_KEY` | Client | Same key, exposed to client for chat |
-| `STRIPE_SECRET_KEY` | Server only | Stripe secret key for mentoring payments |
-| `NEXT_PUBLIC_STRIPE_PUBLIC_KEY` | Client | Stripe publishable key |
+| `GEMINI_API_KEY` | Server only | Google Gemini API key for quiz generation and the AI advisor |
+| `GOOGLE_GENERATIVE_AI_API_KEY` | Server only | Optional alternate name for the same Gemini key |
+| `OPENAI_API_KEY` | Server only | Optional AI advisor fallback key |
+| `ROUTELLM_API_KEY` | Server only | Optional AI advisor fallback key |
+| `STRIPE_SECRET_KEY` | Server only | Stripe secret key for mentoring payments. Must start with `sk_test_` or `sk_live_` |
+| `NEXT_PUBLIC_STRIPE_PUBLIC_KEY` | Client | Stripe publishable key. Must start with `pk_test_` or `pk_live_` |
 
 ### ⚠️ Keys that are NOT needed anymore
 

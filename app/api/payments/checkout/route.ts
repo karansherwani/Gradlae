@@ -24,6 +24,10 @@ const PRICING = {
     },
 };
 
+function cleanEnv(value: string | undefined): string {
+    return (value || '').trim().replace(/^['"]|['"]$/g, '');
+}
+
 function getBaseUrl(request: NextRequest): string {
     if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL;
     if (process.env.NEXTAUTH_URL) return process.env.NEXTAUTH_URL;
@@ -39,14 +43,23 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-        if (!process.env.STRIPE_SECRET_KEY) {
+        const stripeSecretKey = cleanEnv(process.env.STRIPE_SECRET_KEY);
+        if (!stripeSecretKey) {
             return NextResponse.json(
                 { error: 'Stripe is not configured. Add STRIPE_SECRET_KEY in Vercel environment variables.' },
                 { status: 500 },
             );
         }
 
-        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+        if (!stripeSecretKey.startsWith('sk_test_') && !stripeSecretKey.startsWith('sk_live_')) {
+            console.error('Stripe configuration error: STRIPE_SECRET_KEY must be a secret key starting with sk_test_ or sk_live_.');
+            return NextResponse.json(
+                { error: 'Stripe is configured with the wrong key type. Use a Stripe secret key that starts with sk_test_ or sk_live_.' },
+                { status: 500 },
+            );
+        }
+
+        const stripe = new Stripe(stripeSecretKey);
         const body = await request.json();
         const validation = validateBody(checkoutSchema, body);
         if (!validation.success) {
@@ -99,6 +112,13 @@ export async function POST(request: NextRequest) {
     } catch (error) {
         console.error('Stripe checkout error:', error);
         const message = error instanceof Error ? error.message : 'Unknown Stripe error';
+        if (message.toLowerCase().includes('api key') || message.toLowerCase().includes('invalid')) {
+            return NextResponse.json(
+                { error: 'Stripe rejected the configured API key. Verify STRIPE_SECRET_KEY in Vercel and redeploy.' },
+                { status: 500 },
+            );
+        }
+
         return NextResponse.json(
             { error: `Failed to create checkout session: ${message}` },
             { status: 500 }

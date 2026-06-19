@@ -55,6 +55,10 @@ interface TranscriptCourse {
     bestGrade?: string;
 }
 
+function cleanEnv(value: string | undefined): string {
+    return (value || '').trim().replace(/^['"]|['"]$/g, '');
+}
+
 // ─── STATIC DATA LOADING (fallback) ────────────────────────────────────────
 
 function loadStaticPlannerData(): PlannerData {
@@ -268,20 +272,19 @@ Remember: Help students succeed and graduate on time!`;
     return prompt;
 }
 
-// ─── ROUTELLM FALLBACK ────────────────────────────────────────────────────
+// ─── OPENAI-COMPATIBLE FALLBACKS ──────────────────────────────────────────
 
-async function callRouteLLMFallback(
+async function callOpenAICompatible(
+    providerName: string,
+    apiUrl: string,
+    apiKey: string,
+    model: string,
     systemPrompt: string,
     messages: Array<{ role: string; content: string }>,
 ): Promise<string> {
-    const apiKey = process.env.ROUTELLM_API_KEY || process.env.OPENAI_API_KEY;
     if (!apiKey) {
-        throw new Error('No fallback AI API key configured');
+        throw new Error(`${providerName} API key is missing`);
     }
-
-    const apiUrl = process.env.ROUTELLM_API_KEY
-        ? 'https://routellm.abacus.ai/v1/chat/completions'
-        : 'https://api.openai.com/v1/chat/completions';
 
     const response = await fetch(apiUrl, {
         method: 'POST',
@@ -290,7 +293,7 @@ async function callRouteLLMFallback(
             'Authorization': `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-            model: process.env.ROUTELLM_API_KEY ? 'gpt-4o' : 'gpt-4o-mini',
+            model,
             messages: [
                 { role: 'system', content: systemPrompt },
                 ...messages.map(m => ({
@@ -305,12 +308,56 @@ async function callRouteLLMFallback(
 
     if (!response.ok) {
         const errorText = await response.text();
-        console.error('RouteLLM fallback error:', errorText);
-        throw new Error('Fallback AI service also failed');
+        console.error(`${providerName} fallback error:`, errorText);
+        throw new Error(`${providerName} AI service failed`);
     }
 
     const data = await response.json();
     return data.choices[0].message.content;
+}
+
+async function callConfiguredFallbacks(
+    systemPrompt: string,
+    messages: Array<{ role: string; content: string }>,
+): Promise<string> {
+    const providers = [
+        {
+            name: 'RouteLLM',
+            key: cleanEnv(process.env.ROUTELLM_API_KEY),
+            url: 'https://routellm.abacus.ai/v1/chat/completions',
+            model: 'gpt-4o',
+        },
+        {
+            name: 'OpenAI',
+            key: cleanEnv(process.env.OPENAI_API_KEY),
+            url: 'https://api.openai.com/v1/chat/completions',
+            model: 'gpt-4o-mini',
+        },
+    ].filter(provider => provider.key);
+
+    if (providers.length === 0) {
+        throw new Error('No fallback AI API key configured');
+    }
+
+    let lastError: unknown = null;
+    for (const provider of providers) {
+        try {
+            console.log(`Using ${provider.name} fallback for advisor...`);
+            return await callOpenAICompatible(
+                provider.name,
+                provider.url,
+                provider.key,
+                provider.model,
+                systemPrompt,
+                messages,
+            );
+        } catch (error) {
+            lastError = error;
+            console.warn(`${provider.name} fallback failed:`, error instanceof Error ? error.message : error);
+        }
+    }
+
+    throw lastError instanceof Error ? lastError : new Error('All AI fallbacks failed');
 }
 
 // ─── API HANDLER ──────────────────────────────────────────────────────────
@@ -384,7 +431,11 @@ export async function POST(request: NextRequest) {
         const lastMessage = messages[messages.length - 1];
 
         // ─── Try Gemini first, fall back to RouteLLM ─────────────────────
-        const geminiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY;
+        const geminiKey = cleanEnv(
+            process.env.GEMINI_API_KEY ||
+            process.env.GOOGLE_GENERATIVE_AI_API_KEY ||
+            process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY,
+        );
         let aiMessage: string | null = null;
 
         if (geminiKey) {
@@ -425,12 +476,11 @@ export async function POST(request: NextRequest) {
         // ─── Fallback to RouteLLM if Gemini failed or key missing ────────
         if (!aiMessage) {
             try {
-                console.log('Using RouteLLM fallback for advisor...');
-                aiMessage = await callRouteLLMFallback(systemPrompt, messages);
+                aiMessage = await callConfiguredFallbacks(systemPrompt, messages);
             } catch (fallbackError) {
-                console.error('Both Gemini and RouteLLM failed:', (fallbackError as Error).message);
+                console.error('All configured AI providers failed:', (fallbackError as Error).message);
                 return NextResponse.json(
-                    { error: 'AI service is temporarily unavailable. Please try again later.' },
+                    { error: 'AI advisor is not configured correctly. Add GEMINI_API_KEY or OPENAI_API_KEY in Vercel and redeploy.' },
                     { status: 503 }
                 );
             }
