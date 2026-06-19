@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "staffId": "1770098072761",
+    "name": "Gradlae CS Peer Mentor",
+    "major": "Computer Science",
+    "bio": "Peer mentor for intro programming, data structures, and planning a balanced technical semester.",
+    "courses": ["CSC 110", "CSC 120", "CSC 210", "MATH 122A/B"],
+    "supportsInPerson": false,
+    "supportsOnline": true,
+    "price": 20
+  },
+  {
+    "staffId": "1770173271137",
+    "name": "Gradlae Math Peer Mentor",
+    "major": "Mathematics",
+    "bio": "Peer mentor for calculus, prerequisite review, and building confidence before placement quizzes.",
+    "courses": ["MATH 112", "MATH 122A/B", "MATH 129", "MATH 223"],
+    "supportsInPerson": false,
+    "supportsOnline": true,
+    "price": 20
+  }
+]
