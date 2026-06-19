@@ -4,8 +4,6 @@
 // Uses Google Gemini (free tier) for AI responses.
 
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { loadAllCourses, Course as CSVCourse } from '@/app/lib/loadCourses';
 import { supabaseAdmin } from '@/app/lib/supabaseServer';
@@ -59,13 +57,8 @@ function cleanEnv(value: string | undefined): string {
     return (value || '').trim().replace(/^['"]|['"]$/g, '');
 }
 
-// ─── STATIC DATA LOADING (fallback) ────────────────────────────────────────
+// ─── STATIC DATA LOADING (removed – see buildSystemPrompt null handling) ───
 
-function loadStaticPlannerData(): PlannerData {
-    const plannerPath = path.join(process.cwd(), 'data', 'degreeRequirements.json');
-    const data = fs.readFileSync(plannerPath, 'utf-8');
-    return JSON.parse(data);
-}
 
 function buildPlannerContext(planner: PlannerData): string {
     const plan = planner.plans[0];
@@ -209,16 +202,31 @@ function buildTranscriptContextFromDB(courses: TranscriptCourse[], studentName: 
 // ─── SYSTEM PROMPT ─────────────────────────────────────────────────────────
 
 function buildSystemPrompt(
-    plannerContext: string,
+    plannerContext: string | null,
     catalogSample: string,
     studentContext?: string,
 ): string {
     let prompt = `You are an AI academic advisor for students at the University of Arizona.
-You have access to the student's degree plan and a sample of the course catalog.
+You have access to a sample of the course catalog.
 
-${plannerContext}
+`;
 
-AVAILABLE COURSE CATALOG (sample of relevant courses):
+    if (plannerContext) {
+        prompt += `The student has a saved degree plan:\n${plannerContext}\n\n`;
+    } else {
+        prompt += `IMPORTANT: No specific degree plan has been saved for this student.
+You do NOT have a pre-built semester-by-semester plan.
+Do NOT invent or assume a fixed 8-semester schedule.
+Instead, use the course catalog below and the student's transcript (if available)
+to give personalized, dynamic advice. When asked what courses to take,
+search the catalog for relevant courses based on the student's major,
+completed coursework, remaining prerequisites, and interests.
+If you don't know the student's exact major or requirements, ASK them.
+
+`;
+    }
+
+    prompt += `AVAILABLE COURSE CATALOG (sample of relevant courses):
 ${catalogSample}
 
 `;
@@ -244,11 +252,12 @@ you need their transcript for accurate answers. Do not guess or assume.
 
     prompt += `YOUR ROLE:
 - Help students plan semesters, check prerequisites, and choose courses
-- Generate personalized graduation plans
+- Generate personalized graduation plans based on their ACTUAL transcript and interests
 - Answer questions about degree requirements
 - Be conversational, supportive, and encouraging
-- Base all advice on the data provided above (transcript, planner, catalog)
+- Base all advice on the data provided above (transcript, catalog)
 - If you lack data to answer accurately, say so instead of guessing
+- When you don't have a saved degree plan, ask the student about their major and interests to give better advice
 
 CONSTRAINTS:
 - Maximum 21 credits per semester
@@ -258,6 +267,7 @@ CONSTRAINTS:
 - Show degree plans in clear tabular format with course codes, titles, and units
 - Always complete the entire plan in one response
 - NEVER describe the student as a "senior" unless they truly have senior standing (120+ earned credits). Use the semester count and earned credits provided to determine standing.
+- NEVER show a generic template plan. Always personalize based on actual student data.
 
 When showing schedules use this format:
 FALL 2025
@@ -422,8 +432,9 @@ export async function POST(request: NextRequest) {
 
         }
 
-        // Build context – prefer DB planner, fall back to static file
-        const plannerContext = dbPlannerContext || buildPlannerContext(loadStaticPlannerData());
+        // Build context – use DB planner if available; otherwise tell the AI
+        // to reason dynamically from transcript + catalog instead of a static template.
+        const plannerContext = dbPlannerContext || null;
         const allCourses = loadAllCourses();
         const catalogSample = buildCourseSample(allCourses);
 
