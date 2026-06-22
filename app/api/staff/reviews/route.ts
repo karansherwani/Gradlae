@@ -3,6 +3,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
+import { getUserFromRequest } from '@/app/lib/supabaseAuth';
+import { sanitizeString } from '@/app/lib/validation';
 
 interface Review {
   id: string;
@@ -79,6 +81,11 @@ export async function GET(request: NextRequest) {
 // POST - Create a new review (when student submits review)
 export async function POST(request: NextRequest) {
   try {
+    const user = await getUserFromRequest(request);
+    if (!user) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { 
       staffId, 
@@ -96,7 +103,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (rating < 1 || rating > 5) {
+    const numericRating = Number(rating);
+    if (!Number.isFinite(numericRating) || numericRating < 1 || numericRating > 5) {
       return NextResponse.json(
         { message: 'Rating must be between 1 and 5' },
         { status: 400 }
@@ -107,11 +115,11 @@ export async function POST(request: NextRequest) {
 
     const newReview: Review = {
       id: `review_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      staffId,
-      studentName,
-      course: course || 'General Tutoring',
-      rating,
-      text,
+      staffId: sanitizeString(String(staffId)).slice(0, 80),
+      studentName: sanitizeString(String(studentName)).slice(0, 100),
+      course: sanitizeString(String(course || 'General Tutoring')).slice(0, 100),
+      rating: numericRating,
+      text: sanitizeString(String(text)).slice(0, 2000),
       date: new Date().toLocaleDateString('en-US', { 
         month: 'short', 
         day: 'numeric', 

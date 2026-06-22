@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
+import { getUserFromRequest } from '@/app/lib/supabaseAuth';
 
 interface Appointment {
   id: string;
@@ -50,16 +51,25 @@ async function writeAppointments(appointments: Appointment[]) {
   await fs.writeFile(APPOINTMENTS_FILE, JSON.stringify(appointments, null, 2));
 }
 
+function isStaffUser(user: { role: string } | null) {
+  return user?.role === 'instructor' || user?.role === 'staff';
+}
+
 // GET - Fetch appointments for a staff member
 export async function GET(request: NextRequest) {
   try {
+    const user = await getUserFromRequest(request);
+    if (!isStaffUser(user)) {
+      return NextResponse.json({ message: 'Forbidden: Staff role required' }, { status: user ? 403 : 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const staffId = searchParams.get('staffId');
 
-    if (!staffId) {
+    if (!staffId || staffId !== user?.id) {
       return NextResponse.json(
-        { message: 'Staff ID is required' },
-        { status: 400 }
+        { message: 'Staff ID is invalid' },
+        { status: 403 }
       );
     }
 
@@ -86,6 +96,11 @@ export async function GET(request: NextRequest) {
 // POST - Create a new appointment (when student books)
 export async function POST(request: NextRequest) {
   try {
+    const user = await getUserFromRequest(request);
+    if (!user) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { 
       staffId, 
@@ -106,6 +121,10 @@ export async function POST(request: NextRequest) {
         { message: 'Missing required fields' },
         { status: 400 }
       );
+    }
+
+    if (studentEmail.toLowerCase().trim() !== user.email.toLowerCase().trim()) {
+      return NextResponse.json({ message: 'Forbidden: Cannot book for another email' }, { status: 403 });
     }
 
     const allAppointments = await readAppointments();

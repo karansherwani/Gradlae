@@ -57,6 +57,26 @@ function cleanEnv(value: string | undefined): string {
     return (value || '').trim().replace(/^['"]|['"]$/g, '');
 }
 
+function getGeminiApiKey(): string {
+    return cleanEnv(
+        process.env.GEMINI_API_KEY ||
+        process.env.GOOGLE_GENERATIVE_AI_API_KEY ||
+        process.env.GOOGLE_API_KEY ||
+        process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY,
+    );
+}
+
+function getGeminiModels(): string[] {
+    const configuredModel = cleanEnv(process.env.GEMINI_MODEL);
+    return [
+        configuredModel,
+        'gemini-2.5-flash',
+        'gemini-2.0-flash',
+        'gemini-1.5-flash',
+        'gemini-1.5-flash-latest',
+    ].filter(Boolean);
+}
+
 // ─── STATIC DATA LOADING (removed – see buildSystemPrompt null handling) ───
 
 
@@ -370,10 +390,56 @@ async function callConfiguredFallbacks(
     throw lastError instanceof Error ? lastError : new Error('All AI fallbacks failed');
 }
 
+async function callGemini(
+    apiKey: string,
+    systemPrompt: string,
+    messages: Array<{ role: string; content: string }>,
+): Promise<string> {
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const lastMessage = messages[messages.length - 1];
+    if (!lastMessage?.content) {
+        throw new Error('No user message provided');
+    }
+
+    const conversationText = messages
+        .slice(-12)
+        .map(message => `${message.role === 'assistant' ? 'Advisor' : 'Student'}: ${message.content}`)
+        .join('\n\n');
+
+    const prompt = `${systemPrompt}
+
+RECENT CONVERSATION
+-------------------
+${conversationText}
+
+Answer the student's latest message directly.`;
+
+    let lastError: unknown = null;
+    for (const modelName of getGeminiModels()) {
+        try {
+            const model = genAI.getGenerativeModel({ model: modelName });
+            const result = await model.generateContent(prompt);
+            const text = result.response.text();
+            if (text?.trim()) return text;
+            lastError = new Error(`${modelName} returned an empty response`);
+        } catch (error) {
+            lastError = error;
+            console.warn(`Gemini model ${modelName} failed:`, error instanceof Error ? error.message : error);
+        }
+    }
+
+    throw lastError instanceof Error ? lastError : new Error('All Gemini model attempts failed');
+}
+
 // ─── API HANDLER ──────────────────────────────────────────────────────────
 
 export async function POST(request: NextRequest) {
     try {
+        const advisorUser = await getUserFromRequest(request);
+        if (!advisorUser) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const body = await request.json();
 
         // Validate input with Zod
@@ -396,9 +462,6 @@ export async function POST(request: NextRequest) {
         // ─── Try to load from Supabase for authenticated users ──────────
         let studentContext: string | undefined = clientContext || undefined;
         let dbPlannerContext: string | null = null;
-        let advisorUser: Awaited<ReturnType<typeof getUserFromRequest>> = null;
-
-        advisorUser = await getUserFromRequest(request);
         if (advisorUser) {
             // Load transcript from Supabase
             const { data: transcript } = await supabaseAdmin
@@ -439,47 +502,16 @@ export async function POST(request: NextRequest) {
         const catalogSample = buildCourseSample(allCourses);
 
         const systemPrompt = buildSystemPrompt(plannerContext, catalogSample, studentContext);
-        const lastMessage = messages[messages.length - 1];
 
-        // ─── Try Gemini first, fall back to RouteLLM ─────────────────────
-        const geminiKey = cleanEnv(
-            process.env.GEMINI_API_KEY ||
-            process.env.GOOGLE_GENERATIVE_AI_API_KEY ||
-            process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY,
-        );
+        // ─── Try Gemini first, fall back to RouteLLM/OpenAI ──────────────
+        const geminiKey = getGeminiApiKey();
         let aiMessage: string | null = null;
 
         if (geminiKey) {
             try {
-                const genAI = new GoogleGenerativeAI(geminiKey);
-                const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-
-                // Convert chat messages to Gemini format
-                const geminiHistory = messages
-                    .slice(0, -1)
-                    .filter((m: { role: string }) => m.role === 'user' || m.role === 'assistant')
-                    .map((m: { role: string; content: string }) => ({
-                        role: m.role === 'assistant' ? 'model' : 'user',
-                        parts: [{ text: m.content }],
-                    }));
-
-                const chat = model.startChat({
-                    history: [
-                        { role: 'user', parts: [{ text: systemPrompt }] },
-                        { role: 'model', parts: [{ text: 'Understood. I am ready to help as an AI academic advisor for University of Arizona students. I will follow all the guidelines and constraints provided.' }] },
-                        ...geminiHistory,
-                    ],
-                    generationConfig: {
-                        temperature: 0.7,
-                        maxOutputTokens: 4096,
-                    },
-                });
-
-                const result = await chat.sendMessage(lastMessage.content);
-                const response = result.response;
-                aiMessage = response.text() || null;
+                aiMessage = await callGemini(geminiKey, systemPrompt, messages);
             } catch (geminiError) {
-                console.warn('Gemini API failed, falling back to RouteLLM:', (geminiError as Error).message);
+                console.warn('Gemini API failed, falling back to other AI providers:', (geminiError as Error).message);
                 // aiMessage stays null → will trigger fallback below
             }
         }

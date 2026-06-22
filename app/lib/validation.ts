@@ -65,15 +65,6 @@ export const resetSchema = z.object({
     email: z.string().email().max(254).optional(),
     netId: z.string().max(50).optional(),
     staffId: z.string().max(50).optional(),
-    newPassword: z
-        .string()
-        .min(8)
-        .max(128)
-        .regex(/[a-z]/)
-        .regex(/[A-Z]/)
-        .regex(/[0-9]/)
-        .optional(),
-    otp: z.string().max(50).optional(),
 });
 
 // ─── CHAT & ADVISOR SCHEMAS ─────────────────────────────────────────────────

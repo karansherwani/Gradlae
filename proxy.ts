@@ -13,6 +13,7 @@ const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 const RATE_LIMITS: Record<string, { maxRequests: number; windowMs: number }> = {
     auth: { maxRequests: 10, windowMs: 15 * 60 * 1000 },    // 10 req / 15 min
     ai: { maxRequests: 30, windowMs: 60 * 1000 },            // 30 req / min
+    upload: { maxRequests: 10, windowMs: 60 * 1000 },        // 10 req / min
     api: { maxRequests: 100, windowMs: 60 * 1000 },           // 100 req / min
 };
 
@@ -101,7 +102,7 @@ export function proxy(request: NextRequest) {
     }
 
     // ─── Rate Limiting ───
-    if (pathname.startsWith('/api/') && !pathname.startsWith('/api/upload')) {
+    if (pathname.startsWith('/api/')) {
         const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
             || request.headers.get('x-real-ip')
             || 'unknown';

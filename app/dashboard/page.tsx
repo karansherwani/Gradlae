@@ -79,7 +79,7 @@ export default function Dashboard() {
       router.push('/auth');
       return;
     }
-    if (dbUser?.role === 'instructor' || dbUser?.role === 'staff' || dbUser?.name?.startsWith('Prof.')) {
+    if (dbUser?.role === 'instructor' || dbUser?.role === 'staff') {
       router.push('/staff/dashboard');
     }
   }, [authLoading, user, dbUser, router]);

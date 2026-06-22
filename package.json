@@ -26,7 +26,6 @@
     "csv-parse": "^6.1.0",
     "framer-motion": "^12.24.7",
     "lucide-react": "^0.562.0",
-    "mongoose": "^9.1.5",
     "next": "^16.2.9",
     "papaparse": "^5.5.3",
     "pdfjs-dist": "^5.4.530",
