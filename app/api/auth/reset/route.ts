@@ -6,6 +6,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/app/lib/supabaseServer';
 import { resetSchema, validateBody } from '@/app/lib/validation';
 
+function getResetEmailCandidates(identifier: string): string[] {
+  const normalized = identifier.toLowerCase().trim();
+  const candidates = [normalized];
+
+  // Early beta UArizona accounts used @uofa.edu before the app switched to
+  // the correct @arizona.edu domain.
+  if (normalized.endsWith('@arizona.edu')) {
+    candidates.push(normalized.replace('@arizona.edu', '@uofa.edu'));
+  }
+
+  return [...new Set(candidates)];
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -27,17 +40,19 @@ export async function POST(request: NextRequest) {
 
     // Use Supabase's built-in password reset email. Do not implement a custom
     // OTP/password update endpoint here; Supabase verifies the recovery token.
-    const { error } = await supabaseAdmin.auth.resetPasswordForEmail(
-      identifier.toLowerCase().trim(),
-      {
-        redirectTo: `${request.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'https://gradlae.com'}/auth`,
-      },
-    );
+    for (const candidateEmail of getResetEmailCandidates(identifier)) {
+      const { error } = await supabaseAdmin.auth.resetPasswordForEmail(
+        candidateEmail,
+        {
+          redirectTo: `${request.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'https://gradlae.com'}/auth`,
+        },
+      );
 
-    if (error) {
-      console.error('Password reset email error:', error.message);
-      // SECURITY: Don't reveal whether the email exists.
-      // Fall through to the same generic response.
+      if (error) {
+        console.error('Password reset email error:', error.message);
+        // SECURITY: Don't reveal whether the email exists.
+        // Continue trying compatible beta addresses, then return generic success.
+      }
     }
 
     // SECURITY: Always return the same response regardless of whether

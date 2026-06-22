@@ -7,6 +7,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/app/lib/supabaseServer';
 import { signinSchema, validateBody } from '@/app/lib/validation';
 
+function getSigninEmailCandidates(email: string): string[] {
+    const normalized = email.toLowerCase().trim();
+    const candidates = [normalized];
+
+    // Early beta accounts were created with @uofa.edu before the UArizona
+    // domain was corrected to @arizona.edu. Keep those students able to log in.
+    if (normalized.endsWith('@arizona.edu')) {
+        candidates.push(normalized.replace('@arizona.edu', '@uofa.edu'));
+    }
+
+    return [...new Set(candidates)];
+}
+
 export async function POST(request: NextRequest) {
     try {
         // Verify env vars are set (this is the #1 cause of Vercel failures)
@@ -28,28 +41,37 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ message: validation.error }, { status: 400 });
         }
         const { email, password } = validation.data;
+        const emailCandidates = getSigninEmailCandidates(email);
 
         // Sign in via Supabase Auth — password is verified against the bcrypt hash
         let sessionData;
         try {
-            const result = await supabaseAdmin.auth.signInWithPassword({
-                email: email.toLowerCase().trim(),
-                password,
-            });
+            let lastErrorMessage = '';
+            for (const candidateEmail of emailCandidates) {
+                const result = await supabaseAdmin.auth.signInWithPassword({
+                    email: candidateEmail,
+                    password,
+                });
 
-            if (result.error) {
-                const msg = result.error.message.toLowerCase();
+                if (!result.error) {
+                    sessionData = result.data;
+                    break;
+                }
+
+                lastErrorMessage = result.error.message;
+            }
+
+            if (!sessionData) {
+                const msg = lastErrorMessage.toLowerCase();
                 if (msg.includes('invalid') || msg.includes('credentials') || msg.includes('password')) {
                     return NextResponse.json({ message: 'Invalid email or password' }, { status: 401 });
                 }
                 if (msg.includes('not confirmed') || msg.includes('email')) {
                     return NextResponse.json({ message: 'Please confirm your email address first' }, { status: 401 });
                 }
-                console.error('[signin/route] Sign-in error:', result.error.message);
+                console.error('[signin/route] Sign-in error:', lastErrorMessage);
                 return NextResponse.json({ message: 'Sign-in failed. Please try again.' }, { status: 400 });
             }
-
-            sessionData = result.data;
         } catch (fetchErr) {
             console.error('[signin/route] Supabase fetch error:', fetchErr);
             return NextResponse.json(
@@ -73,7 +95,7 @@ export async function POST(request: NextRequest) {
         if (!userRow) {
             const { data: insertedUser } = await supabaseAdmin.from('users').insert({
                 auth_id: sessionData.user.id,
-                email: (sessionData.user.email || email).toLowerCase().trim(),
+                email: (sessionData.user.email || emailCandidates[0]).toLowerCase().trim(),
                 name: sessionData.user.user_metadata?.full_name || email.split('@')[0],
                 school: 'UArizona',
                 role: 'student',
