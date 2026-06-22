@@ -290,7 +290,7 @@ export default function PlacementsPage() {
         const transcript = parseTranscriptText(text);
 
         if (transcript.courses.length === 0) {
-          throw new Error('I could not find course rows in this PDF. Please export the transcript as a text-based PDF from UAccess and try again.');
+          throw new Error('I could not read course rows from this PDF yet. Please upload the UAccess unofficial transcript PDF export, not a screenshot or scanned copy.');
         }
 
         const saveResponse = await fetch('/api/upload', {
@@ -459,7 +459,7 @@ export default function PlacementsPage() {
                       </div>
                     )}
 
-                    <p className="text-sm text-muted-foreground mt-4">Supports: PDF, JPG, PNG</p>
+                    <p className="text-sm text-muted-foreground mt-4">Supports: UAccess transcript PDF</p>
 
                     {/* Error Display */}
                     {uploadError && (
