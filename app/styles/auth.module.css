@@ -298,8 +298,7 @@
 }
 
 .submitBtn,
-.generateBtn,
-.googleBtn {
+.generateBtn {
   width: 100%;
   min-height: 54px;
   border-radius: 999px;
@@ -420,25 +419,6 @@
   padding: 0 16px;
 }
 
-.googleBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  border: 1px solid var(--auth-line);
-  background: var(--pm-bg);
-  color: var(--auth-ink);
-}
-
-.googleBtn:hover:not(:disabled) {
-  border-color: var(--uofa-blue);
-  background: var(--auth-surface);
-}
-
-.googleBtn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
 
 @media (max-width: 980px) {
   .main {
