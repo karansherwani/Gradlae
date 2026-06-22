@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../components/AuthProvider';
 import styles from '../styles/support.module.css';
 
+const CONTACT_EMAIL = 'gradlae@gmail.com';
+
 export default function PrivacyPage() {
     const router = useRouter();
     const { user } = useAuth();
@@ -50,7 +52,7 @@ export default function PrivacyPage() {
 
                         <h2>6. Contact Us</h2>
                         <p>
-                            If you have questions or comments about this policy, you may email us at privacy@merse.edu.
+                            If you have questions or comments about this policy, you may email us at {CONTACT_EMAIL}.
                         </p>
                     </div>
                 </div>

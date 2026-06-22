@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../components/AuthProvider';
 import styles from '../styles/support.module.css';
 
+const CONTACT_EMAIL = 'gradlae@gmail.com';
+
 export default function TermsPage() {
     const router = useRouter();
     const { user } = useAuth();
@@ -61,7 +63,7 @@ export default function TermsPage() {
 
                         <h2>7. Contact</h2>
                         <p>
-                            For inquiries regarding our Terms of Service, please contact support at support@merse.com.
+                            For inquiries regarding our Terms of Service, please contact us at {CONTACT_EMAIL}.
                         </p>
                     </div>
                 </div>
