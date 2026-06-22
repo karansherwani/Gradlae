@@ -5,7 +5,6 @@ import { CourseGraph } from '@/app/lib/courseGraph';
 import { Course, StudentProfile, ChatMessage, DegreePlan } from '@/types';
 import { chatRequestSchema, validateBody, sanitizeAIInput } from '@/app/lib/validation';
 import { loadGraphCourses } from '@/app/lib/loadCourses';
-import { getUserFromRequest } from '@/app/lib/supabaseAuth';
 import fs from 'fs';
 import path from 'path';
 
@@ -357,11 +356,6 @@ Remember: Help students succeed and graduate on time!`;
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await getUserFromRequest(request);
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const body = await request.json();
 
     // Validate input with Zod schema

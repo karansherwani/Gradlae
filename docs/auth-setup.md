@@ -11,8 +11,6 @@ Set these in **Vercel Dashboard → Settings → Environment Variables** (and in
 | `SUPABASE_SERVICE_ROLE_KEY` | Server only | Supabase service role key (secret — never expose to client) |
 | `GEMINI_API_KEY` | Server only | Google Gemini API key for quiz generation and the AI advisor |
 | `GOOGLE_GENERATIVE_AI_API_KEY` | Server only | Optional alternate name for the same Gemini key |
-| `GOOGLE_API_KEY` | Server only | Optional alternate Gemini key name supported by the AI advisor |
-| `GEMINI_MODEL` | Server only | Optional preferred Gemini model. Defaults through several Flash model fallbacks |
 | `OPENAI_API_KEY` | Server only | Optional AI advisor fallback key |
 | `ROUTELLM_API_KEY` | Server only | Optional AI advisor fallback key |
 | `STRIPE_SECRET_KEY` | Server only | Stripe secret key for mentoring payments. Must start with `sk_test_` or `sk_live_` |
@@ -25,7 +23,7 @@ Set these in **Vercel Dashboard → Settings → Environment Variables** (and in
 | `NEXTAUTH_URL` | **Removed** — NextAuth is no longer used |
 | `NEXTAUTH_SECRET` | **Removed** — NextAuth is no longer used |
 | `MONGODB_URI` | **Removed** — MongoDB is no longer used |
-| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | **Removed** — Google sign-in is no longer used |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | **Removed** — Google OAuth now goes through Supabase |
 
 ## How Auth Works
 
@@ -66,7 +64,7 @@ Set these in **Vercel Dashboard → Settings → Environment Variables** (and in
 ### ❌ What was removed
 - `app/data/users.json` — contained **plaintext passwords** (deleted and gitignored)
 - `app/api/auth/login/route.ts` — compared passwords with `===` against JSON file (replaced with Supabase proxy)
-- `app/api/auth/reset/route.ts` — custom OTP/password update flow removed; now uses Supabase recovery emails
+- `app/api/auth/reset/route.ts` — wrote plaintext passwords to JSON file (replaced with Supabase admin API)
 - `app/lib/db.ts` → `updateUserPassword()` — stored passwords in plaintext (no longer called)
 
 ## Supabase Dashboard Config

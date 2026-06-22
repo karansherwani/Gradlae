@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
         if (!validation.success) {
             return NextResponse.json({ message: validation.error }, { status: 400 });
         }
-        const { email, password, name, school } = validation.data;
+        const { email, password, name, school, role } = validation.data;
 
         // 1. Create Supabase auth user (password is bcrypt-hashed by Supabase internally)
         const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
                 email: (authUser.email || email).toLowerCase().trim(),
                 name: name || email.split('@')[0],
                 school: school || 'UArizona',
-                role: 'student',
+                role: role || 'student',
             });
 
         if (dbError) {
@@ -100,7 +100,6 @@ export async function POST(request: NextRequest) {
             userId: authUser.id,
             email: authUser.email,
             fullName: name || email.split('@')[0],
-            role: 'student',
             accessToken: sessionData.session.access_token,
             refreshToken: sessionData.session.refresh_token,
         });

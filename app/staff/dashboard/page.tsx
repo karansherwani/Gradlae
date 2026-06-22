@@ -13,7 +13,7 @@ type TabType = 'schedule' | 'appointments' | 'profile' | 'reviews';
 
 export default function StaffDashboard() {
   const router = useRouter();
-  const { user, dbUser, loading: authLoading, accessToken, signOut } = useAuth();
+  const { user, dbUser, loading: authLoading, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>('schedule');
   const [upcomingCount, setUpcomingCount] = useState(0);
 
@@ -21,7 +21,9 @@ export default function StaffDashboard() {
   const staffId = dbUser?.id || '';
   const isStaffAccount =
     dbUser?.role === 'instructor' ||
-    dbUser?.role === 'staff';
+    dbUser?.role === 'staff' ||
+    dbUser?.name?.startsWith('Prof.') ||
+    user?.user_metadata?.full_name?.startsWith('Prof.');
 
   useEffect(() => {
     if (authLoading) return;
@@ -124,17 +126,16 @@ export default function StaffDashboard() {
         {/* MAIN CONTENT AREA */}
         <main className={styles.mainContent}>
           {activeTab === 'schedule' && (
-            <ScheduleCalendar staffId={staffId} staffName={staffName} accessToken={accessToken} />
+            <ScheduleCalendar staffId={staffId} staffName={staffName} />
           )}
           {activeTab === 'appointments' && (
             <AppointmentsSidebar
               staffId={staffId}
-              accessToken={accessToken}
               onCountUpdate={setUpcomingCount}
             />
           )}
           {activeTab === 'profile' && (
-            <StaffProfile staffId={staffId} staffName={staffName} accessToken={accessToken} />
+            <StaffProfile staffId={staffId} staffName={staffName} />
           )}
           {activeTab === 'reviews' && (
             <ReviewsPage staffId={staffId} />

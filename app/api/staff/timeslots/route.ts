@@ -3,7 +3,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
-import { getUserFromRequest } from '@/app/lib/supabaseAuth';
 
 interface TimeSlot {
   id: string;
@@ -47,25 +46,16 @@ async function writeTimeSlots(slots: TimeSlot[]) {
   await fs.writeFile(SLOTS_FILE, JSON.stringify(slots, null, 2));
 }
 
-function isStaffUser(user: { role: string } | null) {
-  return user?.role === 'instructor' || user?.role === 'staff';
-}
-
 // GET - Fetch time slots for a staff member
 export async function GET(request: NextRequest) {
   try {
-    const user = await getUserFromRequest(request);
-    if (!isStaffUser(user)) {
-      return NextResponse.json({ message: 'Forbidden: Staff role required' }, { status: user ? 403 : 401 });
-    }
-
     const { searchParams } = new URL(request.url);
     const staffId = searchParams.get('staffId');
 
-    if (!staffId || staffId !== user?.id) {
+    if (!staffId) {
       return NextResponse.json(
-        { message: 'Staff ID is invalid' },
-        { status: 403 }
+        { message: 'Staff ID is required' },
+        { status: 400 }
       );
     }
 
@@ -85,17 +75,12 @@ export async function GET(request: NextRequest) {
 // POST - Create a new time slot
 export async function POST(request: NextRequest) {
   try {
-    const user = await getUserFromRequest(request);
-    if (!isStaffUser(user)) {
-      return NextResponse.json({ message: 'Forbidden: Staff role required' }, { status: user ? 403 : 401 });
-    }
-
     const body = await request.json();
     const { staffId, staffName, day, date, time, duration } = body;
 
-    if (!staffId || staffId !== user?.id || !staffName || !day || !date || !time) {
+    if (!staffId || !staffName || !day || !date || !time) {
       return NextResponse.json(
-        { message: 'Missing or invalid required fields' },
+        { message: 'Missing required fields' },
         { status: 400 }
       );
     }
@@ -147,11 +132,6 @@ export async function POST(request: NextRequest) {
 // DELETE - Remove a time slot
 export async function DELETE(request: NextRequest) {
   try {
-    const user = await getUserFromRequest(request);
-    if (!isStaffUser(user)) {
-      return NextResponse.json({ message: 'Forbidden: Staff role required' }, { status: user ? 403 : 401 });
-    }
-
     const { searchParams } = new URL(request.url);
     const slotId = searchParams.get('slotId');
 
@@ -170,10 +150,6 @@ export async function DELETE(request: NextRequest) {
         { message: 'Slot not found' },
         { status: 404 }
       );
-    }
-
-    if (slot.staffId !== user?.id) {
-      return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
     if (slot.isBooked) {

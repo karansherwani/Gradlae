@@ -22,27 +22,11 @@ function cleanEnv(value: string | undefined): string {
 }
 
 function getGeminiClient(): GoogleGenerativeAI {
-    const apiKey = cleanEnv(
-        process.env.GEMINI_API_KEY ||
-        process.env.GOOGLE_GENERATIVE_AI_API_KEY ||
-        process.env.GOOGLE_API_KEY ||
-        process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY,
-    );
+    const apiKey = cleanEnv(process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY);
     if (!apiKey) {
         throw new Error('Gemini API key is not configured');
     }
     return new GoogleGenerativeAI(apiKey);
-}
-
-function getGeminiModels(): string[] {
-    const configuredModel = cleanEnv(process.env.GEMINI_QUIZ_MODEL || process.env.GEMINI_MODEL);
-    return [
-        configuredModel,
-        'gemini-2.5-flash',
-        'gemini-2.0-flash',
-        'gemini-1.5-flash',
-        'gemini-1.5-flash-latest',
-    ].filter(Boolean);
 }
 
 // Generate a unique seed for this user/course combination
@@ -60,6 +44,13 @@ export async function generateQuizForCourse(
     try {
         const seed = generateQuizSeed(userId, courseNumber, attemptNumber);
         const genAI = getGeminiClient();
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+        const difficultyHint = {
+            easy: "fundamental concepts, basic definitions, and simple problems",
+            medium: "intermediate application, core theorems, and standard course problems",
+            hard: "advanced application, complex scenario analysis, and edge cases"
+        };
 
         const prompt = `You are a university professor creating a rigid prerequisite assessment quiz.
 The goal is to verify if a student possesses the ACTUAL technical knowledge from ${courseNumber} - ${courseName} required for the next level.
@@ -97,23 +88,8 @@ For MATH: Focus on calculus, algebra, or proofs as relevant. Write expressions i
 For CS: Focus on algorithms, syntax, or logic.
 For SCIENCES: Focus on laws, formulas, and observations.`;
 
-        let responseText = '';
-        let lastGeminiError: unknown = null;
-        for (const modelName of getGeminiModels()) {
-            try {
-                const model = genAI.getGenerativeModel({ model: modelName });
-                const result = await model.generateContent(prompt);
-                responseText = result.response.text();
-                if (responseText.trim()) break;
-            } catch (error) {
-                lastGeminiError = error;
-                console.warn(`Quiz Gemini model ${modelName} failed:`, error instanceof Error ? error.message : error);
-            }
-        }
-
-        if (!responseText.trim()) {
-            throw lastGeminiError instanceof Error ? lastGeminiError : new Error('Gemini returned an empty quiz response');
-        }
+        const result = await model.generateContent(prompt);
+        const responseText = result.response.text();
 
         console.log('Raw AI response:', responseText.substring(0, 500));
 

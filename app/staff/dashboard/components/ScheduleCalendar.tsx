@@ -15,15 +15,7 @@ interface TimeSlot {
   studentEmail?: string;
 }
 
-export default function ScheduleCalendar({
-  staffId,
-  staffName,
-  accessToken,
-}: {
-  staffId: string;
-  staffName: string;
-  accessToken: string | null;
-}) {
+export default function ScheduleCalendar({ staffId, staffName }: { staffId: string; staffName: string }) {
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('09:00');
@@ -33,9 +25,7 @@ export default function ScheduleCalendar({
   useEffect(() => {
     let isMounted = true;
 
-    fetch(`/api/staff/timeslots?staffId=${staffId}`, {
-      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
-    })
+    fetch(`/api/staff/timeslots?staffId=${staffId}`)
       .then(response => response.ok ? response.json() : null)
       .then(data => {
         if (isMounted && data) {
@@ -50,13 +40,11 @@ export default function ScheduleCalendar({
     return () => {
       isMounted = false;
     };
-  }, [staffId, accessToken]);
+  }, [staffId]);
 
   const loadTimeSlots = useCallback(async () => {
     try {
-      const response = await fetch(`/api/staff/timeslots?staffId=${staffId}`, {
-        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
-      });
+      const response = await fetch(`/api/staff/timeslots?staffId=${staffId}`);
       if (response.ok) {
         const data = await response.json();
         console.log('Loaded time slots:', data.slots);
@@ -65,7 +53,7 @@ export default function ScheduleCalendar({
     } catch (error) {
       console.error('Error loading time slots:', error);
     }
-  }, [staffId, accessToken]);
+  }, [staffId]);
 
   const createTimeSlot = async () => {
     if (!selectedDate || !selectedTime) {
@@ -82,10 +70,7 @@ export default function ScheduleCalendar({
     try {
       const response = await fetch('/api/staff/timeslots', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           staffId,
           staffName,
@@ -118,7 +103,6 @@ export default function ScheduleCalendar({
     try {
       const response = await fetch(`/api/staff/timeslots?slotId=${slotId}`, {
         method: 'DELETE',
-        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
       });
 
       if (response.ok) {

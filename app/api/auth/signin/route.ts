@@ -40,7 +40,9 @@ export async function POST(request: NextRequest) {
         if (!validation.success) {
             return NextResponse.json({ message: validation.error }, { status: 400 });
         }
-        const { email, password } = validation.data;
+        const { email, password, role } = validation.data;
+        const requestedRole = role === 'staff' ? 'staff' : role;
+        const requestedStaffAccess = requestedRole === 'instructor' || requestedRole === 'staff';
         const emailCandidates = getSigninEmailCandidates(email);
 
         // Sign in via Supabase Auth — password is verified against the bcrypt hash
@@ -98,9 +100,22 @@ export async function POST(request: NextRequest) {
                 email: (sessionData.user.email || emailCandidates[0]).toLowerCase().trim(),
                 name: sessionData.user.user_metadata?.full_name || email.split('@')[0],
                 school: 'UArizona',
-                role: 'student',
+                role: requestedRole || 'student',
             }).select().single();
             userRow = insertedUser;
+        } else if (requestedStaffAccess && userRow.role !== 'instructor' && userRow.role !== 'staff') {
+            const { data: updatedUser, error: updateError } = await supabaseAdmin
+                .from('users')
+                .update({ role: requestedRole })
+                .eq('id', userRow.id)
+                .select()
+                .single();
+
+            if (updateError) {
+                console.error('[signin/route] Failed to update staff role:', updateError.message);
+            } else if (updatedUser) {
+                userRow = updatedUser;
+            }
         }
 
         return NextResponse.json({
@@ -109,7 +124,7 @@ export async function POST(request: NextRequest) {
             email: sessionData.user.email,
             fullName: userRow?.name || sessionData.user.user_metadata?.full_name || email.split('@')[0],
             school: userRow?.school || 'UArizona',
-            role: userRow?.role || 'student',
+            role: userRow?.role || requestedRole || 'student',
             dbUserId: userRow?.id || null,
             accessToken: sessionData.session.access_token,
             refreshToken: sessionData.session.refresh_token,

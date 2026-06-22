@@ -118,20 +118,6 @@ export default function AdvisorChat({
     const fileInputRef = useRef<HTMLInputElement>(null);
     const isHomeMode = messages.length === 1 && messages[0]?.id === 'welcome' && !isTyping;
 
-    const getFriendlyAdvisorError = (message: string) => {
-        const normalized = message.toLowerCase();
-        if (normalized.includes('unauthorized')) {
-            return 'Your session expired. Please refresh the page or sign in again.';
-        }
-        if (normalized.includes('configured') || normalized.includes('api key') || normalized.includes('ai service')) {
-            return 'The AI advisor is temporarily unavailable while we finish beta configuration. Please try again in a few minutes.';
-        }
-        if (normalized.includes('too many')) {
-            return 'The advisor is receiving a lot of requests right now. Please wait a moment and try again.';
-        }
-        return 'The advisor had trouble answering that. Please try again in a moment.';
-    };
-
     useEffect(() => {
         if (initialMessages?.length) {
             setMessages(initialMessages.map(message => ({
@@ -277,18 +263,6 @@ export default function AdvisorChat({
         if (!content.trim()) return;
         setError(null);
 
-        if (!accessToken) {
-            const authMessage = 'Your session expired. Please refresh the page or sign in again.';
-            setError(authMessage);
-            setMessages(prev => [...prev, {
-                id: `error-${Date.now()}`,
-                role: 'assistant',
-                content: authMessage,
-                timestamp: new Date(),
-            }]);
-            return;
-        }
-
         const userMessage: Message = {
             id: `user-${Date.now()}`,
             role: 'user',
@@ -320,7 +294,7 @@ export default function AdvisorChat({
                 }),
             });
 
-            const data = await response.json().catch(() => ({}));
+            const data = await response.json();
 
             if (!response.ok) {
                 throw new Error(data.error || 'Failed to get response');
@@ -337,13 +311,12 @@ export default function AdvisorChat({
         } catch (err) {
             console.error('Advisor chat error:', err);
             const errorMsg = err instanceof Error ? err.message : 'Something went wrong';
-            const friendlyError = getFriendlyAdvisorError(errorMsg);
-            setError(friendlyError);
+            setError(errorMsg);
 
             const errorMessage: Message = {
                 id: `error-${Date.now()}`,
                 role: 'assistant',
-                content: friendlyError,
+                content: `I'm sorry, I encountered an error: ${errorMsg}. Please try again.`,
                 timestamp: new Date(),
             };
             setMessages(prev => [...prev, errorMessage]);

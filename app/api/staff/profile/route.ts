@@ -54,10 +54,6 @@ async function writeProfiles(profiles: StaffProfile[]) {
   await fs.writeFile(PROFILES_FILE, JSON.stringify(profiles, null, 2));
 }
 
-function isStaffUser(user: { role: string } | null) {
-  return user?.role === 'instructor' || user?.role === 'staff';
-}
-
 // GET - Fetch a staff member's profile (public)
 export async function GET(request: NextRequest) {
   try {
@@ -95,7 +91,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Role check — only staff/instructors can create profiles
-    if (!isStaffUser(user)) {
+    if (user.role !== 'instructor' && user.role !== 'staff') {
       return NextResponse.json({ message: 'Forbidden: Staff role required' }, { status: 403 });
     }
 
@@ -107,9 +103,6 @@ export async function POST(request: NextRequest) {
     }
 
     const { staffId, ...profileData } = validation.data;
-    if (staffId !== user.id) {
-      return NextResponse.json({ message: 'Forbidden: Cannot update another staff profile' }, { status: 403 });
-    }
 
     const allProfiles = await readProfiles();
     const existingIndex = allProfiles.findIndex(p => p.staffId === staffId);

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuth } from './AuthProvider';
 import styles from '../styles/chat-widget.module.css';
 
 const ChatIcon = () => (
@@ -11,15 +10,14 @@ const ChatIcon = () => (
   </svg>
 );
 
+const CompassIcon = () => (
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M12 2.8 15.1 9l6.1 3-6.1 3L12 21.2 8.9 15l-6.1-3 6.1-3L12 2.8Z" />
+  </svg>
+);
+
 export default function PaceMatchChatWidget() {
   const [open, setOpen] = useState(false);
-  const { user, loading } = useAuth();
-  const isSignedIn = !!user;
-  const signInHref = isSignedIn ? '/dashboard' : '/auth';
-  const advisorHref = isSignedIn ? '/advisor' : '/auth?redirect=/advisor';
-  const signInLabel = isSignedIn
-    ? 'I am signed in and need account help'
-    : 'I am a student trying to sign in';
 
   return (
     <div className={styles.widget}>
@@ -38,8 +36,8 @@ export default function PaceMatchChatWidget() {
           <p className={styles.prompt}>What best describes what you need today?</p>
 
           <div className={styles.options}>
-            <a href={loading ? '/help' : signInHref}>{signInLabel}</a>
-            <a href={loading ? '/help' : advisorHref}>I need academic planning support</a>
+            <a href="/auth">I am a student trying to sign in</a>
+            <a href="/auth?redirect=/advisor">I need academic planning support</a>
             <a href="/help">I need product support</a>
           </div>
 

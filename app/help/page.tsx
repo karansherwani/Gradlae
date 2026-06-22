@@ -5,8 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../components/AuthProvider';
 import styles from '../styles/support.module.css';
 
-const CONTACT_EMAIL = 'gradlae@gmail.com';
-
 interface Message {
     text: string;
     sender: 'bot' | 'user';
@@ -60,8 +58,8 @@ export default function HelpCenterPage() {
                 const businessHours = isBusinessHours();
                 const ticketId = Math.floor(Math.random() * 90000 + 10000);
                 const finalMessage = businessHours
-                    ? `I've logged beta support ticket #${ticketId}. Please also email ${CONTACT_EMAIL} with screenshots or details so we can follow up quickly.`
-                    : `I've logged beta support ticket #${ticketId}. Please email ${CONTACT_EMAIL} with screenshots or details, and we'll review it as soon as possible.`;
+                    ? `I've opened a priority ticket (#${ticketId}) for you. Since you're contacting us during our active business hours, a support agent will reach out to you shortly via email.`
+                    : `I've opened a ticket (#${ticketId}) for you. It's currently outside our standard business hours (9 AM - 5 PM), so our team will reach out to you as soon as we're back online tomorrow morning.`;
                 setMessages(prev => [...prev, { text: finalMessage, sender: 'bot' }]);
                 setStep(3);
             }
@@ -81,20 +79,20 @@ export default function HelpCenterPage() {
             <main className={styles.main}>
                 <div className={styles.contentCard} style={{ border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}>
                     <h1 style={{ fontSize: '2.5rem', fontWeight: '800', textAlign: 'center' }}>How can we help?</h1>
-                    <p className={styles.subtitle} style={{ textAlign: 'center', marginBottom: '40px' }}>Report beta issues, account problems, transcript upload bugs, or AI advisor errors.</p>
+                    <p className={styles.subtitle} style={{ textAlign: 'center', marginBottom: '40px' }}>Select a support method or chat with our automated assistant.</p>
 
                     <div className={styles.helpOptions}>
                         <div className={styles.helpCard}>
-                            <div style={{ fontSize: '0.8rem', fontWeight: 800, letterSpacing: '0.12em', marginBottom: '15px', color: 'var(--uofa-blue)' }}>BETA SUPPORT</div>
-                            <h3 style={{ color: 'var(--uofa-blue)' }}>Report an Issue</h3>
-                            <p>Send screenshots, the page you were on, and what went wrong.</p>
-                            <a href={`mailto:${CONTACT_EMAIL}?subject=Gradlae%20Beta%20Issue`} className={styles.actionBtn} style={{ background: 'var(--uofa-blue)', color: 'white', padding: '8px 16px', borderRadius: '20px', display: 'inline-block' }}>Email Issue</a>
+                            <div style={{ fontSize: '0.8rem', fontWeight: 800, letterSpacing: '0.12em', marginBottom: '15px', color: 'var(--uofa-blue)' }}>PHONE</div>
+                            <h3 style={{ color: 'var(--uofa-blue)' }}>24/7 Phone</h3>
+                            <p>Immediate support for urgent issues.</p>
+                            <a href="tel:+18005550199" className={styles.actionBtn} style={{ background: 'var(--uofa-blue)', color: 'white', padding: '8px 16px', borderRadius: '20px', display: 'inline-block' }}>Call Now</a>
                         </div>
                         <div className={styles.helpCard}>
                             <div style={{ fontSize: '0.8rem', fontWeight: 800, letterSpacing: '0.12em', marginBottom: '15px', color: 'var(--uofa-blue)' }}>EMAIL</div>
-                            <h3 style={{ color: 'var(--uofa-blue)' }}>General Feedback</h3>
-                            <p>Tell us what confused you, what broke, and what would make Gradlae useful.</p>
-                            <a href={`mailto:${CONTACT_EMAIL}?subject=Gradlae%20Beta%20Feedback`} className={styles.actionBtn} style={{ background: 'var(--uofa-blue)', color: 'white', padding: '8px 16px', borderRadius: '20px', display: 'inline-block' }}>Send Feedback</a>
+                            <h3 style={{ color: 'var(--uofa-blue)' }}>Email Us</h3>
+                            <p>For general inquiries and feedback.</p>
+                            <a href="mailto:support@merse.com" className={styles.actionBtn} style={{ background: 'var(--uofa-blue)', color: 'white', padding: '8px 16px', borderRadius: '20px', display: 'inline-block' }}>Send Email</a>
                         </div>
                     </div>
 

@@ -21,11 +21,9 @@ interface Appointment {
 
 export default function AppointmentsSidebar({ 
   staffId, 
-  accessToken,
   onCountUpdate 
 }: { 
   staffId: string; 
-  accessToken: string | null;
   onCountUpdate: (count: number) => void;
 }) {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -34,13 +32,11 @@ export default function AppointmentsSidebar({
 
   useEffect(() => {
     loadAppointments();
-  }, [staffId, accessToken]);
+  }, [staffId]);
 
   const loadAppointments = async () => {
     try {
-      const response = await fetch(`/api/staff/appointments?staffId=${staffId}`, {
-        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
-      });
+      const response = await fetch(`/api/staff/appointments?staffId=${staffId}`);
       if (response.ok) {
         const data = await response.json();
         setAppointments(data.appointments || []);
