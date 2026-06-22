@@ -2,8 +2,13 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import styles from '../styles/advisor.module.css';
-import { extractPdfTextInBrowser } from '../lib/browserPdfText';
+import { extractPdfTextInBrowser, extractPdfTextWithLayoutInBrowser } from '../lib/browserPdfText';
 import { parseTranscriptText } from '../lib/transcriptTextParser';
+import {
+    buildAdvisementReportContext,
+    getGraduationRequirementActions,
+    parseAdvisementReportText,
+} from '../lib/advisementReportParser';
 
 interface Message {
     id: string;
@@ -116,7 +121,20 @@ export default function AdvisorChat({
     const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const activeContextRef = useRef(activeContext);
+    const documentContextsRef = useRef<string[]>([]);
+    const pendingUploadRef = useRef<Promise<void> | null>(null);
     const isHomeMode = messages.length === 1 && messages[0]?.id === 'welcome' && !isTyping;
+
+    const updateActiveContext = useCallback((context: string) => {
+        activeContextRef.current = context;
+        setActiveContext(context);
+    }, []);
+
+    const addDocumentContext = useCallback((context: string) => {
+        documentContextsRef.current = [...documentContextsRef.current, context];
+        setDocumentContexts(documentContextsRef.current);
+    }, []);
 
     useEffect(() => {
         if (initialMessages?.length) {
@@ -141,8 +159,25 @@ export default function AdvisorChat({
 
     // Keep activeContext in sync with prop changes
     useEffect(() => {
-        if (studentContext) setActiveContext(studentContext);
-    }, [studentContext]);
+        if (studentContext) updateActiveContext(studentContext);
+    }, [studentContext, updateActiveContext]);
+
+    useEffect(() => {
+        activeContextRef.current = activeContext;
+    }, [activeContext]);
+
+    useEffect(() => {
+        documentContextsRef.current = documentContexts;
+    }, [documentContexts]);
+
+    const setPendingUpload = useCallback((uploadPromise: Promise<void>) => {
+        pendingUploadRef.current = uploadPromise;
+        uploadPromise.finally(() => {
+            if (pendingUploadRef.current === uploadPromise) {
+                pendingUploadRef.current = null;
+            }
+        });
+    }, []);
 
     useEffect(() => {
         const handlePrompt = (event: Event) => {
@@ -195,7 +230,7 @@ export default function AdvisorChat({
 
                 // ─── Transcript detected ─────────────────────────────────
                 const ctx = buildTranscriptContext(data.courses, studentName);
-                setActiveContext(ctx);
+                updateActiveContext(ctx);
                 onTranscriptParsed?.(ctx);
 
                 const { earnedCredits, uniqueCompleted, inProgress } = computeCorrectedCredits(data.courses);
@@ -213,14 +248,43 @@ export default function AdvisorChat({
                     timestamp: new Date(),
                 };
                 setMessages(prev => [...prev, feedbackMsg]);
-            } else if (rawText.trim().length >= 20) {
+            } else {
+                const layoutText = await extractPdfTextWithLayoutInBrowser(file);
+                const advisementReport = parseAdvisementReportText(layoutText);
+
+                if (
+                    advisementReport.unitRequirements.length > 0 ||
+                    advisementReport.gpaRequirements.length > 0 ||
+                    advisementReport.missingRequirements.length > 0
+                ) {
+                    const reportContext = buildAdvisementReportContext(advisementReport);
+                    addDocumentContext(reportContext);
+
+                    const remainingUnits = advisementReport.unitRequirements
+                        .map(req => req.required !== null && req.total !== null ? Math.max(0, req.required - req.total) : 0)
+                        .reduce((sum, value) => sum + value, 0);
+                    const graduationActions = getGraduationRequirementActions(advisementReport);
+
+                    const feedbackMsg: Message = {
+                        id: `system-${Date.now()}`,
+                        role: 'assistant',
+                        content:
+                            `I've analyzed your advisement report (${file.name}).\n\n` +
+                            `Not satisfied requirement sections found: ${advisementReport.missingRequirements.length}\n` +
+                            `Actionable remaining requirements with needed units/courses: ${graduationActions.length}\n` +
+                            (remainingUnits > 0 ? `Remaining overall degree units shown in the report: ${remainingUnits}\n` : '') +
+                            `\nI can now help you turn this report into a graduation plan, choose courses from the available lists, and balance your next semesters.`,
+                        timestamp: new Date(),
+                    };
+                    setMessages(prev => [...prev, feedbackMsg]);
+                } else if (rawText.trim().length >= 20) {
                 // ─── Generic document (planner, syllabus, etc.) ──────────
                 const MAX_TEXT_LENGTH = 15000;
                 const trimmedText = rawText.length > MAX_TEXT_LENGTH
                     ? rawText.substring(0, MAX_TEXT_LENGTH) + '\n\n[... document truncated ...]'
                     : rawText;
                 const docLabel = `UPLOADED DOCUMENT: ${file.name}\n${trimmedText}`;
-                setDocumentContexts(prev => [...prev, docLabel]);
+                addDocumentContext(docLabel);
 
                 const feedbackMsg: Message = {
                     id: `system-${Date.now()}`,
@@ -232,9 +296,10 @@ export default function AdvisorChat({
                     timestamp: new Date(),
                 };
                 setMessages(prev => [...prev, feedbackMsg]);
-            } else {
-                setError('Could not extract useful content from this file. Please try a different PDF.');
-                setUploadedFileName(null);
+                } else {
+                    setError('Could not extract useful content from this file. Please try a different PDF.');
+                    setUploadedFileName(null);
+                }
             }
         } catch (err) {
             console.error('File upload error:', err);
@@ -243,20 +308,22 @@ export default function AdvisorChat({
         } finally {
             setUploadingFile(false);
         }
-    }, [studentName, onTranscriptParsed, accessToken]);
+    }, [studentName, onTranscriptParsed, accessToken, updateActiveContext, addDocumentContext]);
 
     // ─── Build the full context to send to the advisor ────────────────────
     const buildFullContext = useCallback(() => {
         const parts: string[] = [];
-        if (activeContext) parts.push(activeContext);
-        if (documentContexts.length > 0) {
+        const currentActiveContext = activeContextRef.current;
+        const currentDocumentContexts = documentContextsRef.current;
+        if (currentActiveContext) parts.push(currentActiveContext);
+        if (currentDocumentContexts.length > 0) {
             parts.push('\n--- ADDITIONAL UPLOADED DOCUMENTS ---');
-            for (const doc of documentContexts) {
+            for (const doc of currentDocumentContexts) {
                 parts.push(doc);
             }
         }
         return parts.join('\n\n');
-    }, [activeContext, documentContexts]);
+    }, []);
 
     // ─── Send message ────────────────────────────────────────────────────
     const sendMessage = async (content: string) => {
@@ -275,6 +342,10 @@ export default function AdvisorChat({
         setIsTyping(true);
 
         try {
+            if (pendingUploadRef.current) {
+                await pendingUploadRef.current;
+            }
+
             // Build messages for the API (exclude welcome & system feedback messages)
             const chatMessages = [...messages, userMessage]
                 .filter(m => m.role === 'user' || (m.role === 'assistant' && !m.id.startsWith('system-') && m.id !== 'welcome'))
@@ -328,7 +399,9 @@ export default function AdvisorChat({
     const handleKeyPress = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            sendMessage(inputValue);
+            if (!isTyping) {
+                sendMessage(inputValue);
+            }
         }
     };
 
@@ -411,7 +484,10 @@ export default function AdvisorChat({
                 style={{ display: 'none' }}
                 onChange={(e) => {
                     const file = e.target.files?.[0];
-                    if (file) handleFileUpload(file);
+                    if (file) {
+                        const uploadPromise = handleFileUpload(file);
+                        setPendingUpload(uploadPromise);
+                    }
                     e.target.value = '';
                 }}
             />
@@ -441,6 +517,7 @@ export default function AdvisorChat({
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         onKeyPress={handleKeyPress}
+                        disabled={isTyping}
                         rows={1}
                     />
                     <button
