@@ -105,7 +105,7 @@ export const chatRequestSchema = z.object({
 
 export const advisorRequestSchema = z.object({
     messages: z.array(chatMessageSchema).min(1).max(50),
-    studentContext: z.string().max(20000).optional(),
+    studentContext: z.string().max(50000).optional(),
 });
 
 // ─── QUIZ SCHEMAS ───────────────────────────────────────────────────────────

@@ -53,6 +53,33 @@ interface TranscriptCourse {
     bestGrade?: string;
 }
 
+function inferAcademicFocusFromCourses(courses: TranscriptCourse[]): string[] {
+    const counts = new Map<string, number>();
+    for (const course of courses) {
+        const subject = course.course?.trim().split(/\s+/)[0]?.toUpperCase();
+        if (!subject) continue;
+        counts.set(subject, (counts.get(subject) || 0) + 1);
+    }
+
+    const focusRules: Array<{ label: string; subjects: string[] }> = [
+        { label: 'Statistics and Data Science', subjects: ['DATA', 'MATH', 'ISTA'] },
+        { label: 'Computer Science', subjects: ['CSC', 'CSCV', 'ISTA'] },
+        { label: 'Mathematics', subjects: ['MATH', 'STAT'] },
+        { label: 'Engineering', subjects: ['ENGR', 'ECE', 'SIE', 'MSE', 'CHEE'] },
+        { label: 'Natural Sciences', subjects: ['CHEM', 'PHYS', 'GEOS', 'BIOS', 'MCB', 'ECOL'] },
+    ];
+
+    return focusRules
+        .map(rule => ({
+            label: rule.label,
+            score: rule.subjects.reduce((sum, subject) => sum + (counts.get(subject) || 0), 0),
+        }))
+        .filter(item => item.score >= 2)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 3)
+        .map(item => item.label);
+}
+
 function cleanEnv(value: string | undefined): string {
     return (value || '').trim().replace(/^['"]|['"]$/g, '');
 }
@@ -182,6 +209,10 @@ function buildTranscriptContextFromDB(courses: TranscriptCourse[], studentName: 
     ctx += `Completed Semesters: ${semesterCount}\n`;
     ctx += `Academic Standing: ${standing} (based on ${earnedCredits} earned credits)\n`;
     ctx += `Earned Credits: ${earnedCredits} (unique passed courses, excludes W and duplicate attempts)\n`;
+    const inferredFocus = inferAcademicFocusFromCourses(courses);
+    if (inferredFocus.length) {
+        ctx += `Likely Academic Focus From Course History: ${inferredFocus.join(', ')}\n`;
+    }
     if (ipCredits > 0) {
         ctx += `In-Progress Credits: ${ipCredits} (not counted in earned total)\n`;
     }
@@ -206,6 +237,11 @@ function buildSystemPrompt(
     catalogSample: string,
     studentContext?: string,
 ): string {
+    const hasStudentAcademicData = Boolean(studentContext?.trim());
+    const hasAdvisementReport = Boolean(studentContext?.includes('UPLOADED ACADEMIC ADVISEMENT REPORT'));
+    const hasCompletedCourses = Boolean(studentContext?.includes('COMPLETED COURSES') || studentContext?.includes('COURSE HISTORY'));
+    const hasRequirementData = Boolean(studentContext?.includes('ACTIONABLE GRADUATION GAPS') || studentContext?.includes('GPA REQUIREMENTS'));
+
     let prompt = `You are an AI academic advisor for students at the University of Arizona.
 You have access to a sample of the course catalog.
 
@@ -221,7 +257,9 @@ Instead, use the course catalog below and the student's transcript (if available
 to give personalized, dynamic advice. When asked what courses to take,
 search the catalog for relevant courses based on the student's major,
 completed coursework, remaining prerequisites, and interests.
-If you don't know the student's exact major or requirements, ASK them.
+If the student's uploaded data contains an advisement report, requirement names, GPA rows,
+course history, or graduation gaps, infer the major/field from that data instead of asking
+the student to repeat it.
 
 `;
     }
@@ -256,8 +294,11 @@ you need their transcript for accurate answers. Do not guess or assume.
 - Answer questions about degree requirements
 - Be conversational, supportive, and encouraging
 - Base all advice on the data provided above (transcript, catalog)
-- If you lack data to answer accurately, say so instead of guessing
-- When you don't have a saved degree plan, ask the student about their major and interests to give better advice
+- If uploaded transcript/advisement data is present, do NOT say you lack access to it.
+- If requirement names mention majors/minors (for example Statistics and Data Science, Mathematics, Computer Science), treat those as the student's academic fields.
+- If course history is present, use those courses as completed/in-progress history. Do NOT say the student has 0 earned credits unless the supplied unit summary actually says 0.
+- If you lack a specific detail that is not in the supplied data, ask only for that detail after using everything already provided.
+- When you don't have any transcript, advisement report, saved planner, or requirement data, ask the student about their major and interests to give better advice
 
 CONSTRAINTS:
 - Maximum 21 credits per semester
@@ -268,6 +309,7 @@ CONSTRAINTS:
 - Always complete the entire plan in one response
 - NEVER describe the student as a "senior" unless they truly have senior standing (120+ earned credits). Use the semester count and earned credits provided to determine standing.
 - NEVER show a generic template plan. Always personalize based on actual student data.
+- NEVER ask "what is your major?" when ${hasStudentAcademicData && (hasAdvisementReport || hasRequirementData || hasCompletedCourses) ? 'the uploaded context already contains academic data; infer from it and proceed.' : 'the answer is available in supplied student data.'}
 
 When showing schedules use this format:
 FALL 2025
@@ -394,7 +436,10 @@ export async function POST(request: NextRequest) {
         }));
 
         // ─── Try to load from Supabase for authenticated users ──────────
-        let studentContext: string | undefined = clientContext || undefined;
+        const contextParts: string[] = [];
+        if (clientContext?.trim()) {
+            contextParts.push(`CLIENT-UPLOADED CONTEXT:\n${clientContext.trim()}`);
+        }
         let dbPlannerContext: string | null = null;
         let advisorUser: Awaited<ReturnType<typeof getUserFromRequest>> = null;
 
@@ -413,7 +458,7 @@ export async function POST(request: NextRequest) {
                 const parsed = transcript.parsed_json as { courses: TranscriptCourse[]; studentInfo?: { name?: string } };
                 if (parsed.courses?.length > 0) {
                     const name = parsed.studentInfo?.name || advisorUser.name || 'Student';
-                    studentContext = buildTranscriptContextFromDB(parsed.courses, name);
+                    contextParts.push(`SAVED TRANSCRIPT CONTEXT:\n${buildTranscriptContextFromDB(parsed.courses, name)}`);
                 }
             }
 
@@ -431,6 +476,8 @@ export async function POST(request: NextRequest) {
             }
 
         }
+
+        const studentContext = contextParts.length ? contextParts.join('\n\n') : undefined;
 
         // Build context – use DB planner if available; otherwise tell the AI
         // to reason dynamically from transcript + catalog instead of a static template.

@@ -66,6 +66,33 @@ function computeCorrectedCredits(courses: TranscriptCourse[]) {
     return { earnedCredits, uniqueCompleted: unique, inProgress, ipCredits };
 }
 
+function inferAcademicFocusFromCourses(courses: TranscriptCourse[]): string[] {
+    const counts = new Map<string, number>();
+    for (const course of courses) {
+        const subject = course.course?.trim().split(/\s+/)[0]?.toUpperCase();
+        if (!subject) continue;
+        counts.set(subject, (counts.get(subject) || 0) + 1);
+    }
+
+    const focusRules: Array<{ label: string; subjects: string[] }> = [
+        { label: 'Statistics and Data Science', subjects: ['DATA', 'MATH', 'ISTA'] },
+        { label: 'Computer Science', subjects: ['CSC', 'CSCV', 'ISTA'] },
+        { label: 'Mathematics', subjects: ['MATH', 'STAT'] },
+        { label: 'Engineering', subjects: ['ENGR', 'ECE', 'SIE', 'MSE', 'CHEE'] },
+        { label: 'Natural Sciences', subjects: ['CHEM', 'PHYS', 'GEOS', 'BIOS', 'MCB', 'ECOL'] },
+    ];
+
+    return focusRules
+        .map(rule => ({
+            label: rule.label,
+            score: rule.subjects.reduce((sum, subject) => sum + (counts.get(subject) || 0), 0),
+        }))
+        .filter(item => item.score >= 2)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 3)
+        .map(item => item.label);
+}
+
 function buildTranscriptContext(
     courses: TranscriptCourse[],
     studentName: string,
@@ -86,6 +113,10 @@ function buildTranscriptContext(
     ctx += `Completed Semesters: ${semesterCount}\n`;
     ctx += `Academic Standing: ${standing} (based on ${earnedCredits} earned credits)\n`;
     ctx += `Earned Credits: ${earnedCredits} (unique passed courses, excludes W and duplicate attempts)\n`;
+    const inferredFocus = inferAcademicFocusFromCourses(courses);
+    if (inferredFocus.length) {
+        ctx += `Likely Academic Focus From Course History: ${inferredFocus.join(', ')}\n`;
+    }
     if (ipCredits > 0) {
         ctx += `In-Progress Credits: ${ipCredits} (not counted in earned total)\n`;
     }
