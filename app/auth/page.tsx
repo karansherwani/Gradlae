@@ -584,59 +584,6 @@ function AuthPageContent() {
                 </p>
               )}
             </form>
-            
-            <div style={{ display: 'flex', alignItems: 'center', margin: '20px 0', color: '#cbd5e1' }}>
-              <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }}></div>
-              <span style={{ padding: '0 10px', fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>or continue with</span>
-              <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }}></div>
-            </div>
-
-            <button
-              type="button"
-              onClick={async () => {
-                setError('');
-                setLoading(true);
-                try {
-                  const { error: oauthError } = await supabase.auth.signInWithOAuth({
-                    provider: 'google',
-                    options: {
-                      redirectTo: `${window.location.origin}/auth/callback?redirect=${redirectTo || '/dashboard'}`,
-                    }
-                  });
-                  if (oauthError) throw oauthError;
-                } catch (err) {
-                  setError(err instanceof Error ? err.message : 'Failed to initialize Google Sign-in');
-                  setLoading(false);
-                }
-              }}
-              style={{
-                width: '100%',
-                background: '#ffffff',
-                border: '1px solid #cbd5e1',
-                borderRadius: '8px',
-                padding: '12px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '10px',
-                cursor: 'pointer',
-                fontWeight: 600,
-                fontSize: '0.95rem',
-                color: '#334155',
-                transition: 'background 0.2s',
-                marginBottom: '15px',
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.background = '#f8fafc'}
-              onMouseLeave={(e) => e.currentTarget.style.background = '#ffffff'}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" style={{ display: 'block' }}>
-                <path
-                  fill="#EA4335"
-                  d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.214-5.207 4.214-3.524 0-6.388-2.864-6.388-6.388 0-3.524 2.864-6.388 6.388-6.388 1.625 0 3.09.61 4.22 1.625l3.125-3.125C19.26 2.457 15.937 1 12.24 1 5.753 1 .5 6.253.5 12.74S5.753 24.48 12.24 24.48c6.19 0 11.23-4.5 11.23-11.23 0-.648-.065-1.285-.18-1.895h-11.05z"
-                />
-              </svg>
-              <span>Google Workspace SSO</span>
-            </button>
           </>
           )}
 
