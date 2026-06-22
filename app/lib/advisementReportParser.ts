@@ -67,6 +67,11 @@ export interface GraduationRequirementAction {
 }
 
 const TERM_PATTERN = '(?:Fall|Sprg|Spring|Summer|Winter)\\s+20\\d{2}';
+const TERM_ONLY_PATTERN = /^(Fall|Sprg|Spring|Summer|Winter)\s+20\d{2}$/i;
+const SUBJECT_PATTERN = /^[A-Z]{2,5}$/;
+const CATALOG_PATTERN = /^\d{3}[A-Z0-9]*$/;
+const GRADE_PATTERN = /^(A|B|C|D|E|F)[+-]?$|^W$|^IP$|^P$|^S$|^RINC$/i;
+const NUMBER_PATTERN = /^\d+(?:\.\d+)?$/;
 
 function normalizeTerm(term: string): string {
     return term.replace(/^Sprg/i, 'Spring').replace(/\s+/g, ' ').trim();
@@ -140,6 +145,129 @@ function parseCourseCodes(text: string): string[] {
     return [...new Set(matches.map(code => code.replace(/\s+/g, ' ').trim().toUpperCase()))];
 }
 
+function normalizeAdvisementLines(text: string): string[] {
+    const sourceLines = text
+        .split('\n')
+        .map(line => line.replace(/\s+/g, ' ').trim())
+        .filter(Boolean)
+        .filter(line => !/^Page \d+ of \d+$/i.test(line))
+        .filter(line => !/^--- PAGE \d+ ---$/i.test(line));
+
+    const rebuilt: string[] = [];
+
+    for (let i = 0; i < sourceLines.length; i++) {
+        const line = sourceLines[i];
+        const nextLine = sourceLines[i + 1] || '';
+
+        if (nextLine.match(/^\((?:R|RG)\d+(?:\/L\d+)?\)?$/)) {
+            rebuilt.push(`${line} ${nextLine}`);
+            i++;
+            continue;
+        }
+
+        if (/^[\u0387\u2022]$/.test(line) && /^(Units|Courses|GPA):$/i.test(nextLine)) {
+            const valueLine = sourceLines[i + 2] || '';
+            rebuilt.push(`${line} ${nextLine} ${valueLine}`);
+            i += 2;
+            continue;
+        }
+
+        if (/^(Units|Courses|GPA):$/i.test(line) && sourceLines[i + 1]) {
+            rebuilt.push(`${line} ${sourceLines[i + 1]}`);
+            i++;
+            continue;
+        }
+
+        if (
+            /^[A-Za-z][A-Za-z0-9 &'()/-]+$/.test(line) &&
+            TERM_ONLY_PATTERN.test(sourceLines[i + 1] || '') &&
+            /^\d+\.\d{3}$/.test(sourceLines[i + 2] || '') &&
+            /^\d+\.\d{3}$/.test(sourceLines[i + 3] || '') &&
+            /^(Satisfied|Not Satisfied)$/i.test(sourceLines[i + 4] || '')
+        ) {
+            rebuilt.push(`${line} ${sourceLines[i + 1]} ${sourceLines[i + 2]} ${sourceLines[i + 3]} ${sourceLines[i + 4]}`);
+            i += 4;
+            continue;
+        }
+
+        if (
+            /^[A-Za-z][A-Za-z0-9 &'()/-]+$/.test(line) &&
+            /^\d+\.\d{2}$/.test(sourceLines[i + 1] || '') &&
+            /^\d+\.\d{2}$/.test(sourceLines[i + 2] || '') &&
+            /^\d+\.\d{2}$/.test(sourceLines[i + 3] || '') &&
+            /^\d+\.\d{2}$/.test(sourceLines[i + 4] || '') &&
+            /^(Satisfied|Not Satisfied)$/i.test(sourceLines[i + 5] || '')
+        ) {
+            rebuilt.push(`${line} ${sourceLines[i + 1]} ${sourceLines[i + 2]} ${sourceLines[i + 3]} ${sourceLines[i + 4]} ${sourceLines[i + 5]}`);
+            i += 5;
+            continue;
+        }
+
+        if (
+            TERM_ONLY_PATTERN.test(line) &&
+            SUBJECT_PATTERN.test(sourceLines[i + 1] || '') &&
+            CATALOG_PATTERN.test(sourceLines[i + 2] || '')
+        ) {
+            const term = line;
+            const subject = sourceLines[i + 1];
+            const catalogNumber = sourceLines[i + 2];
+            const titleParts: string[] = [];
+            let grade = 'IP';
+            let units = '';
+            let type = '';
+            let cursor = i + 3;
+
+            while (cursor < sourceLines.length) {
+                const token = sourceLines[cursor];
+                const next = sourceLines[cursor + 1] || '';
+
+                if (GRADE_PATTERN.test(token) && NUMBER_PATTERN.test(next)) {
+                    grade = token;
+                    units = next;
+                    cursor += 2;
+                    if (/^[A-Z]{2,6}$/.test(sourceLines[cursor] || '')) {
+                        type = sourceLines[cursor];
+                        cursor++;
+                    }
+                    break;
+                }
+
+                if (NUMBER_PATTERN.test(token)) {
+                    units = token;
+                    cursor++;
+                    if (/^[A-Z]{2,6}$/.test(sourceLines[cursor] || '')) {
+                        type = sourceLines[cursor];
+                        cursor++;
+                    }
+                    break;
+                }
+
+                if (
+                    TERM_ONLY_PATTERN.test(token) ||
+                    isRequirementHeader(token) ||
+                    /^Courses Available$/i.test(token) ||
+                    /^Course History$/i.test(token)
+                ) {
+                    break;
+                }
+
+                titleParts.push(token);
+                cursor++;
+            }
+
+            if (units && titleParts.length > 0) {
+                rebuilt.push(`${term} ${subject} ${catalogNumber} ${titleParts.join(' ')} ${grade} ${units}${type ? ` ${type}` : ''}`);
+                i = Math.max(i, cursor - 1);
+                continue;
+            }
+        }
+
+        rebuilt.push(line);
+    }
+
+    return rebuilt;
+}
+
 function extractStudentInfo(lines: string[]): AdvisementStudentInfo {
     let name: string | null = null;
     let studentId: string | null = null;
@@ -155,7 +283,20 @@ function extractStudentInfo(lines: string[]): AdvisementStudentInfo {
             break;
         }
 
-        if (!name && /^[A-Z][A-Za-z'-]+(?:\s+[A-Z][A-Za-z'-]+)+$/.test(line.trim())) {
+        if (!name && line.toLowerCase() === 'for') {
+            const studentLine = lines[i + 1] || '';
+            const studentMatch = studentLine.match(/^(.+?)\s+\((\d{6,12})\)$/);
+            if (studentMatch) {
+                name = studentMatch[1].trim();
+                studentId = studentMatch[2];
+            }
+        }
+
+        if (!preparedOn && line.toLowerCase() === 'prepared on' && /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(lines[i + 1] || '')) {
+            preparedOn = lines[i + 1];
+        }
+
+        if (!name && /^[A-Z][A-Za-z'-]+(?:\s+[A-Z][A-Za-z'-]+)+$/.test(line.trim()) && !/Academic Advisement Report/i.test(line)) {
             name = line.trim();
         } else if (!studentId && /^\d{6,12}$/.test(line.trim())) {
             studentId = line.trim();
@@ -257,12 +398,7 @@ function parseCourseHistory(lines: string[]): AdvisementCourse[] {
 }
 
 export function parseAdvisementReportText(text: string): AdvisementReport {
-    const lines = text
-        .split('\n')
-        .map(line => line.replace(/\s+/g, ' ').trim())
-        .filter(Boolean)
-        .filter(line => !/^Page \d+ of \d+$/i.test(line))
-        .filter(line => !/^--- PAGE \d+ ---$/i.test(line));
+    const lines = normalizeAdvisementLines(text);
 
     const requirementBlocks = parseRequirementBlocks(lines);
 

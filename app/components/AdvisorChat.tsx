@@ -7,6 +7,7 @@ import { parseTranscriptText } from '../lib/transcriptTextParser';
 import {
     buildAdvisementReportContext,
     getGraduationRequirementActions,
+    AdvisementReport,
     parseAdvisementReportText,
 } from '../lib/advisementReportParser';
 
@@ -88,6 +89,20 @@ function buildTranscriptContext(
     }
 
     return ctx;
+}
+
+function getAdvisementReportScore(report: AdvisementReport): number {
+    return (
+        report.gpaRequirements.length * 2 +
+        report.unitRequirements.length * 3 +
+        report.missingRequirements.length * 4 +
+        getGraduationRequirementActions(report).length * 8 +
+        Math.min(report.courseHistory.length, 20)
+    );
+}
+
+function hasAdvisementReportData(report: AdvisementReport): boolean {
+    return getAdvisementReportScore(report) > 0;
 }
 
 export default function AdvisorChat({
@@ -249,14 +264,14 @@ export default function AdvisorChat({
                 };
                 setMessages(prev => [...prev, feedbackMsg]);
             } else {
+                const rawAdvisementReport = parseAdvisementReportText(rawText);
                 const layoutText = await extractPdfTextWithLayoutInBrowser(file);
-                const advisementReport = parseAdvisementReportText(layoutText);
+                const layoutAdvisementReport = parseAdvisementReportText(layoutText);
+                const advisementReport = getAdvisementReportScore(layoutAdvisementReport) >= getAdvisementReportScore(rawAdvisementReport)
+                    ? layoutAdvisementReport
+                    : rawAdvisementReport;
 
-                if (
-                    advisementReport.unitRequirements.length > 0 ||
-                    advisementReport.gpaRequirements.length > 0 ||
-                    advisementReport.missingRequirements.length > 0
-                ) {
+                if (hasAdvisementReportData(advisementReport)) {
                     const reportContext = buildAdvisementReportContext(advisementReport);
                     addDocumentContext(reportContext);
 
