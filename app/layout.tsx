@@ -14,6 +14,14 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Gradlae – Personalized University Academic Pacing",
   description: "Upload transcripts, match batch placements, take qualification quizzes, and unlock tailored university course pacing on the Gradlae academic success platform.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "424x424" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/icon.png",
+  },
   openGraph: {
     title: "Gradlae – Personalized University Academic Pacing",
     description: "Discover your optimal learning speed. Match accelerate, standard, and supported tracks tailored directly to your transcript details.",
