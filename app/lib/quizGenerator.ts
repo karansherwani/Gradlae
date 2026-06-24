@@ -91,8 +91,6 @@ For SCIENCES: Focus on laws, formulas, and observations.`;
         const result = await model.generateContent(prompt);
         const responseText = result.response.text();
 
-        console.log('Raw AI response:', responseText.substring(0, 500));
-
         // Clean up response
         let cleanedText = responseText
             .replace(/```json/g, '')
@@ -104,7 +102,7 @@ For SCIENCES: Focus on laws, formulas, and observations.`;
         if (jsonMatch) {
             cleanedText = jsonMatch[0];
         } else {
-            console.error('No JSON found in response:', cleanedText);
+            console.error('No JSON found in AI response');
             throw new Error('No JSON found in AI response');
         }
 
@@ -113,18 +111,15 @@ For SCIENCES: Focus on laws, formulas, and observations.`;
             parsedQuestions = JSON.parse(cleanedText);
         } catch (parseError) {
             console.error('JSON parse error:', parseError);
-            console.error('Attempted to parse:', cleanedText.substring(0, 500));
             throw new Error('Failed to parse AI response as JSON');
         }
 
-        console.log('Parsed response keys:', Object.keys(parsedQuestions));
-
         if (!parsedQuestions.questions || !Array.isArray(parsedQuestions.questions)) {
-            console.error('Invalid structure:', JSON.stringify(parsedQuestions).substring(0, 500));
+            console.error('Invalid AI response structure: missing questions array');
             throw new Error('Invalid response structure from AI: missing questions array');
         }
 
-        console.log('Number of questions:', parsedQuestions.questions.length);
+        console.log('Generated quiz questions:', parsedQuestions.questions.length);
 
         // Validate each question has required fields
         const validatedQuestions: QuizQuestion[] = parsedQuestions.questions.map(

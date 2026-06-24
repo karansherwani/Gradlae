@@ -82,7 +82,7 @@ async function respondWithParsedTranscript(transcript: ParsedTranscript, request
         }
 
         savedToDatabase = true;
-        console.log(`Transcript saved to Supabase for user: ${user.email}`);
+        console.log('Transcript saved to Supabase');
     }
 
     return NextResponse.json({

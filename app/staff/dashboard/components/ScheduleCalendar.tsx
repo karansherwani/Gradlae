@@ -15,7 +15,7 @@ interface TimeSlot {
   studentEmail?: string;
 }
 
-export default function ScheduleCalendar({ staffId, staffName }: { staffId: string; staffName: string }) {
+export default function ScheduleCalendar({ staffId, staffName, accessToken }: { staffId: string; staffName: string; accessToken: string | null }) {
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('09:00');
@@ -25,11 +25,12 @@ export default function ScheduleCalendar({ staffId, staffName }: { staffId: stri
   useEffect(() => {
     let isMounted = true;
 
-    fetch(`/api/staff/timeslots?staffId=${staffId}`)
+    fetch(`/api/staff/timeslots?staffId=${staffId}`, {
+      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
+    })
       .then(response => response.ok ? response.json() : null)
       .then(data => {
         if (isMounted && data) {
-          console.log('Loaded time slots:', data.slots);
           setTimeSlots(data.slots || []);
         }
       })
@@ -40,20 +41,21 @@ export default function ScheduleCalendar({ staffId, staffName }: { staffId: stri
     return () => {
       isMounted = false;
     };
-  }, [staffId]);
+  }, [staffId, accessToken]);
 
   const loadTimeSlots = useCallback(async () => {
     try {
-      const response = await fetch(`/api/staff/timeslots?staffId=${staffId}`);
+      const response = await fetch(`/api/staff/timeslots?staffId=${staffId}`, {
+        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
+      });
       if (response.ok) {
         const data = await response.json();
-        console.log('Loaded time slots:', data.slots);
         setTimeSlots(data.slots || []);
       }
     } catch (error) {
       console.error('Error loading time slots:', error);
     }
-  }, [staffId]);
+  }, [staffId, accessToken]);
 
   const createTimeSlot = async () => {
     if (!selectedDate || !selectedTime) {
@@ -65,12 +67,13 @@ export default function ScheduleCalendar({ staffId, staffName }: { staffId: stri
     const dayName = selectedDateObj.toLocaleDateString('en-US', { weekday: 'long' });
     const dateFormatted = selectedDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
-    console.log('Creating slot:', { dayName, dateFormatted, selectedTime });
-
     try {
       const response = await fetch('/api/staff/timeslots', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        },
         body: JSON.stringify({
           staffId,
           staffName,
@@ -82,7 +85,6 @@ export default function ScheduleCalendar({ staffId, staffName }: { staffId: stri
       });
 
       if (response.ok) {
-        console.log('Slot created successfully');
         setShowCreateModal(false);
         await loadTimeSlots(); // Reload to show new slot
         setSelectedDate('');
@@ -103,6 +105,7 @@ export default function ScheduleCalendar({ staffId, staffName }: { staffId: stri
     try {
       const response = await fetch(`/api/staff/timeslots?slotId=${slotId}`, {
         method: 'DELETE',
+        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
       });
 
       if (response.ok) {

@@ -40,18 +40,51 @@ interface Event {
     additionalInfo: string;
 }
 
+interface ResearchOpportunity {
+    id: string;
+    name: string;
+    profile_url: string;
+    department: string;
+    department_url: string;
+    offering_opportunity: string;
+    opportunity_types: string[];
+    prerequisites: string;
+    research_location: string;
+    end_date: string;
+    title?: string;
+    email?: string;
+    description?: string;
+    start_date?: string;
+    college?: string;
+    majors_considered?: string;
+    research_locations?: string[];
+}
+
+interface ResearchOpportunitiesPayload {
+    source: string;
+    scraped_at: string;
+    count: number;
+    opportunities: ResearchOpportunity[];
+}
+
+const CATEGORY_PREVIEW_COUNT = 12;
+
 export default function ClubsPage() {
     const router = useRouter();
     const { user, loading: authLoading } = useAuth();
     const [selectedCategories, setSelectedCategories] = useState<string[]>(['All']);
-    const [activeTab, setActiveTab] = useState<'clubs' | 'events'>('clubs');
+    const [activeTab, setActiveTab] = useState<'clubs' | 'events' | 'research'>('clubs');
     const [clubs, setClubs] = useState<Club[]>([]);
     const [events, setEvents] = useState<Event[]>([]);
+    const [researchOpportunities, setResearchOpportunities] = useState<ResearchOpportunity[]>([]);
     const [clubCategories, setClubCategories] = useState<string[]>(['All']);
     const [eventCategories, setEventCategories] = useState<string[]>(['All']);
+    const [researchCategories, setResearchCategories] = useState<string[]>(['All']);
     const [searchQuery, setSearchQuery] = useState('');
+    const [categoriesExpanded, setCategoriesExpanded] = useState(false);
     const [loading, setLoading] = useState(true);
     const [eventsLoading, setEventsLoading] = useState(true);
+    const [researchLoading, setResearchLoading] = useState(true);
 
     useEffect(() => {
         if (authLoading) return;
@@ -115,6 +148,42 @@ export default function ClubsPage() {
             .catch(error => {
                 console.error('Error loading events:', error);
                 setEventsLoading(false);
+            });
+
+        // Load research opportunities from the scraped data
+        fetch('/data/uofa_research_opportunities.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to load research opportunities data');
+                }
+                return response.json();
+            })
+            .then((data: ResearchOpportunitiesPayload) => {
+                const opportunities = data.opportunities || [];
+                setResearchOpportunities(opportunities);
+
+                const uniqueResearchCategories = new Set<string>();
+                opportunities.forEach(opportunity => {
+                    opportunity.opportunity_types?.forEach(type => {
+                        if (type) uniqueResearchCategories.add(type);
+                    });
+                    if (opportunity.research_location) {
+                        opportunity.research_location.split(',').forEach(location => {
+                            const trimmed = location.trim();
+                            if (trimmed) uniqueResearchCategories.add(trimmed);
+                        });
+                    }
+                    if (opportunity.department) {
+                        uniqueResearchCategories.add(opportunity.department);
+                    }
+                });
+
+                setResearchCategories(['All', ...Array.from(uniqueResearchCategories).sort()]);
+                setResearchLoading(false);
+            })
+            .catch(error => {
+                console.error('Error loading research opportunities:', error);
+                setResearchLoading(false);
             });
     }, [authLoading, user, router]);
 
@@ -215,6 +284,34 @@ export default function ClubsPage() {
         return categoryMatch && searchMatch;
     });
 
+    const filteredResearchOpportunities = researchOpportunities.filter(opportunity => {
+        const locationTags = opportunity.research_location?.split(',').map(location => location.trim()) || [];
+        const researchTags = [
+            opportunity.department,
+            ...locationTags,
+            ...(opportunity.opportunity_types || []),
+        ].filter(Boolean);
+        const categoryMatch = selectedCategories.includes('All') ||
+            selectedCategories.some(category => researchTags.includes(category));
+
+        const searchableValues = [
+            opportunity.name,
+            opportunity.title,
+            opportunity.department,
+            opportunity.college,
+            opportunity.research_location,
+            opportunity.prerequisites,
+            opportunity.majors_considered,
+            opportunity.description,
+            ...(opportunity.opportunity_types || []),
+        ].filter(Boolean).join(' ').toLowerCase();
+
+        const searchMatch = searchQuery === '' ||
+            searchableValues.includes(searchQuery.toLowerCase());
+
+        return categoryMatch && searchMatch;
+    });
+
     // Sort events by date (earliest first)
     const sortedEvents = [...filteredEvents].sort((a, b) => {
         const dateA = parseEventDate(a.date);
@@ -224,7 +321,15 @@ export default function ClubsPage() {
     });
 
     // Get the appropriate categories based on active tab
-    const currentCategories = activeTab === 'clubs' ? clubCategories : eventCategories;
+    const currentCategories = activeTab === 'clubs'
+        ? clubCategories
+        : activeTab === 'events'
+            ? eventCategories
+            : researchCategories;
+    const hasMoreCategories = currentCategories.length > CATEGORY_PREVIEW_COUNT;
+    const visibleCategories = categoriesExpanded
+        ? currentCategories
+        : currentCategories.filter((category, index) => index < CATEGORY_PREVIEW_COUNT || selectedCategories.includes(category));
 
     // Helper function to format date for display
     const formatEventDate = (dateStr: string) => {
@@ -235,7 +340,7 @@ export default function ClubsPage() {
                 const month = eventDate.toLocaleDateString('en-US', { month: 'short' });
                 return { day: day.toString(), month };
             }
-        } catch (e) {
+        } catch {
             console.error('Error formatting date:', dateStr);
         }
         return { day: '--', month: '---' };
@@ -261,9 +366,9 @@ export default function ClubsPage() {
             {/* HERO SECTION */}
             <section className={styles.hero}>
                 <div className={styles.heroContent}>
-                    <h1>University of Arizona Clubs &amp; Events</h1>
+                    <h1>University of Arizona Campus Opportunities</h1>
                     <p className={styles.heroSubtext}>
-                        Discover {clubs.length} student organizations and {sortedEvents.length} upcoming events that match your interests.
+                        Discover {clubs.length} student organizations, {sortedEvents.length} upcoming events, and {researchOpportunities.length} research positions that match your interests.
                     </p>
                 </div>
             </section>
@@ -288,6 +393,7 @@ export default function ClubsPage() {
                             setActiveTab('clubs');
                             setSelectedCategories(['All']);
                             setSearchQuery('');
+                            setCategoriesExpanded(false);
                         }}
                     >
                         Clubs ({filteredClubs.length})
@@ -298,9 +404,21 @@ export default function ClubsPage() {
                             setActiveTab('events');
                             setSelectedCategories(['All']);
                             setSearchQuery('');
+                            setCategoriesExpanded(false);
                         }}
                     >
                         Upcoming Events ({sortedEvents.length})
+                    </button>
+                    <button
+                        className={`${styles.tab} ${activeTab === 'research' ? styles.activeTab : ''}`}
+                        onClick={() => {
+                            setActiveTab('research');
+                            setSelectedCategories(['All']);
+                            setSearchQuery('');
+                            setCategoriesExpanded(false);
+                        }}
+                    >
+                        Research ({filteredResearchOpportunities.length})
                     </button>
                 </div>
 
@@ -308,7 +426,7 @@ export default function ClubsPage() {
                 <section className={styles.filterSection}>
                     <h2>Filter by Category</h2>
                     <div className={styles.interestTags}>
-                        {currentCategories.map(category => (
+                        {visibleCategories.map(category => (
                             <button
                                 key={category}
                                 className={`${styles.interestTag} ${selectedCategories.includes(category) ? styles.selected : ''}`}
@@ -318,6 +436,17 @@ export default function ClubsPage() {
                             </button>
                         ))}
                     </div>
+                    {hasMoreCategories && (
+                        <div className={styles.filterActions}>
+                            <button
+                                type="button"
+                                className={styles.readMoreBtn}
+                                onClick={() => setCategoriesExpanded(!categoriesExpanded)}
+                            >
+                                {categoriesExpanded ? 'Show less' : `Read more (${currentCategories.length - CATEGORY_PREVIEW_COUNT} more)`}
+                            </button>
+                        </div>
+                    )}
                 </section>
 
                 {/* Loading State */}
@@ -330,6 +459,12 @@ export default function ClubsPage() {
                 {eventsLoading && activeTab === 'events' && (
                     <div className={styles.loadingState}>
                         <p>Loading events...</p>
+                    </div>
+                )}
+
+                {researchLoading && activeTab === 'research' && (
+                    <div className={styles.loadingState}>
+                        <p>Loading research positions...</p>
                     </div>
                 )}
 
@@ -434,6 +569,70 @@ export default function ClubsPage() {
                                         </div>
                                     );
                                 })}
+                            </div>
+                        )}
+                    </section>
+                )}
+
+                {/* Research List */}
+                {activeTab === 'research' && !researchLoading && (
+                    <section className={styles.listSection}>
+                        {filteredResearchOpportunities.length === 0 ? (
+                            <div className={styles.emptyState}>
+                                <p>No research positions found matching your criteria.</p>
+                            </div>
+                        ) : (
+                            <div className={styles.researchGrid}>
+                                {filteredResearchOpportunities.map(opportunity => (
+                                    <div key={opportunity.id} className={styles.researchCard}>
+                                        <div className={styles.clubHeader}>
+                                            <span className={styles.categoryBadge}>Research Position</span>
+                                        </div>
+                                        <h3>{opportunity.name}</h3>
+                                        {opportunity.title && (
+                                            <p className={styles.organization}>{opportunity.title}</p>
+                                        )}
+                                        <p className={styles.subcategories}>
+                                            {opportunity.department || 'University of Arizona'}
+                                        </p>
+                                        {opportunity.description && opportunity.description !== 'No description given' && (
+                                            <p className={styles.description}>{opportunity.description}</p>
+                                        )}
+                                        <div className={styles.researchMeta}>
+                                            {(opportunity.opportunity_types?.length || 0) > 0 && (
+                                                <span>Type: {opportunity.opportunity_types.join(', ')}</span>
+                                            )}
+                                            {opportunity.research_location && (
+                                                <span>Location: {opportunity.research_location}</span>
+                                            )}
+                                            {opportunity.prerequisites && (
+                                                <span>Prereqs: {opportunity.prerequisites}</span>
+                                            )}
+                                            {opportunity.end_date && (
+                                                <span>End Date: {opportunity.end_date}</span>
+                                            )}
+                                        </div>
+                                        {(opportunity.opportunity_types?.length || 0) > 0 && (
+                                            <div className={styles.eventTags}>
+                                                {opportunity.opportunity_types.map((type, idx) => (
+                                                    <span key={idx} className={styles.tag}>{type}</span>
+                                                ))}
+                                            </div>
+                                        )}
+                                        <div className={styles.clubActions}>
+                                            {opportunity.profile_url && (
+                                                <a
+                                                    href={opportunity.profile_url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className={styles.joinBtn}
+                                                >
+                                                    View Research Position
+                                                </a>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         )}
                     </section>

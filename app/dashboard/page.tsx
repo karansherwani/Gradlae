@@ -113,8 +113,8 @@ export default function Dashboard() {
     },
     {
       category: 'CAMPUS LIFE',
-      title: 'Clubs & Events',
-      description: 'Find student orgs, study groups, and events that match your interests',
+      title: 'Campus Opportunities',
+      description: 'Find clubs, events, and research positions that match your interests',
       icon: <UsersIcon />,
       color: '#0C234B',
       path: '/clubs',

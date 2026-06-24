@@ -18,8 +18,8 @@ export async function POST(request: NextRequest) {
             message,
         };
 
-        // Server-side audit log for feedback & bug reports
-        console.info(`[Feedback Received] ID: ${newFeedback.id} | Type: ${type} | Email: ${email}`);
+        // Server-side audit log without storing contact details in logs.
+        console.info(`[Feedback Received] ID: ${newFeedback.id} | Type: ${type}`);
 
         return NextResponse.json({
             success: true,

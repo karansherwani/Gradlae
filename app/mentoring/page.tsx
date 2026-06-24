@@ -402,7 +402,7 @@ export default function MentoringPage() {
                 <nav className={styles.headerNav}>
                     <a href="/dashboard">Dashboard</a>
                     <a href="/placements">My Courses</a>
-                    <a href="/clubs">Clubs & Events</a>
+                    <a href="/clubs">Campus Opportunities</a>
                 </nav>
                 <Link href="/dashboard" className={styles.headerCta}>
                     ← Back

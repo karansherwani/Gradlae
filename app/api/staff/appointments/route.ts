@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
+import { getUserFromRequest } from '@/app/lib/supabaseAuth';
 
 interface Appointment {
   id: string;
@@ -50,9 +51,18 @@ async function writeAppointments(appointments: Appointment[]) {
   await fs.writeFile(APPOINTMENTS_FILE, JSON.stringify(appointments, null, 2));
 }
 
+function isStaffUser(user: { role: string } | null): boolean {
+  return user?.role === 'instructor' || user?.role === 'staff';
+}
+
 // GET - Fetch appointments for a staff member
 export async function GET(request: NextRequest) {
   try {
+    const user = await getUserFromRequest(request);
+    if (!isStaffUser(user)) {
+      return NextResponse.json({ message: 'Forbidden: Staff role required' }, { status: 403 });
+    }
+
     const { searchParams } = new URL(request.url);
     const staffId = searchParams.get('staffId');
 
@@ -61,6 +71,10 @@ export async function GET(request: NextRequest) {
         { message: 'Staff ID is required' },
         { status: 400 }
       );
+    }
+
+    if (user?.id !== staffId) {
+      return NextResponse.json({ message: 'Forbidden: Cannot view appointments for another staff account' }, { status: 403 });
     }
 
     const allAppointments = await readAppointments();
@@ -86,11 +100,14 @@ export async function GET(request: NextRequest) {
 // POST - Create a new appointment (when student books)
 export async function POST(request: NextRequest) {
   try {
+    const user = await getUserFromRequest(request);
+    if (!user) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { 
       staffId, 
-      studentName, 
-      studentEmail, 
       course, 
       day, 
       date, 
@@ -101,7 +118,7 @@ export async function POST(request: NextRequest) {
       notes
     } = body;
 
-    if (!staffId || !studentName || !studentEmail || !day || !date || !time) {
+    if (!staffId || !day || !date || !time) {
       return NextResponse.json(
         { message: 'Missing required fields' },
         { status: 400 }
@@ -113,8 +130,8 @@ export async function POST(request: NextRequest) {
     const newAppointment: Appointment = {
       id: `apt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       staffId,
-      studentName,
-      studentEmail,
+      studentName: user.name || user.email.split('@')[0],
+      studentEmail: user.email,
       course: course || 'General Tutoring',
       day,
       date,

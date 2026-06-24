@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
+import { getUserFromRequest } from '@/app/lib/supabaseAuth';
 
 interface Review {
   id: string;
@@ -79,17 +80,21 @@ export async function GET(request: NextRequest) {
 // POST - Create a new review (when student submits review)
 export async function POST(request: NextRequest) {
   try {
+    const user = await getUserFromRequest(request);
+    if (!user) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { 
       staffId, 
-      studentName, 
       course, 
       rating, 
       text, 
       sessionDate 
     } = body;
 
-    if (!staffId || !studentName || !rating || !text) {
+    if (!staffId || !rating || !text) {
       return NextResponse.json(
         { message: 'Missing required fields' },
         { status: 400 }
@@ -108,7 +113,7 @@ export async function POST(request: NextRequest) {
     const newReview: Review = {
       id: `review_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       staffId,
-      studentName,
+      studentName: user.name || user.email.split('@')[0],
       course: course || 'General Tutoring',
       rating,
       text,

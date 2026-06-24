@@ -435,46 +435,45 @@ export async function POST(request: NextRequest) {
             content: m.role === 'user' ? sanitizeAIInput(m.content) : m.content,
         }));
 
-        // ─── Try to load from Supabase for authenticated users ──────────
+        // ─── Load authenticated user context ───────────────────────────
         const contextParts: string[] = [];
         if (clientContext?.trim()) {
             contextParts.push(`CLIENT-UPLOADED CONTEXT:\n${clientContext.trim()}`);
         }
         let dbPlannerContext: string | null = null;
-        let advisorUser: Awaited<ReturnType<typeof getUserFromRequest>> = null;
+        const advisorUser = await getUserFromRequest(request);
+        if (!advisorUser) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
 
-        advisorUser = await getUserFromRequest(request);
-        if (advisorUser) {
-            // Load transcript from Supabase
-            const { data: transcript } = await supabaseAdmin
-                .from('transcripts')
-                .select('parsed_json')
-                .eq('user_id', advisorUser.id)
-                .order('created_at', { ascending: false })
-                .limit(1)
-                .single();
+        // Load transcript from Supabase
+        const { data: transcript } = await supabaseAdmin
+            .from('transcripts')
+            .select('parsed_json')
+            .eq('user_id', advisorUser.id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
 
-            if (transcript?.parsed_json) {
-                const parsed = transcript.parsed_json as { courses: TranscriptCourse[]; studentInfo?: { name?: string } };
-                if (parsed.courses?.length > 0) {
-                    const name = parsed.studentInfo?.name || advisorUser.name || 'Student';
-                    contextParts.push(`SAVED TRANSCRIPT CONTEXT:\n${buildTranscriptContextFromDB(parsed.courses, name)}`);
-                }
+        if (transcript?.parsed_json) {
+            const parsed = transcript.parsed_json as { courses: TranscriptCourse[]; studentInfo?: { name?: string } };
+            if (parsed.courses?.length > 0) {
+                const name = parsed.studentInfo?.name || advisorUser.name || 'Student';
+                contextParts.push(`SAVED TRANSCRIPT CONTEXT:\n${buildTranscriptContextFromDB(parsed.courses, name)}`);
             }
+        }
 
-            // Load planner from Supabase (if user has saved one)
-            const { data: planner } = await supabaseAdmin
-                .from('planners')
-                .select('planner_json')
-                .eq('user_id', advisorUser.id)
-                .order('updated_at', { ascending: false })
-                .limit(1)
-                .single();
+        // Load planner from Supabase (if user has saved one)
+        const { data: planner } = await supabaseAdmin
+            .from('planners')
+            .select('planner_json')
+            .eq('user_id', advisorUser.id)
+            .order('updated_at', { ascending: false })
+            .limit(1)
+            .single();
 
-            if (planner?.planner_json) {
-                dbPlannerContext = buildPlannerContext(planner.planner_json as PlannerData);
-            }
-
+        if (planner?.planner_json) {
+            dbPlannerContext = buildPlannerContext(planner.planner_json as PlannerData);
         }
 
         const studentContext = contextParts.length ? contextParts.join('\n\n') : undefined;
@@ -545,7 +544,7 @@ export async function POST(request: NextRequest) {
         }
 
         const lastUserMsg = messages.filter((m: { role: string }) => m.role === 'user').pop();
-        if (advisorUser && lastUserMsg) {
+        if (lastUserMsg) {
             void (async () => {
                 try {
                     await supabaseAdmin

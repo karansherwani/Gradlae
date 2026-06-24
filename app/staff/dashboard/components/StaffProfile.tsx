@@ -19,7 +19,7 @@ interface StaffProfileData {
   specializations?: string[];
 }
 
-export default function StaffProfile({ staffId, staffName }: { staffId: string; staffName: string }) {
+export default function StaffProfile({ staffId, staffName, accessToken }: { staffId: string; staffName: string; accessToken: string | null }) {
   const [profile, setProfile] = useState<StaffProfileData>({
     staffId,
     name: staffName,
@@ -78,7 +78,10 @@ export default function StaffProfile({ staffId, staffName }: { staffId: string; 
     try {
       const response = await fetch('/api/staff/profile', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        },
         body: JSON.stringify(profile),
       });
 

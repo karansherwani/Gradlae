@@ -21,9 +21,11 @@ interface Appointment {
 
 export default function AppointmentsSidebar({ 
   staffId, 
+  accessToken,
   onCountUpdate 
 }: { 
   staffId: string; 
+  accessToken: string | null;
   onCountUpdate: (count: number) => void;
 }) {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -36,13 +38,15 @@ export default function AppointmentsSidebar({
 
   const loadAppointments = async () => {
     try {
-      const response = await fetch(`/api/staff/appointments?staffId=${staffId}`);
+      const response = await fetch(`/api/staff/appointments?staffId=${staffId}`, {
+        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
+      });
       if (response.ok) {
         const data = await response.json();
         setAppointments(data.appointments || []);
         
         // Update upcoming count
-        const upcomingCount = data.appointments.filter(
+        const upcomingCount = (data.appointments || []).filter(
           (apt: Appointment) => apt.status === 'upcoming'
         ).length;
         onCountUpdate(upcomingCount);

@@ -75,7 +75,7 @@ export default function LandingPage() {
       { title: 'Staff Dashboard', desc: 'Give academic teams a focused view of patterns, bottlenecks, and follow-up needs.' },
     ],
     explore: [
-      { title: 'Clubs & Events', desc: 'Recommend student organizations and events connected to interests, major, and goals.' },
+      { title: 'Campus Opportunities', desc: 'Recommend clubs, events, and research positions connected to interests, major, and goals.' },
       { title: 'Research Discovery', desc: 'Surface labs, faculty work, and research opportunities that fit the academic path.' },
       { title: 'Career-Relevant Experiences', desc: 'Connect coursework to resume-building activities and campus programs.' },
       { title: 'Resource Matching', desc: 'Point students to financial, academic, wellness, and community resources at the right time.' },

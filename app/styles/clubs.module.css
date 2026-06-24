@@ -236,6 +236,27 @@
     color: var(--color-text-inverse);
 }
 
+.filterActions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 14px;
+}
+
+.readMoreBtn {
+    background: transparent;
+    border: none;
+    color: var(--uofa-blue);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 700;
+    padding: 6px 0;
+}
+
+.readMoreBtn:hover {
+    color: var(--uofa-red);
+    text-decoration: underline;
+}
+
 /* Tabs */
 .tabs {
     display: flex;
@@ -340,6 +361,44 @@
     background: var(--pm-red);
 }
 
+/* Research Grid */
+.researchGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.researchCard {
+    background: var(--uofa-light-blue);
+    padding: 25px;
+    border-radius: 12px;
+    position: relative;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.researchCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.researchCard h3 {
+    color: var(--uofa-blue);
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.researchMeta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 5px;
+}
+
 /* Events Grid */
 .eventsGrid {
     display: flex;
@@ -425,6 +484,10 @@
     }
 
     .clubsGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .researchGrid {
         grid-template-columns: 1fr;
     }
 
