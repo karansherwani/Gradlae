@@ -12,6 +12,8 @@ interface UserProfile {
     studentId: string;
     address: string;
     profilePicture: string;
+    major: string;
+    degreePlanId: string;
 }
 
 export default function ProfilePage() {
@@ -26,6 +28,8 @@ export default function ProfilePage() {
         studentId: '',
         address: '',
         profilePicture: '',
+        major: 'Computer Science and Engineering',
+        degreePlanId: 'bs-cse-2025-26',
     });
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -56,6 +60,8 @@ export default function ProfilePage() {
                     studentId: data.studentId || '',
                     address: data.address || '',
                     profilePicture: data.profilePicture || '',
+                    major: data.major || 'Computer Science and Engineering',
+                    degreePlanId: data.degreePlanId || 'bs-cse-2025-26',
                 });
             }
         } catch (error) {
@@ -210,6 +216,29 @@ export default function ProfilePage() {
                                 placeholder="e.g., 12345678"
                             />
                             <p className={styles.fieldHint}>Your university student ID number</p>
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label htmlFor="major">Major</label>
+                            <input
+                                type="text"
+                                id="major"
+                                value={profile.major}
+                                onChange={(e) => setProfile({ ...profile, major: e.target.value })}
+                                placeholder="e.g., Computer Science and Engineering"
+                            />
+                            <p className={styles.fieldHint}>Used to select your degree plan template</p>
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label htmlFor="degreePlanId">Degree Plan</label>
+                            <select
+                                id="degreePlanId"
+                                value={profile.degreePlanId}
+                                onChange={(e) => setProfile({ ...profile, degreePlanId: e.target.value })}
+                            >
+                                <option value="bs-cse-2025-26">B.S. Computer Science and Engineering (2025-26)</option>
+                            </select>
                         </div>
 
                         <div className={styles.formGroup}>

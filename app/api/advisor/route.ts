@@ -9,6 +9,12 @@ import { loadAllCourses, Course as CSVCourse } from '@/app/lib/loadCourses';
 import { supabaseAdmin } from '@/app/lib/supabaseServer';
 import { getUserFromRequest } from '@/app/lib/supabaseAuth';
 import { advisorRequestSchema, validateBody, sanitizeAIInput } from '@/app/lib/validation';
+import {
+    buildPlannerPayloadFromTemplate,
+    loadDegreePlanById,
+    loadDegreePlanForMajor,
+    type StoredPlannerData,
+} from '@/app/lib/degreePlans';
 
 // ─── TYPES ─────────────────────────────────────────────────────────────────
 
@@ -474,6 +480,21 @@ export async function POST(request: NextRequest) {
 
         if (planner?.planner_json) {
             dbPlannerContext = buildPlannerContext(planner.planner_json as PlannerData);
+        } else {
+            const { data: userRow } = await supabaseAdmin
+                .from('users')
+                .select('major, degree_plan_id')
+                .eq('id', advisorUser.id)
+                .single();
+
+            const template =
+                loadDegreePlanById(userRow?.degree_plan_id) ||
+                loadDegreePlanForMajor(userRow?.major) ||
+                loadDegreePlanById(null);
+
+            if (template) {
+                dbPlannerContext = buildPlannerContext(buildPlannerPayloadFromTemplate(template) as PlannerData);
+            }
         }
 
         const studentContext = contextParts.length ? contextParts.join('\n\n') : undefined;
