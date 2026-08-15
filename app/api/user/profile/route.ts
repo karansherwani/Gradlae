@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
 
         const { data: row } = await supabaseAdmin
             .from('users')
-            .select('name, date_of_birth, student_id, address, profile_picture')
+            .select('name, date_of_birth, student_id, address, profile_picture, major, degree_plan_id')
             .eq('id', user.id)
             .single();
 
@@ -25,6 +25,8 @@ export async function GET(request: NextRequest) {
             studentId: row?.student_id || '',
             address: row?.address || '',
             profilePicture: row?.profile_picture || '',
+            major: row?.major || '',
+            degreePlanId: row?.degree_plan_id || 'bs-cse-2025-26',
         });
     } catch (error) {
         console.error('Profile GET error:', error);
@@ -40,7 +42,7 @@ export async function PUT(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { fullName, dateOfBirth, studentId, address, profilePicture } = await request.json();
+        const { fullName, dateOfBirth, studentId, address, profilePicture, major, degreePlanId } = await request.json();
 
         const { error: updateError } = await supabaseAdmin
             .from('users')
@@ -50,6 +52,8 @@ export async function PUT(request: NextRequest) {
                 student_id: studentId || '',
                 address: address || '',
                 profile_picture: profilePicture || '',
+                major: major || '',
+                degree_plan_id: degreePlanId || 'bs-cse-2025-26',
             })
             .eq('id', user.id);
 
@@ -60,7 +64,7 @@ export async function PUT(request: NextRequest) {
 
         return NextResponse.json({
             success: true,
-            profile: { fullName, dateOfBirth, studentId, address, profilePicture },
+            profile: { fullName, dateOfBirth, studentId, address, profilePicture, major, degreePlanId },
         });
     } catch (error) {
         console.error('Profile PUT error:', error);
