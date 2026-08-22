@@ -6,12 +6,10 @@ import { useAuth } from '../components/AuthProvider';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import styles from '../styles/placements.module.css';
-import { fetchCourses, setCourses, Course, getPrerequisites } from '../lib/courseData';
+import { fetchCourses, setCourses, getCourses, Course, getPrerequisites } from '../lib/courseData';
 import { getRecommendedBatch, PrerequisiteInfo } from '../lib/batchLogic';
 import { extractPdfTextInBrowser } from '../lib/browserPdfText';
 import { parseTranscriptText } from '../lib/transcriptTextParser';
-import { courseCodeToDisplay } from '../lib/courseCodes';
-import type { DegreeAuditResult } from '../lib/degreeAudit';
 
 type Step = 'upload' | 'results';
 
@@ -88,10 +86,6 @@ export default function PlacementsPage() {
   const [loadingTranscript, setLoadingTranscript] = useState(true);
   const [transcriptVerified, setTranscriptVerified] = useState(true);
   const [verificationMessage, setVerificationMessage] = useState<string | null>(null);
-  const [degreeAudit, setDegreeAudit] = useState<DegreeAuditResult | null>(null);
-  const [auditLoading, setAuditLoading] = useState(false);
-  const [eligibilityByCourse, setEligibilityByCourse] = useState<Record<string, PrerequisiteInfo[]>>({});
-  const [plannerLoaded, setPlannerLoaded] = useState(false);
 
   // Check for saved transcript on load
   useEffect(() => {
@@ -134,167 +128,6 @@ export default function PlacementsPage() {
 
     checkSavedTranscript();
   }, [authLoading, user, accessToken]);
-
-  useEffect(() => {
-    if (!accessToken || step !== 'results') return;
-
-    const loadAudit = async () => {
-      setAuditLoading(true);
-      try {
-        const response = await fetch('/api/degree-audit', {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-        const data = await readJsonResponse(response) as { audit?: DegreeAuditResult };
-        if (response.ok && data.audit) {
-          setDegreeAudit(data.audit);
-        }
-      } catch (error) {
-        console.error('Degree audit load error:', error);
-      } finally {
-        setAuditLoading(false);
-      }
-    };
-
-    void loadAudit();
-  }, [accessToken, step, grades.length]);
-
-  useEffect(() => {
-    if (!accessToken || plannerLoaded) return;
-
-    const loadPlanner = async () => {
-      try {
-        const response = await fetch('/api/planner', {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-        const data = await readJsonResponse(response) as {
-          planner?: { plannedCourseCodes?: string[] };
-        };
-
-        const codes = data.planner?.plannedCourseCodes || [];
-        if (codes.length === 0) {
-          setPlannerLoaded(true);
-          return;
-        }
-
-        const restored: Course[] = [];
-        for (const code of codes) {
-          const courseResponse = await fetch(`/api/courses?code=${encodeURIComponent(code)}`);
-          const courseData = await readJsonResponse(courseResponse) as { courses?: Array<Record<string, string | number>> };
-          const row = courseData.courses?.[0];
-          if (!row) continue;
-          restored.push({
-            courseCode: `${row.subject || ''} ${row.catalogNumber || ''}`.trim(),
-            courseName: String(row.title || ''),
-            department: String(row.offeringUnit || ''),
-            credits: Number(row.minUnits || 0),
-            description: String(row.description || ''),
-            track: '',
-            level: '',
-            prerequisite1: String(row.enrollmentRequirements || ''),
-            prerequisite2: String(row.courseRequisites || ''),
-          });
-        }
-
-        if (restored.length > 0) {
-          setPlannedCourses(restored);
-        }
-      } catch (error) {
-        console.error('Planner load error:', error);
-      } finally {
-        setPlannerLoaded(true);
-      }
-    };
-
-    void loadPlanner();
-  }, [accessToken, plannerLoaded]);
-
-  useEffect(() => {
-    if (!accessToken || !plannerLoaded) return;
-
-    const timeout = setTimeout(async () => {
-      try {
-        await fetch('/api/planner', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({
-            planner: {
-              plannedCourseCodes: plannedCourses.map((course) => course.courseCode),
-            },
-          }),
-        });
-      } catch (error) {
-        console.error('Planner save error:', error);
-      }
-    }, 500);
-
-    return () => clearTimeout(timeout);
-  }, [plannedCourses, accessToken, plannerLoaded]);
-
-  useEffect(() => {
-    if (plannedCourses.length === 0) {
-      setEligibilityByCourse({});
-      return;
-    }
-
-    let cancelled = false;
-
-    const loadEligibility = async () => {
-      const next: Record<string, PrerequisiteInfo[]> = {};
-
-      for (const course of plannedCourses) {
-        try {
-          const response = await fetch('/api/courses/eligibility', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              code: course.courseCode,
-              completedCourses: grades,
-            }),
-          });
-          const data = await readJsonResponse(response) as {
-            eligible?: boolean;
-            missingDetails?: Array<{ courseId: string; courseName: string; reason: string }>;
-          };
-
-          if (data.eligible) {
-            next[course.courseCode] = [];
-            continue;
-          }
-
-          next[course.courseCode] = (data.missingDetails || []).map((detail) => ({
-            code: courseCodeToDisplay(detail.courseId),
-            name: detail.courseName,
-            grade: 'N/A',
-            met: false,
-          }));
-        } catch (error) {
-          console.error('Eligibility check error:', error);
-          next[course.courseCode] = getPrerequisites(course.courseCode).map((prereq) => {
-            const normalizedCode = prereq.courseCode.toUpperCase().replace(/\s+/g, ' ').trim();
-            const transcriptCourse = grades.find((g) => g.course.toUpperCase().replace(/\s+/g, ' ').trim() === normalizedCode);
-            const passingGrades = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'P', 'S'];
-            const grade = transcriptCourse?.grade || 'N/A';
-            return {
-              code: prereq.courseCode,
-              name: prereq.courseName,
-              grade,
-              met: Boolean(transcriptCourse && passingGrades.includes(transcriptCourse.grade)),
-            };
-          });
-        }
-      }
-
-      if (!cancelled) {
-        setEligibilityByCourse(next);
-      }
-    };
-
-    void loadEligibility();
-    return () => { cancelled = true; };
-  }, [plannedCourses, grades]);
 
   // Fetch courses from CSV via API — search-driven now
   const [allCourses, setAllCourses] = useState<Course[]>([]);
@@ -345,6 +178,42 @@ export default function PlacementsPage() {
     }, 300); // 300ms debounce
     return () => { cancelled = true; clearTimeout(timeout); };
   }, [searchQuery]);
+
+  // Check if a prerequisite is met based on transcript grades
+  const checkPrerequisite = (prereqCode: string): { met: boolean; grade: string } => {
+    // Normalize course code for comparison
+    const normalizedCode = prereqCode.toUpperCase().replace(/\s+/g, ' ').trim();
+
+    // Find the course in the transcript
+    const transcriptCourse = grades.find(g => {
+      const gradeCode = g.course.toUpperCase().replace(/\s+/g, ' ').trim();
+      return gradeCode === normalizedCode;
+    });
+
+    if (!transcriptCourse) {
+      return { met: false, grade: 'N/A' };
+    }
+
+    // Check if grade is passing (not E, F, or IP)
+    const passingGrades = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'P', 'S'];
+    const isPassing = passingGrades.includes(transcriptCourse.grade);
+
+    return { met: isPassing, grade: transcriptCourse.grade };
+  };
+
+  // Get prerequisite info for a course
+  const getPrereqInfo = (course: Course): PrerequisiteInfo[] => {
+    const prereqs = getPrerequisites(course.courseCode);
+    return prereqs.map(p => {
+      const { met, grade } = checkPrerequisite(p.courseCode);
+      return {
+        code: p.courseCode,
+        name: p.courseName,
+        grade,
+        met
+      };
+    });
+  };
 
   // Add a course to planned list
   const addPlannedCourse = (course: Course) => {
@@ -640,55 +509,6 @@ export default function PlacementsPage() {
               </button>
             </div>
 
-            <div className={styles.planSection}>
-              <div className={styles.planHeader}>
-                <div className={styles.planIcon}>▣</div>
-                <div>
-                  <h3>Degree Progress</h3>
-                  <p>Requirements tracked against your saved degree plan</p>
-                </div>
-              </div>
-
-              {auditLoading && <p className={styles.emptySubtext}>Calculating degree progress...</p>}
-
-              {!auditLoading && degreeAudit && (
-                <div className={styles.plannedCourses}>
-                  <div className={styles.plannedCard}>
-                    <div className={styles.plannedHeader}>
-                      <div>
-                        <p className={styles.plannedCode}>{degreeAudit.planName}</p>
-                        <p className={styles.plannedName}>Catalog {degreeAudit.catalogYear}</p>
-                      </div>
-                    </div>
-                    <div className={styles.prereqList}>
-                      <p className={styles.prereqTitle}>Credits</p>
-                      <div className={styles.prereqItem}>
-                        <span>Earned: {degreeAudit.unitsEarned}</span>
-                        <span>In progress: {degreeAudit.unitsInProgress}</span>
-                        <span>Remaining: {degreeAudit.unitsRemaining}</span>
-                      </div>
-                      <p className={styles.prereqTitle}>Required courses</p>
-                      <div className={styles.prereqItem}>
-                        <span>Satisfied: {degreeAudit.satisfiedCount}</span>
-                        <span>In progress: {degreeAudit.inProgressCount}</span>
-                        <span>Remaining: {degreeAudit.remainingCount}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {degreeAudit.requirements.filter((req) => req.status === 'remaining').slice(0, 6).map((req) => (
-                    <div key={req.key} className={`${styles.prereqItem} ${styles.prereqNotMet}`}>
-                      <div>
-                        <p className={styles.prereqCode}>{req.label}</p>
-                        <p className={styles.prereqName}>{req.units} units still needed</p>
-                      </div>
-                      <div className={styles.prereqStatus}>Remaining</div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
             {/* Plan Next Semester Section */}
             <div className={styles.planSection}>
               <div className={styles.planHeader}>
@@ -740,7 +560,7 @@ export default function PlacementsPage() {
               {plannedCourses.length > 0 ? (
                 <div className={styles.plannedCourses}>
                   {plannedCourses.map((course) => {
-                    const prereqInfo = eligibilityByCourse[course.courseCode] || [];
+                    const prereqInfo = getPrereqInfo(course);
                     const batchRec = getRecommendedBatch(prereqInfo);
 
                     return (
@@ -759,7 +579,7 @@ export default function PlacementsPage() {
                         </div>
 
                         {/* Prerequisites */}
-                        {prereqInfo.length > 0 ? (
+                        {prereqInfo.length > 0 && (
                           <div className={styles.prereqList}>
                             <p className={styles.prereqTitle}>Prerequisites</p>
                             {prereqInfo.map((prereq) => (
@@ -782,10 +602,6 @@ export default function PlacementsPage() {
                                 </div>
                               </div>
                             ))}
-                          </div>
-                        ) : (
-                          <div className={styles.prereqList}>
-                            <p className={styles.prereqTitle} style={{ color: '#059669' }}>Prerequisites satisfied</p>
                           </div>
                         )}
 
