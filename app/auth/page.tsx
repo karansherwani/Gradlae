@@ -3,11 +3,12 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '../lib/supabaseClient';
-import { UNIVERSITIES, buildNetIdEmail, getUniversityById } from '../lib/universities';
+import { UNIVERSITIES, buildNetIdEmail } from '../lib/universities';
+import { getPasswordValidationError } from '../lib/validation';
 import styles from '../styles/auth.module.css';
 
 type UserRole = 'student' | 'staff' | null;
-type Mode = 'signin' | 'signup' | 'reset';
+type Mode = 'signin' | 'signup';
 
 function AuthPageContent() {
   const router = useRouter();
@@ -28,7 +29,6 @@ function AuthPageContent() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [resetMessage, setResetMessage] = useState('');
 
   const handleLogoClick = async () => {
     const { data } = await supabase.auth.getSession();
@@ -98,7 +98,6 @@ function AuthPageContent() {
       setPassword('');
       setConfirmPassword('');
       setMode('signin');
-      setResetMessage('');
     } else if (flowStep === 'role') {
       setFlowStep('university');
       setSelectedUniversity('');
@@ -119,8 +118,9 @@ function AuthPageContent() {
         setLoading(false);
         return;
       }
-      if (password.length < 6) {
-        setError('Password must be at least 6 characters');
+      const passwordError = getPasswordValidationError(password);
+      if (passwordError) {
+        setError(passwordError);
         setLoading(false);
         return;
       }
@@ -171,36 +171,6 @@ function AuthPageContent() {
     } catch (err) {
       setError('Connection failed. Please try again or contact IT support.');
       console.error('Auth Error:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleReset = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    setResetMessage('');
-
-    try {
-      const response = await fetch('/api/auth/reset', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          netId: netId || undefined,
-          university: selectedUniversity || undefined,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setResetMessage(data.message || 'If that account exists, a password reset email has been sent.');
-      } else {
-        setError(data.message || 'Error processing request');
-      }
-    } catch {
-      setError('An error occurred during authentication');
     } finally {
       setLoading(false);
     }
@@ -355,69 +325,19 @@ function AuthPageContent() {
           <h2>
             {mode === 'signin'
               ? `${roleLabel} Sign In`
-              : mode === 'signup'
-                ? `Create ${roleLabel} Account`
-                : 'Reset Password'}
+              : `Create ${roleLabel} Account`}
           </h2>
           <p>
             {mode === 'signin'
               ? 'Enter your NetID credentials to continue'
-              : mode === 'signup'
-                ? 'Create your account with your NetID'
-                : 'Enter your NetID. We\'ll send a reset link to your university email'}
+              : 'Create your account with your NetID'}
           </p>
 
           <div className={styles.securityNote}>
             <strong>Secure Login</strong> - Sign in with your university NetID
           </div>
 
-          {mode === 'reset' ? (
-            <form onSubmit={handleReset}>
-              <div className={styles.formGroup}>
-                <label>NetID</label>
-                <input
-                  type="text"
-                  value={netId}
-                  onChange={(e) => setNetId(e.target.value)}
-                  placeholder="e.g., jsmith"
-                  required
-                  disabled={loading}
-                />
-                <p className={styles.fieldHint}>
-                  We&apos;ll email a reset link to {netId || 'your-netid'}@{getUniversityById(selectedUniversity)?.domain || 'your-university.edu'}
-                </p>
-              </div>
-
-              {error && <p className={styles.error}>{error}</p>}
-              {resetMessage && (
-                <p
-                  className={styles.success}
-                  style={{ color: 'green', fontSize: '0.9rem', marginBottom: '15px' }}
-                >
-                  {resetMessage}
-                </p>
-              )}
-
-              <button type="submit" className={styles.submitBtn} disabled={loading || !netId}>
-                {loading ? 'Sending...' : 'Send reset email'}
-              </button>
-
-              <button
-                type="button"
-                className={styles.toggleBtn}
-                style={{ marginTop: '15px', width: '100%' }}
-                onClick={() => {
-                  setMode('signin');
-                  setError('');
-                  setResetMessage('');
-                }}
-              >
-                Back to Sign In
-              </button>
-            </form>
-          ) : (
-            <>
-              <form onSubmit={handleSubmit} name="login-form" autoComplete="on">
+          <form onSubmit={handleSubmit} name="login-form" autoComplete="on">
               <div className={styles.formGroup}>
                 <label htmlFor="netId">NetID</label>
                 <input
@@ -517,25 +437,12 @@ function AuthPageContent() {
               {mode === 'signin' && (
                 <p className={styles.helpText}>
                   Forgot your password?{' '}
-                  <a
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setMode('reset');
-                      setError('');
-                      setResetMessage('');
-                    }}
-                  >
-                    Reset it here
-                  </a>
+                  <a href="/auth/reset">Reset it here</a>
                 </p>
               )}
             </form>
-          </>
-          )}
 
-          {mode !== 'reset' && (
-            <div className={styles.toggleMode}>
+          <div className={styles.toggleMode}>
               <p>
                 {mode === 'signin' ? (
                   <>
@@ -569,7 +476,6 @@ function AuthPageContent() {
                 )}
               </p>
             </div>
-          )}
         </div>
       </main>
     </div>

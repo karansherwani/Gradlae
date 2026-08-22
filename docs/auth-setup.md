@@ -62,21 +62,31 @@ Set these in **Vercel Dashboard → Settings → Environment Variables** (and in
 - We **never** write passwords to localStorage
 
 ### Password Reset
-1. User enters NetID on `/auth` after selecting their university
+Password reset lives on a **dedicated page** at `/auth/reset` (separate from sign-in/sign-up on `/auth`).
+
+**Request a reset**
+1. User opens `/auth/reset`, selects their university, and enters their NetID
 2. Client POSTs to `/api/auth/reset` with `{ netId, university }`
 3. Server builds the email from that university's domain (same as signup) and calls `resetPasswordForEmail`
-4. User clicks the email link and lands on `/auth/reset`
-5. Supabase establishes a recovery session; the user sets a new password with `supabase.auth.updateUser({ password })`
+4. User sees a confirmation message to check their email (uniform response either way — no user enumeration)
+
+**Complete a reset**
+1. User clicks the link in the email and lands on `/auth/reset` with a Supabase recovery token
+2. Client detects `PASSWORD_RECOVERY` (implicit hash flow) or exchanges a PKCE `code` for a session
+3. User sets a new password with `supabase.auth.updateUser({ password })` while the recovery session is active
+4. Client signs out and redirects to `/auth` to sign in with the new password
 
 Add these redirect URLs in **Authentication → URL Configuration**:
 - `https://your-production-domain/auth/reset`
 - `http://localhost:3000/auth/reset`
 
+Set **Site URL** to your production domain (`NEXT_PUBLIC_APP_URL` should match).
+
 ### ❌ What was removed
 - `app/data/users.json` — contained **plaintext passwords** (deleted and gitignored)
 - `app/api/auth/login/route.ts` — compared passwords with `===` against JSON file (replaced with Supabase proxy)
-- `app/api/auth/reset/route.ts` — previously used an unvalidated OTP path; now only sends Supabase recovery emails
-- `app/lib/db.ts` → `updateUserPassword()` — stored passwords in plaintext (no longer called)
+- `app/api/auth/reset/route.ts` — previously used an unvalidated OTP/admin password-update path (removed); now only sends Supabase recovery emails
+- `app/lib/db.ts` → legacy JSON user helpers including plaintext `updateUserPassword()` (removed)
 
 ## Supabase Dashboard Config
 
