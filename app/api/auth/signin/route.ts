@@ -6,19 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/app/lib/supabaseServer';
 import { signinSchema, validateBody } from '@/app/lib/validation';
-
-function getSigninEmailCandidates(email: string): string[] {
-    const normalized = email.toLowerCase().trim();
-    const candidates = [normalized];
-
-    // Early beta accounts were created with @uofa.edu before the UArizona
-    // domain was corrected to @arizona.edu. Keep those students able to log in.
-    if (normalized.endsWith('@arizona.edu')) {
-        candidates.push(normalized.replace('@arizona.edu', '@uofa.edu'));
-    }
-
-    return [...new Set(candidates)];
-}
+import { getCompatibleEmailCandidates } from '@/app/lib/universities';
 
 export async function POST(request: NextRequest) {
     try {
@@ -42,7 +30,7 @@ export async function POST(request: NextRequest) {
         }
         const { email, password, role } = validation.data;
         const requestedStaffAccess = role === 'instructor' || role === 'staff';
-        const emailCandidates = getSigninEmailCandidates(email);
+        const emailCandidates = getCompatibleEmailCandidates(email);
 
         // Sign in via Supabase Auth — password is verified against the bcrypt hash
         let sessionData;
