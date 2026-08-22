@@ -37,13 +37,16 @@ For Vercel deployment, add the same variables in **Vercel → Project Settings �
 
 ### 3. Run the Database Migration
 
-Open Supabase Dashboard → **SQL Editor** → **New query**, then paste the contents of:
+Open Supabase Dashboard → **SQL Editor** → **New query**, then paste and run (in order):
 
 ```
 supabase/migration.sql
+supabase/migration_v2.sql
+supabase/migration_v3_degree_planning.sql
+supabase/migration_v4_feedback.sql
 ```
 
-Click **Run**. This creates all tables, RLS policies, and storage buckets.
+Click **Run**. This creates all tables, RLS policies, storage buckets, and the `feedback` table used by `/feedback`.
 
 ### 4. Database Tables
 
@@ -53,6 +56,7 @@ Click **Run**. This creates all tables, RLS policies, and storage buckets.
 | `transcripts` | Parsed transcript data + raw file storage path |
 | `planners` | Degree plan JSON (semesters, courses, notes) |
 | `advisor_sessions` | AI advisor conversation logs |
+| `feedback` | Product feedback / bug reports from `/feedback` (triage in Supabase dashboard) |
 
 ### 5. Row-Level Security (RLS)
 

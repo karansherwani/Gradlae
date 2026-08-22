@@ -114,11 +114,20 @@ export const checkoutSchema = z.object({
     userEmail: z.string().email().max(254).optional(),
 });
 
+export const FEEDBACK_TYPES = [
+    'General Suggestion',
+    'Bug Report',
+    'Course Request',
+    'Other',
+] as const;
+
 export const feedbackSchema = z.object({
     name: z.string().min(1, 'Name is required').max(100).transform(sanitizeString),
     email: z.string().email('Invalid email address').max(254),
-    type: z.string().min(1, 'Feedback type is required').max(50).transform(sanitizeString),
+    type: z.enum(FEEDBACK_TYPES, { message: 'Invalid feedback type' }),
     message: z.string().min(1, 'Message is required').max(4000).transform(sanitizeString),
+    /** When true and a valid Bearer token is present, link feedback to the Gradlae user row. */
+    includeAccount: z.boolean().optional(),
 });
 
 // ─── VALIDATION HELPER ──────────────────────────────────────────────────────
