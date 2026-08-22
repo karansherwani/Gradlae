@@ -3,21 +3,12 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '../lib/supabaseClient';
+import { UNIVERSITIES, buildNetIdEmail } from '../lib/universities';
+import { getPasswordValidationError } from '../lib/validation';
 import styles from '../styles/auth.module.css';
 
 type UserRole = 'student' | 'staff' | null;
-type Mode = 'signin' | 'signup' | 'reset';
-
-const universities = [
-  { id: 'uofa', name: 'University of Arizona', domain: 'arizona.edu' },
-  { id: 'asu', name: 'Arizona State University', domain: 'asu.edu' },
-  { id: 'nau', name: 'Northern Arizona University', domain: 'nau.edu' },
-  { id: 'uofc', name: 'University of Colorado Boulder', domain: 'colorado.edu' },
-  { id: 'ucsd', name: 'UC San Diego', domain: 'ucsd.edu' },
-  { id: 'stanford', name: 'Stanford University', domain: 'stanford.edu' },
-  { id: 'mit', name: 'MIT', domain: 'mit.edu' },
-  { id: 'berkeley', name: 'UC Berkeley', domain: 'berkeley.edu' },
-];
+type Mode = 'signin' | 'signup';
 
 function AuthPageContent() {
   const router = useRouter();
@@ -38,11 +29,6 @@ function AuthPageContent() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  // Reset Password State
-  const [otp, setOtp] = useState('');
-  const [resetStep, setResetStep] = useState<'request' | 'verify'>('request');
-  const [resetMessage, setResetMessage] = useState('');
 
   const handleLogoClick = async () => {
     const { data } = await supabase.auth.getSession();
@@ -71,7 +57,7 @@ function AuthPageContent() {
     }
   }, []);
 
-  const filteredUniversities = universities.filter(uni =>
+  const filteredUniversities = UNIVERSITIES.filter(uni =>
     uni.name.toLowerCase().includes(uniSearch.toLowerCase()) ||
     uni.domain.toLowerCase().includes(uniSearch.toLowerCase())
   );
@@ -112,8 +98,6 @@ function AuthPageContent() {
       setPassword('');
       setConfirmPassword('');
       setMode('signin');
-      setResetStep('request');
-      setResetMessage('');
     } else if (flowStep === 'role') {
       setFlowStep('university');
       setSelectedUniversity('');
@@ -134,15 +118,16 @@ function AuthPageContent() {
         setLoading(false);
         return;
       }
-      if (password.length < 6) {
-        setError('Password must be at least 6 characters');
+      const passwordError = getPasswordValidationError(password);
+      if (passwordError) {
+        setError(passwordError);
         setLoading(false);
         return;
       }
     }
 
     // Build the email address for Supabase using NetID
-    const userEmail = `${netId.toLowerCase().trim()}@${selectedUniversity || 'uofa'}.edu`;
+    const userEmail = buildNetIdEmail(netId, selectedUniversity);
     const fullName = userRole === 'staff'
       ? `Prof. ${netId.charAt(0).toUpperCase() + netId.slice(1)}`
       : netId.charAt(0).toUpperCase() + netId.slice(1);
@@ -186,49 +171,6 @@ function AuthPageContent() {
     } catch (err) {
       setError('Connection failed. Please try again or contact IT support.');
       console.error('Auth Error:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleReset = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    setResetMessage('');
-
-    try {
-      const response = await fetch('/api/auth/reset', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          netId: netId || undefined,
-          otp: resetStep === 'verify' ? otp : undefined,
-          newPassword: resetStep === 'verify' ? password : undefined,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        if (resetStep === 'request') {
-          setResetStep('verify');
-          setResetMessage(data.message);
-        } else {
-          setResetMessage('Password reset successfully! Please sign in.');
-          setTimeout(() => {
-            setMode('signin');
-            setResetStep('request');
-            setPassword('');
-            setOtp('');
-            setResetMessage('');
-          }, 2000);
-        }
-      } else {
-        setError(data.message || 'Error processing request');
-      }
-    } catch {
-      setError('An error occurred during authentication');
     } finally {
       setLoading(false);
     }
@@ -383,94 +325,19 @@ function AuthPageContent() {
           <h2>
             {mode === 'signin'
               ? `${roleLabel} Sign In`
-              : mode === 'signup'
-                ? `Create ${roleLabel} Account`
-                : 'Reset Password'}
+              : `Create ${roleLabel} Account`}
           </h2>
           <p>
             {mode === 'signin'
               ? 'Enter your NetID credentials to continue'
-              : mode === 'signup'
-                ? 'Create your account with your NetID'
-                : 'Follow the steps to recover access'}
+              : 'Create your account with your NetID'}
           </p>
 
           <div className={styles.securityNote}>
             <strong>Secure Login</strong> - Sign in with your university NetID
           </div>
 
-          {mode === 'reset' ? (
-            <form onSubmit={handleReset}>
-              <div className={styles.formGroup}>
-                <label>NetID</label>
-                <input
-                  type="text"
-                  value={netId}
-                  onChange={(e) => setNetId(e.target.value)}
-                  placeholder="e.g., jsmith"
-                  required
-                  disabled={loading || resetStep === 'verify'}
-                />
-              </div>
-
-              {resetStep === 'verify' && (
-                <>
-                  <div className={styles.formGroup}>
-                    <label>Enter OTP</label>
-                    <input
-                      type="text"
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value)}
-                      placeholder="Enter 6-digit code"
-                      required
-                      disabled={loading}
-                    />
-                    <p className={styles.fieldHint}>Check console for OTP (Demo: 123456)</p>
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label>New Password</label>
-                    <input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="New Password"
-                      required
-                      disabled={loading}
-                    />
-                  </div>
-                </>
-              )}
-
-              {error && <p className={styles.error}>{error}</p>}
-              {resetMessage && (
-                <p
-                  className={styles.success}
-                  style={{ color: 'green', fontSize: '0.9rem', marginBottom: '15px' }}
-                >
-                  {resetMessage}
-                </p>
-              )}
-
-              <button type="submit" className={styles.submitBtn} disabled={loading}>
-                {loading ? 'Processing...' : resetStep === 'request' ? 'Send OTP' : 'Reset Password'}
-              </button>
-
-              <button
-                type="button"
-                className={styles.toggleBtn}
-                style={{ marginTop: '15px', width: '100%' }}
-                onClick={() => {
-                  setMode('signin');
-                  setError('');
-                  setResetStep('request');
-                }}
-              >
-                Back to Sign In
-              </button>
-            </form>
-          ) : (
-            <>
-              <form onSubmit={handleSubmit} name="login-form" autoComplete="on">
+          <form onSubmit={handleSubmit} name="login-form" autoComplete="on">
               <div className={styles.formGroup}>
                 <label htmlFor="netId">NetID</label>
                 <input
@@ -570,25 +437,12 @@ function AuthPageContent() {
               {mode === 'signin' && (
                 <p className={styles.helpText}>
                   Forgot your password?{' '}
-                  <a
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setMode('reset');
-                      setError('');
-                      setResetMessage('');
-                    }}
-                  >
-                    Reset it here
-                  </a>
+                  <a href="/auth/reset">Reset it here</a>
                 </p>
               )}
             </form>
-          </>
-          )}
 
-          {mode !== 'reset' && (
-            <div className={styles.toggleMode}>
+          <div className={styles.toggleMode}>
               <p>
                 {mode === 'signin' ? (
                   <>
@@ -622,7 +476,6 @@ function AuthPageContent() {
                 )}
               </p>
             </div>
-          )}
         </div>
       </main>
     </div>

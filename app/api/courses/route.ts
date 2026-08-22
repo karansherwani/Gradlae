@@ -2,7 +2,8 @@
 // Reads courses from the canonical courses.csv file and returns filtered results
 
 import { NextRequest, NextResponse } from 'next/server';
-import { loadAllCourses, Course } from '@/app/lib/loadCourses';
+import { loadAllCourses, Course, findCourseByCode } from '@/app/lib/loadCourses';
+import { normalizeCourseCode } from '@/app/lib/courseCodes';
 
 const MAX_RESULTS = 50; // Cap for filtered results
 const MAX_UNFILTERED = 200; // Cap when no query is provided
@@ -12,6 +13,22 @@ export async function GET(request: NextRequest) {
         const allCourses = loadAllCourses();
 
         const searchParams = request.nextUrl.searchParams;
+        const code = searchParams.get('code');
+        if (code) {
+            const normalized = normalizeCourseCode(code);
+            const match = findCourseByCode(code);
+            if (!match) {
+                return NextResponse.json({ courses: [], total: allCourses.length, matched: 0 });
+            }
+
+            return NextResponse.json({
+                courses: [match],
+                total: allCourses.length,
+                matched: 1,
+                normalizedCode: normalized,
+            });
+        }
+
         const query = searchParams.get('q');
         const limit = Math.min(
             parseInt(searchParams.get('limit') || String(MAX_RESULTS)),

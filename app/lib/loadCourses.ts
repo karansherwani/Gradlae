@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import Papa from "papaparse";
 import type { Course as GraphCourse, PrerequisiteNode } from "@/types";
+import { normalizeCourseCode } from "@/app/lib/courseCodes";
 
 // Raw row shape from the CSV (matches column headers exactly)
 interface RawCSVRow {
@@ -44,9 +45,32 @@ let cache: Course[] | null = null;
 let graphCache: GraphCourse[] | null = null;
 
 const COURSE_CSV_FILE = "courses.csv";
+const PREREQ_OVERRIDES_PATH = path.join(process.cwd(), "data", "coursePrerequisites.json");
+
+let prereqOverrideCache: Record<string, PrerequisiteNode> | null = null;
 
 function normalizeGraphCourseId(subject: string, catalogNumber: string): string {
     return `${subject}-${catalogNumber}`.toUpperCase();
+}
+
+function loadPrerequisiteOverrides(): Record<string, PrerequisiteNode> {
+    if (prereqOverrideCache) return prereqOverrideCache;
+
+    try {
+        const raw = fs.readFileSync(PREREQ_OVERRIDES_PATH, "utf-8");
+        const parsed = JSON.parse(raw) as { prerequisites?: Record<string, PrerequisiteNode> };
+        prereqOverrideCache = parsed.prerequisites || {};
+    } catch {
+        prereqOverrideCache = {};
+    }
+
+    return prereqOverrideCache;
+}
+
+function resolvePrerequisites(courseId: string, prereqString: string): PrerequisiteNode {
+    const overrides = loadPrerequisiteOverrides();
+    const normalizedId = normalizeCourseCode(courseId) || courseId.toUpperCase();
+    return overrides[normalizedId] || parsePrerequisites(prereqString);
 }
 
 function parsePrerequisitePart(part: string): PrerequisiteNode {
@@ -156,7 +180,10 @@ export function loadGraphCourses(): GraphCourse[] {
                 min: parseFloat(r["Min Units"]) || 0,
                 max: parseFloat(r["Max Units"]) || 0,
             },
-            prerequisites: parsePrerequisites(r["Course Requisites"] || r["Enrollment Requirements"] || ""),
+            prerequisites: resolvePrerequisites(
+                normalizeGraphCourseId(subjectCode, catalogNumber),
+                r["Course Requisites"] || r["Enrollment Requirements"] || "",
+            ),
             components: (r["Components"] || "")
                 .split(",")
                 .map((component) => component.trim())
@@ -176,9 +203,16 @@ export function loadGraphCourses(): GraphCourse[] {
 }
 
 export function findCourseByCode(courseCode: string): Course | undefined {
-    const normalized = courseCode.replace("-", " ").replace(/\s+/g, " ").trim().toUpperCase();
+    const normalizedId = normalizeCourseCode(courseCode);
+    if (!normalizedId) return undefined;
+
     return loadAllCourses().find((course) => (
-        `${course.subject} ${course.catalogNumber}`.toUpperCase() === normalized ||
-        `${course.subject}-${course.catalogNumber}`.toUpperCase() === normalized.replace(" ", "-")
+        normalizeGraphCourseId(course.subject, course.catalogNumber) === normalizedId
     ));
+}
+
+export function findGraphCourseByCode(courseCode: string): GraphCourse | undefined {
+    const normalizedId = normalizeCourseCode(courseCode);
+    if (!normalizedId) return undefined;
+    return loadGraphCourses().find((course) => course.id === normalizedId);
 }
