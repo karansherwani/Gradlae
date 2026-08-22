@@ -10,8 +10,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "process-courses": "tsx scripts/processCourses.ts",
-    "test-chat": "tsx scripts/testChatAPI.ts"
+    "process-courses": "tsx scripts/processCourses.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

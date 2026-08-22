@@ -50,17 +50,6 @@ export const signinSchema = z.object({
     role: z.enum(['student', 'instructor', 'staff']).optional(),
 });
 
-export const loginSchema = z.object({
-    isSignup: z.boolean().optional(),
-    email: z.string().email().max(254).optional(),
-    password: z.string().min(1).max(128),
-    authMethod: z.enum(['email', 'netid', 'staff']).optional(),
-    netId: z.string().max(50).optional(),
-    staffId: z.string().max(50).optional(),
-    university: z.string().max(50).optional(),
-    fullName: z.string().max(100).optional(),
-});
-
 export const resetSchema = z.object({
     email: z.string().email().max(254).optional(),
     netId: z.string().max(50).optional(),
@@ -81,26 +70,6 @@ export const resetSchema = z.object({
 export const chatMessageSchema = z.object({
     role: z.enum(['user', 'assistant', 'system']),
     content: z.string().max(10000, 'Message too long'),
-});
-
-export const chatRequestSchema = z.object({
-    messages: z.array(chatMessageSchema).min(1).max(50),
-    studentProfile: z.object({
-        name: z.string().max(100),
-        major: z.string().max(100),
-        minor: z.string().max(100).optional(),
-        currentSemester: z.number().int().min(1).max(20),
-        startTerm: z.string().max(20),
-        startYear: z.number().int().min(2000).max(2100),
-        interests: z.array(z.string().max(100)).optional(),
-        careerGoals: z.string().max(500).optional(),
-        completedCourses: z.array(z.object({
-            courseId: z.string().max(20),
-            courseName: z.string().max(200),
-            grade: z.string().max(5),
-            units: z.number().min(0).max(20),
-        })),
-    }),
 });
 
 export const advisorRequestSchema = z.object({

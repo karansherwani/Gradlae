@@ -134,17 +134,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
-// GET all profiles (for the Book a Session page)
-export async function GET_ALL() {
-  try {
-    const allProfiles = await readProfiles();
-    return NextResponse.json({ profiles: allProfiles });
-  } catch (error) {
-    console.error('Error fetching profiles:', error);
-    return NextResponse.json(
-      { message: 'Failed to fetch profiles' },
-      { status: 500 }
-    );
-  }
-}

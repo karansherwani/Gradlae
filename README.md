@@ -75,9 +75,10 @@ app/
   api/
     auth/signup/         ← Supabase-based signup
     auth/signin/         ← Supabase-based signin
-    transcript/upload/   ← PDF upload → Storage + parse → DB
+    upload/              ← Parsed transcript save/load
     planner/             ← CRUD for degree planner
     advisor/             ← AI advisor (pulls from Supabase)
+    degree-audit/        ← Transcript vs degree-plan progress
     user/data/           ← Data summary + delete all
   components/
     AuthProvider.tsx     ← Client auth context & useAuth() hook
