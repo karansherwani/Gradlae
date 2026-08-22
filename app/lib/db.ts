@@ -95,20 +95,6 @@ export async function saveUser(user: User): Promise<void> {
     await writeUsers(users);
 }
 
-// Update user password
-export async function updateUserPassword(identifier: string, newPassword: string): Promise<boolean> {
-    const users = await readUsers();
-    const userIndex = users.findIndex(u => u.identifier === identifier);
-
-    if (userIndex === -1) {
-        return false;
-    }
-
-    users[userIndex].password = newPassword;
-    await writeUsers(users);
-    return true;
-}
-
 // Check if user already took quiz for this course
 export async function hasUserAttemptedQuiz(userId: string, courseNumber: string): Promise<boolean> {
     const allData = await readQuizData();
