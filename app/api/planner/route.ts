@@ -4,47 +4,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/app/lib/supabaseServer';
 import { getUserFromRequest } from '@/app/lib/supabaseAuth';
-import {
-    buildPlannerPayloadFromTemplate,
-    loadDegreePlanById,
-    loadDegreePlanForMajor,
-    type StoredPlannerData,
-} from '@/app/lib/degreePlans';
-
-async function ensurePlannerForUser(userId: string): Promise<StoredPlannerData | null> {
-    const { data: userRow } = await supabaseAdmin
-        .from('users')
-        .select('major, degree_plan_id')
-        .eq('id', userId)
-        .single();
-
-    const { data: existing } = await supabaseAdmin
-        .from('planners')
-        .select('planner_json')
-        .eq('user_id', userId)
-        .order('updated_at', { ascending: false })
-        .limit(1)
-        .single();
-
-    if (existing?.planner_json) {
-        return existing.planner_json as StoredPlannerData;
-    }
-
-    const template =
-        loadDegreePlanById(userRow?.degree_plan_id) ||
-        loadDegreePlanForMajor(userRow?.major) ||
-        loadDegreePlanById(null);
-
-    if (!template) return null;
-
-    const payload = buildPlannerPayloadFromTemplate(template);
-    await supabaseAdmin.from('planners').insert({
-        user_id: userId,
-        planner_json: payload,
-    });
-
-    return payload;
-}
 
 // GET – retrieve the latest planner for the authenticated user
 export async function GET(request: NextRequest) {
@@ -54,14 +13,23 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const plannerJson = await ensurePlannerForUser(user.id);
-        if (!plannerJson) {
+        const { data: planner } = await supabaseAdmin
+            .from('planners')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('updated_at', { ascending: false })
+            .limit(1)
+            .single();
+
+        if (!planner) {
             return NextResponse.json({ hasPlanner: false, planner: null });
         }
 
         return NextResponse.json({
             hasPlanner: true,
-            planner: plannerJson,
+            plannerId: planner.id,
+            planner: planner.planner_json,
+            updatedAt: planner.updated_at,
         });
     } catch (error) {
         console.error('Planner fetch error:', error);
@@ -82,13 +50,6 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Planner data is required' }, { status: 400 });
         }
 
-        const existingPayload = await ensurePlannerForUser(user.id);
-        const mergedPlanner: StoredPlannerData = {
-            ...(existingPayload || {}),
-            ...(planner as StoredPlannerData),
-            plans: (planner as StoredPlannerData).plans || existingPayload?.plans || [],
-        };
-
         // Check if user already has a planner
         const { data: existing } = await supabaseAdmin
             .from('planners')
@@ -103,7 +64,7 @@ export async function POST(request: NextRequest) {
             // Update existing
             const { data, error } = await supabaseAdmin
                 .from('planners')
-                .update({ planner_json: mergedPlanner })
+                .update({ planner_json: planner })
                 .eq('id', existing.id)
                 .select()
                 .single();
@@ -113,7 +74,7 @@ export async function POST(request: NextRequest) {
             // Insert new
             const { data, error } = await supabaseAdmin
                 .from('planners')
-                .insert({ user_id: user.id, planner_json: mergedPlanner })
+                .insert({ user_id: user.id, planner_json: planner })
                 .select()
                 .single();
             if (error) throw error;

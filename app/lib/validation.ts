@@ -30,24 +30,15 @@ export function sanitizeAIInput(input: string, maxLength = 4000): string {
 
 // ─── AUTH SCHEMAS ───────────────────────────────────────────────────────────
 
-export const passwordSchema = z
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .max(128, 'Password must be at most 128 characters')
-    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/[0-9]/, 'Password must contain at least one number');
-
-/** Client-side helper — returns the first validation error or null if valid. */
-export function getPasswordValidationError(password: string): string | null {
-    const result = passwordSchema.safeParse(password);
-    if (result.success) return null;
-    return result.error.issues[0]?.message ?? 'Invalid password';
-}
-
 export const signupSchema = z.object({
     email: z.string().email('Invalid email address').max(254),
-    password: passwordSchema,
+    password: z
+        .string()
+        .min(8, 'Password must be at least 8 characters')
+        .max(128, 'Password must be at most 128 characters')
+        .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+        .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+        .regex(/[0-9]/, 'Password must contain at least one number'),
     name: z.string().max(100).optional(),
     school: z.string().max(100).optional(),
     role: z.enum(['student', 'instructor', 'staff']).optional(),
@@ -59,13 +50,30 @@ export const signinSchema = z.object({
     role: z.enum(['student', 'instructor', 'staff']).optional(),
 });
 
+export const loginSchema = z.object({
+    isSignup: z.boolean().optional(),
+    email: z.string().email().max(254).optional(),
+    password: z.string().min(1).max(128),
+    authMethod: z.enum(['email', 'netid', 'staff']).optional(),
+    netId: z.string().max(50).optional(),
+    staffId: z.string().max(50).optional(),
+    university: z.string().max(50).optional(),
+    fullName: z.string().max(100).optional(),
+});
+
 export const resetSchema = z.object({
     email: z.string().email().max(254).optional(),
     netId: z.string().max(50).optional(),
     staffId: z.string().max(50).optional(),
-    university: z.string().max(50).optional(),
-}).strict().refine((data) => Boolean(data.email || data.netId || data.staffId), {
-    message: 'Email, NetID, or Staff ID is required',
+    newPassword: z
+        .string()
+        .min(8)
+        .max(128)
+        .regex(/[a-z]/)
+        .regex(/[A-Z]/)
+        .regex(/[0-9]/)
+        .optional(),
+    otp: z.string().max(50).optional(),
 });
 
 // ─── CHAT & ADVISOR SCHEMAS ─────────────────────────────────────────────────
@@ -73,6 +81,26 @@ export const resetSchema = z.object({
 export const chatMessageSchema = z.object({
     role: z.enum(['user', 'assistant', 'system']),
     content: z.string().max(10000, 'Message too long'),
+});
+
+export const chatRequestSchema = z.object({
+    messages: z.array(chatMessageSchema).min(1).max(50),
+    studentProfile: z.object({
+        name: z.string().max(100),
+        major: z.string().max(100),
+        minor: z.string().max(100).optional(),
+        currentSemester: z.number().int().min(1).max(20),
+        startTerm: z.string().max(20),
+        startYear: z.number().int().min(2000).max(2100),
+        interests: z.array(z.string().max(100)).optional(),
+        careerGoals: z.string().max(500).optional(),
+        completedCourses: z.array(z.object({
+            courseId: z.string().max(20),
+            courseName: z.string().max(200),
+            grade: z.string().max(5),
+            units: z.number().min(0).max(20),
+        })),
+    }),
 });
 
 export const advisorRequestSchema = z.object({

@@ -18,7 +18,7 @@ const RATE_LIMITS: Record<string, { maxRequests: number; windowMs: number }> = {
 
 function getRateLimitCategory(pathname: string): string {
     if (pathname.startsWith('/api/auth')) return 'auth';
-    if (pathname.startsWith('/api/advisor')) return 'ai';
+    if (pathname.startsWith('/api/chat') || pathname.startsWith('/api/advisor')) return 'ai';
     if (pathname.startsWith('/api/upload')) return 'upload';
     return 'api';
 }
