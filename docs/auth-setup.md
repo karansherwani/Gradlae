@@ -61,10 +61,21 @@ Set these in **Vercel Dashboard → Settings → Environment Variables** (and in
 - We **never** log passwords in console output
 - We **never** write passwords to localStorage
 
+### Password Reset
+1. User enters NetID on `/auth` after selecting their university
+2. Client POSTs to `/api/auth/reset` with `{ netId, university }`
+3. Server builds the email from that university's domain (same as signup) and calls `resetPasswordForEmail`
+4. User clicks the email link and lands on `/auth/reset`
+5. Supabase establishes a recovery session; the user sets a new password with `supabase.auth.updateUser({ password })`
+
+Add these redirect URLs in **Authentication → URL Configuration**:
+- `https://your-production-domain/auth/reset`
+- `http://localhost:3000/auth/reset`
+
 ### ❌ What was removed
 - `app/data/users.json` — contained **plaintext passwords** (deleted and gitignored)
 - `app/api/auth/login/route.ts` — compared passwords with `===` against JSON file (replaced with Supabase proxy)
-- `app/api/auth/reset/route.ts` — wrote plaintext passwords to JSON file (replaced with Supabase admin API)
+- `app/api/auth/reset/route.ts` — previously used an unvalidated OTP path; now only sends Supabase recovery emails
 - `app/lib/db.ts` → `updateUserPassword()` — stored passwords in plaintext (no longer called)
 
 ## Supabase Dashboard Config

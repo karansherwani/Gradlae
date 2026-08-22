@@ -3,21 +3,11 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '../lib/supabaseClient';
+import { UNIVERSITIES, buildNetIdEmail, getUniversityById } from '../lib/universities';
 import styles from '../styles/auth.module.css';
 
 type UserRole = 'student' | 'staff' | null;
 type Mode = 'signin' | 'signup' | 'reset';
-
-const universities = [
-  { id: 'uofa', name: 'University of Arizona', domain: 'arizona.edu' },
-  { id: 'asu', name: 'Arizona State University', domain: 'asu.edu' },
-  { id: 'nau', name: 'Northern Arizona University', domain: 'nau.edu' },
-  { id: 'uofc', name: 'University of Colorado Boulder', domain: 'colorado.edu' },
-  { id: 'ucsd', name: 'UC San Diego', domain: 'ucsd.edu' },
-  { id: 'stanford', name: 'Stanford University', domain: 'stanford.edu' },
-  { id: 'mit', name: 'MIT', domain: 'mit.edu' },
-  { id: 'berkeley', name: 'UC Berkeley', domain: 'berkeley.edu' },
-];
 
 function AuthPageContent() {
   const router = useRouter();
@@ -38,10 +28,6 @@ function AuthPageContent() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  // Reset Password State
-  const [otp, setOtp] = useState('');
-  const [resetStep, setResetStep] = useState<'request' | 'verify'>('request');
   const [resetMessage, setResetMessage] = useState('');
 
   const handleLogoClick = async () => {
@@ -71,7 +57,7 @@ function AuthPageContent() {
     }
   }, []);
 
-  const filteredUniversities = universities.filter(uni =>
+  const filteredUniversities = UNIVERSITIES.filter(uni =>
     uni.name.toLowerCase().includes(uniSearch.toLowerCase()) ||
     uni.domain.toLowerCase().includes(uniSearch.toLowerCase())
   );
@@ -112,7 +98,6 @@ function AuthPageContent() {
       setPassword('');
       setConfirmPassword('');
       setMode('signin');
-      setResetStep('request');
       setResetMessage('');
     } else if (flowStep === 'role') {
       setFlowStep('university');
@@ -142,7 +127,7 @@ function AuthPageContent() {
     }
 
     // Build the email address for Supabase using NetID
-    const userEmail = `${netId.toLowerCase().trim()}@${selectedUniversity || 'uofa'}.edu`;
+    const userEmail = buildNetIdEmail(netId, selectedUniversity);
     const fullName = userRole === 'staff'
       ? `Prof. ${netId.charAt(0).toUpperCase() + netId.slice(1)}`
       : netId.charAt(0).toUpperCase() + netId.slice(1);
@@ -203,27 +188,14 @@ function AuthPageContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           netId: netId || undefined,
-          otp: resetStep === 'verify' ? otp : undefined,
-          newPassword: resetStep === 'verify' ? password : undefined,
+          university: selectedUniversity || undefined,
         }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        if (resetStep === 'request') {
-          setResetStep('verify');
-          setResetMessage(data.message);
-        } else {
-          setResetMessage('Password reset successfully! Please sign in.');
-          setTimeout(() => {
-            setMode('signin');
-            setResetStep('request');
-            setPassword('');
-            setOtp('');
-            setResetMessage('');
-          }, 2000);
-        }
+        setResetMessage(data.message || 'If that account exists, a password reset email has been sent.');
       } else {
         setError(data.message || 'Error processing request');
       }
@@ -392,7 +364,7 @@ function AuthPageContent() {
               ? 'Enter your NetID credentials to continue'
               : mode === 'signup'
                 ? 'Create your account with your NetID'
-                : 'Follow the steps to recover access'}
+                : 'Enter your NetID. We\'ll send a reset link to your university email'}
           </p>
 
           <div className={styles.securityNote}>
@@ -409,37 +381,12 @@ function AuthPageContent() {
                   onChange={(e) => setNetId(e.target.value)}
                   placeholder="e.g., jsmith"
                   required
-                  disabled={loading || resetStep === 'verify'}
+                  disabled={loading}
                 />
+                <p className={styles.fieldHint}>
+                  We&apos;ll email a reset link to {netId || 'your-netid'}@{getUniversityById(selectedUniversity)?.domain || 'your-university.edu'}
+                </p>
               </div>
-
-              {resetStep === 'verify' && (
-                <>
-                  <div className={styles.formGroup}>
-                    <label>Enter OTP</label>
-                    <input
-                      type="text"
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value)}
-                      placeholder="Enter 6-digit code"
-                      required
-                      disabled={loading}
-                    />
-                    <p className={styles.fieldHint}>Check console for OTP (Demo: 123456)</p>
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label>New Password</label>
-                    <input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="New Password"
-                      required
-                      disabled={loading}
-                    />
-                  </div>
-                </>
-              )}
 
               {error && <p className={styles.error}>{error}</p>}
               {resetMessage && (
@@ -451,8 +398,8 @@ function AuthPageContent() {
                 </p>
               )}
 
-              <button type="submit" className={styles.submitBtn} disabled={loading}>
-                {loading ? 'Processing...' : resetStep === 'request' ? 'Send OTP' : 'Reset Password'}
+              <button type="submit" className={styles.submitBtn} disabled={loading || !netId}>
+                {loading ? 'Sending...' : 'Send reset email'}
               </button>
 
               <button
@@ -462,7 +409,7 @@ function AuthPageContent() {
                 onClick={() => {
                   setMode('signin');
                   setError('');
-                  setResetStep('request');
+                  setResetMessage('');
                 }}
               >
                 Back to Sign In
