@@ -6,9 +6,18 @@ Project: **PACEMAKER / Gradlae** — AI-powered academic planning platform (Next
 
 ### Git remotes — always push to the fork
 - **`origin` must be `GradlaeTestingFork`**, not the upstream Gradlae repo.
-- Current fork: `https://github.com/sargonug-ops/GradlaeTestingFork`
-- All `git push` commands should target this fork (`git push -u origin <branch>`).
+- Fork URL: `https://github.com/sargonug-ops/GradlaeTestingFork.git`
+- All `git push` commands use `git push -u origin <branch>`.
 - Do **not** add or push to a remote pointing at the original/upstream Gradlae repository unless the user explicitly asks.
-- PRs are opened against branches on the fork (e.g. `cursor/degree-planning-integration-ad76`).
+- Remove `upstream` if present so nothing references the main repo.
 
-Verify before pushing: `git remote get-url origin` should contain `GradlaeTestingFork`.
+If remotes look wrong, run:
+
+```bash
+git remote -v
+git remote set-url origin https://github.com/sargonug-ops/GradlaeTestingFork.git
+git remote remove upstream 2>/dev/null || true
+git remote set-url --push origin https://github.com/sargonug-ops/GradlaeTestingFork.git
+```
+
+Verify before pushing: `git remote get-url origin` and `git remote get-url --push origin` must both contain `GradlaeTestingFork`.
