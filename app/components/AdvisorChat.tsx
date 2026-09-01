@@ -2,8 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import styles from '../styles/advisor.module.css';
-import { extractPdfTextInBrowser, extractPdfTextWithLayoutInBrowser } from '../lib/browserPdfText';
-import { parseTranscriptText } from '../lib/transcriptTextParser';
+import { parseTranscriptFromPdf, describeTranscriptFailure } from '../lib/transcriptPdf';
 import {
     buildAdvisementReportContext,
     getGraduationRequirementActions,
@@ -258,8 +257,7 @@ export default function AdvisorChat({
         setUploadedFileName(file.name);
 
         try {
-            const rawText = await extractPdfTextInBrowser(file);
-            const transcript = parseTranscriptText(rawText);
+            const { transcript, meta, rawText, layoutText } = await parseTranscriptFromPdf(file);
 
             if (transcript.courses.length > 0) {
                 const res = await fetch('/api/upload', {
@@ -296,7 +294,6 @@ export default function AdvisorChat({
                 setMessages(prev => [...prev, feedbackMsg]);
             } else {
                 const rawAdvisementReport = parseAdvisementReportText(rawText);
-                const layoutText = await extractPdfTextWithLayoutInBrowser(file);
                 const layoutAdvisementReport = parseAdvisementReportText(layoutText);
                 const advisementReport = getAdvisementReportScore(layoutAdvisementReport) >= getAdvisementReportScore(rawAdvisementReport)
                     ? layoutAdvisementReport
@@ -343,7 +340,7 @@ export default function AdvisorChat({
                 };
                 setMessages(prev => [...prev, feedbackMsg]);
                 } else {
-                    setError('Could not extract useful content from this file. Please try a different PDF.');
+                    setError(describeTranscriptFailure(meta));
                     setUploadedFileName(null);
                 }
             }
