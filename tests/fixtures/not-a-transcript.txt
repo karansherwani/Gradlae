@@ -1,0 +1,7 @@
+STAT 131 Exam 2 Review Solutions
+Problem 1. Let X be a normal random variable with mean 0 and variance 1.
+Compute P(X < 1.96). Solution: approximately 0.975.
+Problem 2. A fair coin is flipped 10 times. What is the expected number of heads?
+Solution: 5 heads by linearity of expectation.
+Problem 3. Explain the central limit theorem in your own words.
+This document is a study guide and contains no course enrollment rows.
