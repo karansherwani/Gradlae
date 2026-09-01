@@ -1,0 +1,183 @@
+--- PAGE 1 ---
+Name: Test Student
+Student ID: 12345678
+Birthdate: 01/01/2000
+Institution Info: The University of Arizona
+Beginning of Undergraduate Record
+Academic Program History
+Program: College of Science
+05/16/2023 Active in Program
+Major in Computer Science
+Program: College of Science
+03/27/2024 Active in Program
+Major in Computer Science
+Minor in Finance
+Program: College of Science
+05/05/2024 Active in Program
+Major in Computer Science
+Program: College of Science
+07/19/2024 Active in Program
+Major in Computer Science
+Minor in Statistics and Data Science
+Program: College of Science
+11/22/2024 Active in Program
+Major in Statistics and Data Science
+Minor in Computer Science
+Program: College of Science
+09/02/2025 Active in Program
+Major in Statistics and Data Science
+Minor in Computer Science
+Major in Mathematics
+Computer Science Emphasis
+Program: College of Science
+09/04/2025 Active in Program
+Major in Statistics and Data Science
+Major in Mathematics
+Computer Science Emphasis
+Minor in Computer Science
+Page 1 of 3
+Print Date: 01/01/2000
+Unofficial Transcript
+Fall 2023
+Course Description AHRS EHRS Grade Points
+AREC 150C3 Global Economy of Food 3.000 3.000 A 12.000
+CSC 110 Computer Programming I 4.000 4.000 B 12.000
+ENGL 106 Fnd Wrt Engl Additional Lang 3.000 3.000 A 12.000
+GAME 251 Introduction to Game Design 0.000 0.000 W 0.000
+MATH 125 Calculus I 3.000 3.000 A 12.000
+PFFP 150B2 Personal Finance Foundations 3.000 3.000 A 12.000
+UNIV 101 Intro to General Ed Experience 1.000 1.000 A 4.000
+AHRS EHRS QHRS Points
+Term GPA: 3.765 17.000 17.000 17.000 64.000
+Transfer Term GPA 0.000 0.000 0.000 0.000
+Combined GPA 3.765 17.000 17.000 17.000 64.000
+AHRS EHRS QHRS Points
+Cum GPA: 3.765 17.000 17.000 17.000 64.000
+Transfer Cum GPA 0.000 0.000 0.000 0.000
+Combined Cum GPA 3.765 17.000 17.000 17.000 64.000
+Term Honor: Dean's List
+Spring 2024
+Course Description AHRS EHRS Grade Points
+ACCT 200 Intro to Financial Acct 3.000 3.000 A 12.000
+Course Attrib: SUN # ACC 2201 - Financial Accounting
+CSC 120 Intro to Computer Prog II 4.000 4.000 B 12.000
+CSC 144 Discrete Math for Comp Sci I 3.000 3.000 B 9.000
+ECON 200 Basic Economic Issues 3.000 3.000 A 12.000
+ENGL 107 Fnd Wrt Engl Additional Lang 3.000 3.000 A 12.000
+MATH 129 Calculus II 3.000 3.000 A 12.000
+Course Attrib: SUN# MAT 2230 - Calculus II
+AHRS EHRS QHRS Points
+Term GPA: 3.632 19.000 19.000 19.000 69.000
+Transfer Term GPA 0.000 0.000 0.000 0.000
+Combined GPA 3.632 19.000 19.000 19.000 69.000
+AHRS EHRS QHRS Points
+Cum GPA: 3.694 36.000 36.000 36.000 133.000
+Transfer Cum GPA 0.000 0.000 0.000 0.000
+Combined Cum GPA 3.694 36.000 36.000 36.000 133.000
+Term Honor: Dean's List - Full Time
+Academic Year Academic Distinction
+UNOFFICIAL UNOFFICIAL
+--- PAGE 2 ---
+Name: Test Student
+Student ID: 12345678
+Birthdate: 01/01/2000
+Fall 2024
+Course Description AHRS EHRS Grade
+CSC 210 Software Development 4.000 0.000 E
+Repeated: Repeated course excluded from GPA & earned credit
+CSC 244 Discrete Math for Comp Sci II 3.000 3.000 A
+ENGL 108 Fnd Wrt Engl Additional Lang 3.000 3.000 A
+ENVS 210 Environmental Essentials 3.000 3.000 A
+MATH 313 Intro to Linear Algebra 3.000 3.000 A
+AHRS EHRS QHRS
+Term GPA: 4.000 16.000 12.000 12.000
+Transfer Term GPA 0.000 0.000 0.000
+Combined GPA 4.000 16.000 12.000 12.000
+AHRS EHRS QHRS
+Cum GPA: 3.771 52.000 48.000 48.000
+Transfer Cum GPA 0.000 0.000 0.000
+Combined Cum GPA 3.771 52.000 48.000 48.000
+Term Honor: Dean's List - Full Time
+Spring 2025
+Course Description AHRS EHRS Grade
+CHEM 151 Chemical Thinking I 4.000 4.000 A
+Course Attrib: SUN# CHM 1151 - General Chemistry I
+DATA 363 Intro Statistical Method 3.000 3.000 B
+DNC 101 Dance Appreciation 3.000 3.000 A
+EAS 160A1 The Worlds of Buddhism 3.000 3.000 A
+ISTA 322 Data Engineering 3.000 3.000 B
+MATH 223 Vector Calculus 4.000 4.000 B
+Course Attrib: SUN# MAT 2241 - Calculus III
+AHRS EHRS QHRS
+Term GPA: 3.500 20.000 20.000 20.000
+Transfer Term GPA 0.000 0.000 0.000
+Combined GPA 3.500 20.000 20.000 20.000
+AHRS EHRS QHRS
+Cum GPA: 3.691 72.000 68.000 68.000
+Transfer Cum GPA 0.000 0.000 0.000
+Combined Cum GPA 3.691 72.000 68.000 68.000
+Term Honor: Dean's List - Full Time
+Page 2 of 3
+Print Date: 01/01/2000
+Unofficial Transcript
+Fall 2025
+Points Course Description AHRS EHRS Grade Points
+0.000 CSC 337 Web Programming 3.000 3.000 A 12.000
+DATA 201 Foundations of Data Science 3.000 3.000 C 6.000
+12.000 DATA 375 Intro to Statistical Computing 3.000 3.000 A 12.000
+12.000 MATH 323 Formal Math Reasong+Wrtg 3.000 3.000 B 9.000
+12.000 MATH 355 Anls Ord Diff Equations 3.000 3.000 A 12.000
+12.000 MATH 464 Theory of Probability 3.000 3.000 A 12.000
+UNIV 301 General Education Portfolio 1.000 1.000 A 4.000
+Points
+48.000 AHRS EHRS QHRS Points
+0.000 Term GPA: 3.526 19.000 19.000 19.000 67.000
+48.000 Transfer Term GPA 0.000 0.000 0.000 0.000
+Combined GPA 3.526 19.000 19.000 19.000 67.000
+Points
+181.000 AHRS EHRS QHRS Points
+0.000 Cum GPA: 3.655 91.000 87.000 87.000 318.000
+181.000 Transfer Cum GPA 0.000 0.000 0.000 0.000
+Combined Cum GPA 3.655 91.000 87.000 87.000 318.000
+Term Honor: Dean's List - Full Time
+Points Spring 2026
+16.000 Course Description AHRS EHRS Grade Points
+CSC 210 Software Development 4.000 4.000 C 8.000
+9.000 Repeated: Repeated course included in GPA and earned credit
+12.000 DATA 467 Intro to Applied Linear Models 3.000 3.000 B 9.000
+12.000 GEOS 251 Physical Geology 4.000 4.000 A 16.000
+9.000 Course Attrib: SUN# GLG 1101 - Introduction to Geology I
+12.000 MATH 466 Theory of Statistics 3.000 3.000 A 12.000
+MATH 468 Appl Stochastic Process 3.000 3.000 C 6.000
+Points AHRS EHRS QHRS Points
+70.000 Term GPA: 3.000 17.000 17.000 17.000 51.000
+0.000 Transfer Term GPA 0.000 0.000 0.000 0.000
+70.000 Combined GPA 3.000 17.000 17.000 17.000 51.000
+Points AHRS EHRS QHRS Points
+251.000 Cum GPA: 3.548 108.000 104.000 104.000 369.000
+0.000 Transfer Cum GPA 0.000 0.000 0.000 0.000
+251.000 Combined Cum GPA 3.548 108.000 104.000 104.000 369.000
+UNOFFICIAL UNOFFICIAL
+--- PAGE 3 ---
+Name: Test Student Page 3 of 3
+Student ID: 12345678 Print Date: 01/01/2000
+Birthdate: 01/01/2000 Unofficial Transcript
+Fall 2026
+Course Description AHRS EHRS Grade Points
+CSC 380 Principles of Data Science 3.000 0.000 0.000
+DATA 395M Career Exploration Math & 1.000 0.000 0.000
+SDS
+DATA 498D Capstone for Data Science 3.000 0.000 0.000
+MATH 412 Linear Algebra for Data Sci 3.000 0.000 0.000
+MATH 422 Adv Applied Mathematics 3.000 0.000 0.000
+MATH 475A Math Prin Numeric Anls 3.000 0.000 0.000
+AHRS EHRS QHRS Points
+Term GPA: 0.000 16.000 0.000 0.000 0.000
+Transfer Term GPA 0.000 0.000 0.000 0.000
+Combined GPA 0.000 16.000 0.000 0.000 0.000
+AHRS EHRS QHRS Points
+Cum GPA: 3.548 124.000 104.000 104.000 369.000
+Transfer Cum GPA 0.000 0.000 0.000 0.000
+Combined Cum GPA 3.548 124.000 104.000 104.000 369.000
+End of Undergraduate Record
+UNOFFICIAL UNOFFICIAL

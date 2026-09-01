@@ -8,8 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import styles from '../styles/placements.module.css';
 import { fetchCourses, setCourses, getCourses, Course, getPrerequisites } from '../lib/courseData';
 import { getRecommendedBatch, PrerequisiteInfo } from '../lib/batchLogic';
-import { extractPdfTextInBrowser } from '../lib/browserPdfText';
-import { parseTranscriptText } from '../lib/transcriptTextParser';
+import { parseTranscriptFromPdf, describeTranscriptFailure } from '../lib/transcriptPdf';
 
 type Step = 'upload' | 'results';
 
@@ -286,11 +285,10 @@ export default function PlacementsPage() {
 
     try {
       if (selectedFile.type === 'application/pdf' || selectedFile.name.toLowerCase().endsWith('.pdf')) {
-        const text = await extractPdfTextInBrowser(selectedFile);
-        const transcript = parseTranscriptText(text);
+        const { transcript, meta } = await parseTranscriptFromPdf(selectedFile);
 
         if (transcript.courses.length === 0) {
-          throw new Error('I could not find course rows in this PDF. Please export the transcript as a text-based PDF from UAccess and try again.');
+          throw new Error(describeTranscriptFailure(meta));
         }
 
         const saveResponse = await fetch('/api/upload', {
